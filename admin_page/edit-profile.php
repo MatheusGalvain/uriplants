@@ -19,8 +19,6 @@ if($msg)
 }
 }
 
-
-    
 ?>
 <!DOCTYPE html>
 <html lang="en">
