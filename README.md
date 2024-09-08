@@ -17,7 +17,8 @@ Dentro do PHPMyAdmin devemos então criar uma tabela denominada uriplants, o nom
 
 Url ficará algo semelhante a: http://localhost/uriplants/
 
-![image](https://github.com/user-attachments/assets/d50b4b64-1807-4b7b-8e4b-bbb72863167d)
+![image](https://github.com/user-attachments/assets/fbae0810-9829-42cd-adb2-32ec0cb8c117)
+
 
 
 
