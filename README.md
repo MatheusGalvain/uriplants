@@ -9,6 +9,7 @@ Passo a passo:
 - https://cursowed.com.br/dicas/guia-passo-a-passo-como-instalar-o-xampp-no-windows
 
 • Jogamos então a pasta do repostorio dentro de: C:\xampp\htdocs
+
 • Após a instalação deve-se dar start nos serviços do apache e do mysql;
 
 Dentro do PHPMyAdmin devemos então criar uma tabela denominada uriplants, o nome é indiferente do que se definir, será necessário mudar o arquivo config.php da pasta includes caso for diferente os dados;
