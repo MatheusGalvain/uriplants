@@ -35,7 +35,7 @@ if (strlen($_SESSION['adminid'] == 0)) {
                         while ($result = mysqli_fetch_array($query)) { ?>
                             <h1 class="mt-4"><?php echo $result['fname']; ?>'s Profile</h1>
                             <div class="card mb-4">
-
+                                
                                 <div class="card-body">
                                     <a href="edit-profile.php?uid=<?php echo $result['id']; ?>">Edit</a>
                                     <table class="table table-bordered">
