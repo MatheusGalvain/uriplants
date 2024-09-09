@@ -77,7 +77,7 @@ footer {
 footer .footer-left {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Alinha os itens no topo */
+    align-items: flex-start;
     width: 560px;
 }
 
@@ -88,7 +88,7 @@ footer .redes-sociais, footer .telefones, footer .localizacoes {
 }
 
 footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
-    text-align: left; /* Alinhamento padrão à esquerda */
+    text-align: left;
     font-size: 14px;
     font-family: 'Poppins', sans-serif;
 }
@@ -101,12 +101,16 @@ footer .redes-sociais a, footer .telefones a, footer .localizacoes a {
 
 .display-icons {
     display: flex;
-    gap: 10px; /* Espaçamento entre os ícones */
+    gap: 10px;
 }
 
+
 footer .redes-sociais a img {
-    vertical-align: middle; /* Alinha as imagens verticalmente com o texto */
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
 }
+
 
 footer .logo {
     display: flex;
@@ -119,38 +123,96 @@ footer .logo img {
     margin-top: 10px;
 }
 
-/* Ícones de Redes Sociais */
+
 footer .redes-sociais i {
     color: white;
 }
 
+
+
+
 /* Ajuste para dispositivos móveis */
-@media (max-width: 768px) {
-    footer {
-        flex-direction: row; /* Organiza os elementos em linha */
-        justify-content: center; /* Centraliza a barra de ícones */
-        align-items: center;
-        width: 100%;
-        box-sizing: border-box;
-        text-align: center;
-        padding: 10px 35px;
-    }
+@media (max-width: 480px) {
+  footer {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px;
+  }
 
-    footer .telefones, footer .localizacoes, footer .redes-sociais span {
-        display: none;
-    }
+  footer .footer-left {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+  }
 
-    footer .redes-sociais {
-        display: flex;
-        justify-content: center;
-    }
+  footer .redes-sociais, footer .telefones, footer .localizacoes {
+      align-items: center;
+      width: 100%;
+      margin-bottom: 20px;
+  }
 
-    footer .redes-sociais .display-icons {
-        gap: 20px;
-    }
+  footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
+      display: block;
+      width: 100%;
+      text-align: center;
+  }
 
-    footer .logo {
-        margin-left: 20px;
-    }
+  footer .redes-sociais .display-icons, footer .telefones a, footer .localizacoes a {
+      display: block;
+      text-align: center;
+  }
+
+  footer .logo {
+      margin-top: 20px;
+  }
+
+  footer .redes-sociais .display-icons {
+      gap: 20px;
+  }
 }
 
+
+
+/* Ajuste responsividade */
+@media (min-width: 481px) and (max-width: 768px) {
+  footer {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px;
+  }
+
+  footer .footer-left {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+  }
+
+  footer .redes-sociais, footer .telefones, footer .localizacoes {
+      align-items: center;
+      width: 100%;
+      margin-bottom: 20px;
+  }
+
+  footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
+      display: block;
+      width: 100%;
+      text-align: center;
+  }
+
+  footer .redes-sociais .display-icons, footer .telefones a, footer .localizacoes a {
+      display: block;
+      text-align: center;
+  }
+
+  footer .logo {
+      margin-top: 20px;
+  }
+
+  footer .redes-sociais .display-icons {
+      gap: 20px;
+  }
+}

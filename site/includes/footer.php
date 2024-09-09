@@ -5,9 +5,10 @@
                 <div class="redes-sociais">
                     <span>Redes Sociais</span>
                     <div class="display-icons">
-                        <a href="#"><img src="img/instagram.png" /></a>
-                        <a href="#"><img src="img/linkedin.png" /></a>
-                        <a href="#"><img src="img/facebook.png" /></a>
+                        <a href="https://www.facebook.com/uricampuserechim"><img src="images/facebook-icon.png"/></a>
+                        <a href="https://www.instagram.com/urierechim/"><img src="images/instagram-icon.png"/></a>
+                        <a href="https://twitter.com/urierechim"><img src="images/x-icon.png"/></a>
+                        <a href="https://www.youtube.com/urierechim"><img src="images/youtube-icon.png"/></a>
                     </div>
                 </div>
 
@@ -27,7 +28,7 @@
             </div>
 
             <div class="logo">
-                <a href="#"><img src="img/uri-logo.png" /></a>
+                <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" /></a>
             </div>
         </footer>
     </div>
