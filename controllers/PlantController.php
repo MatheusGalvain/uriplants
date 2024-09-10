@@ -49,20 +49,45 @@ class PlantController {
     public function get() {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $conn = getConnection();
+    
+            $sql = "SELECT plants.id, plants.name, plants.common_names, 
+            plants.species, plants.applications, plants.ecology, plants.created_at, 
+            plants.deleted_at, families.name AS family_name, orders.name AS order_name,
+            divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
+            regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
+            regionmap.description AS region_map_description, regionmap.imagem AS region_map_image,
+            properties.name AS property_name, plantsproperties.description AS plant_property_description,
+            images.id AS image_id, images.imagem AS image_blob, images.source AS image_source
+                FROM plants
+                LEFT JOIN families ON plants.family_id = families.id
+                LEFT JOIN orders ON plants.order_id = orders.id
+                LEFT JOIN divisions ON plants.division_id = divisions.id
+                LEFT JOIN classes ON plants.class_id = classes.id
+                LEFT JOIN genus ON plants.genus_id = genus.id
+                LEFT JOIN regionmap ON plants.region_id = regionmap.id
+                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+                LEFT JOIN properties ON plantsproperties.property_id = properties.id
+                LEFT JOIN images ON plantsproperties.id = images.plants_property_id";
 
-            $sql = "SELECT * FROM plants";
             $result = $conn->query($sql);
-
+    
             $plants = [];
             if ($result->num_rows > 0) {
                 while($row = $result->fetch_assoc()) {
+                    if (!empty($row['region_map_image'])) {
+                        $row['region_map_image'] = base64_encode($row['region_map_image']);
+                    }
+                    if (!empty($row['image_blob'])) {
+                        $row['image_blob'] = base64_encode($row['image_blob']);
+                    }
                     $plants[] = $row;
                 }
             }
 
-            echo json_encode($plants);
-
+            echo json_encode($plants, JSON_UNESCAPED_UNICODE);
+    
             $conn->close();
         }
     }
+    
 }
