@@ -173,13 +173,13 @@ CREATE TABLE AuditLogs (
 -- INSERT INTO orders (name) VALUES ('Fabales');
 -- INSERT INTO families (name) VALUES ('Caesalpiniaceae (Leguminosae: Caesalpinioideae)');
 
--- RegionMap blob
+-- RegionMap blob aqui tem que ir pelo phpmyadmin pra upar o arquivo
 
 -- INSERT INTO plants (name, common_names, division_id, class_id, order_id, family_id, genus_id, species, region_id, applications, ecology)
 -- VALUES ('Canafístula', 'Acácia-amarela; amendoim, amendoim-falso, angico-bravo, camurça, curucaia, ibirá e monjoleiro, no Estado de São Paulo; amendoim-bravo; angico; angico-amarelo e angico-cangalha, em Minas Gerais; angico-vermelho e pororoca, no Paraná; barbatimão, cabeça-de-negro e cabelo-de-negro, no Estado do Rio de Janeiro; cambuí, em Mato Grosso do Sul e em Minas Gerais; canafiste; canafrista-branca, no Paraná; canafístula; cancença e favinha, em Pernambuco; canela-de-veado; canhafistula; caobi; cássia-amarela; farinha-seca e faveira, na Bahia e em Minas Gerais; faveiro, no Distrito Federal, em Minas Gerais e no Estado de São Paulo; guarucaia, em Minas Gerais e no Estado de São Paulo; guazu; ibira-puitá, no Rio Grande do Sul e no Estado de São Paulo; jacarandá-de-flor-amarela; madeira-nova, em Pernambuco e na Paraíba; pau-vermelho; quebra-serra, na Bahia; sobrasil; tamboril, na Bahia, em Pernambuco e no Estado do Rio de Janeiro; tamboril–branco; tamboril-bravo, na Bahia e no Estado de São Paulo; e tamburi.', 1,1,1,1,NULL,'Peltophorum dubium (Sprengel) Taubert, Engler et Prantl, Natürl. Pflanzenf. ed. I. 3(3).77:176, 1892.' ,1, 'Madeira serrada e roliça: essa essência constitui-se, atualmente, numa madeira de alto valor econômico, uma vez que já foi desprezada comercialmente. Por isso, permanecia nas derrubadas sem aproveitamento econômico imediato, como é o caso das queimadas do oeste do Paraná, feitas há alguns anos (Pereira, 1978). A madeira de canafístula é indicada em construção civil, para uso em vigas, caibros, ripas, marcos de portas, janelas e assoalhos. Em uso externo, é aproveitada para mourões, dormentes e cruzetas. É usada também na indústria de móveis e guarnições e em construção naval e militar. Em marcenaria e carpintaria, para fabricar carroçarias, chapas e peças para decorações de interiores e parquetes.', 'É uma espécie pioneira, o que significa que ela é uma das primeiras a colonizar áreas degradadas, contribuindo para a recuperação do solo e da vegetação. A canafístula tem a capacidade de fixar nitrogênio no solo, o que melhora a fertilidade do ambiente ao seu redor, beneficiando outras plantas.
 -- '  );
 
 
--- INSERT INTO `plantsproperties` (`id`, `plant_id`, `property_id`, `description`, `created_at`, `deleted_at`) VALUES (NULL, '1', '8', NULL, current_timestamp(), NULL);
+-- INSERT INTO `plantsproperties` (`id`, `plant_id`, `property_id`, `description`, `created_at`, `deleted_at`) VALUES (NULL, '1', '1', NULL, current_timestamp(), NULL);
 
--- Image blob 
+-- Image blob  aqui tem que ir pelo phpmyadmin pra upar o arquivo
