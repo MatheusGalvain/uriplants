@@ -1,6 +1,6 @@
 <div class="wrapper-footer">
         <footer>
-            <div class="footer-left">
+            <!-- <div class="footer-left">
 
                 <div class="redes-sociais">
                     <span>Redes Sociais</span>
@@ -25,7 +25,7 @@
                         Avenida Sete de Setembro, 1621
                     </a>
                 </div>
-            </div>
+            </div> -->
 
             <div class="logo">
                 <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" /></a>

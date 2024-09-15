@@ -1,109 +1,102 @@
 /* CSS Reset básico */
-
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  html, body {
-    height: 100%;
-    font-family: sans-serif;
-  }
-  
-  body {
-    line-height: 1.6;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: normal;
-  }
-  
-  ul, ol {
-    list-style: none;
-  }
-  
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
-  
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  button {
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  input, textarea {
-    border: none;
-    outline: none;
-    font-family: inherit;
-  }
-  
-  blockquote {
-    margin: 0;
-  }
-  
-  code, pre {
-    font-family: monospace;
-  }
-  
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+html,
+body {
+  height: 100%;
+  background-color: #f0f4f6;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  border: none;
+  font-family: inherit;
+}
+
+/* footer */
 .wrapper-footer {
-    background-color: #00668F;
+  background-color: #00668F;
 }
 
 footer {
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    max-width: 926px;
-    margin: 0 auto;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
 }
 
 footer .footer-left {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 560px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 560px;
 }
 
-footer .redes-sociais, footer .telefones, footer .localizacoes {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+footer .redes-sociais,
+footer .telefones,
+footer .localizacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
-    text-align: left;
-    font-size: 14px;
-    font-family: 'Poppins', sans-serif;
-}
-
-footer .redes-sociais a, footer .telefones a, footer .localizacoes a {
-    color: white;
-    text-decoration: none;
-    font-size: 15px;
+footer .redes-sociais a,
+footer .telefones a,
+footer .localizacoes a {
+  color: white;
+  font-size: 15px;
 }
 
 .display-icons {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
-
 
 footer .redes-sociais a img {
   width: 20px;
@@ -111,108 +104,213 @@ footer .redes-sociais a img {
   vertical-align: middle;
 }
 
-
 footer .logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 footer .logo img {
-    height: 50px;
-    margin-top: 10px;
+  height: 50px;
+  margin-top: 10px;
 }
-
-
-footer .redes-sociais i {
-    color: white;
-}
-
-
-
 
 /* Ajuste para dispositivos móveis */
 @media (max-width: 480px) {
   footer {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
   }
 
   footer .footer-left {
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
 
-  footer .redes-sociais, footer .telefones, footer .localizacoes {
-      align-items: center;
-      width: 100%;
-      margin-bottom: 20px;
+  footer .redes-sociais,
+  footer .telefones,
+  footer .localizacoes {
+    align-items: center;
+    width: 100%;
   }
 
-  footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
-      display: block;
-      width: 100%;
-      text-align: center;
-  }
-
-  footer .redes-sociais .display-icons, footer .telefones a, footer .localizacoes a {
-      display: block;
-      text-align: center;
-  }
-
-  footer .logo {
-      margin-top: 20px;
+  footer .redes-sociais .display-icons,
+  footer .telefones a,
+  footer .localizacoes a {
+    text-align: center;
   }
 
   footer .redes-sociais .display-icons {
-      gap: 20px;
+    gap: 20px;
   }
 }
 
-
-
-/* Ajuste responsividade */
-@media (min-width: 481px) and (max-width: 768px) {
-  footer {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 10px;
-  }
-
-  footer .footer-left {
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-  }
-
-  footer .redes-sociais, footer .telefones, footer .localizacoes {
-      align-items: center;
-      width: 100%;
-      margin-bottom: 20px;
-  }
-
-  footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
-      display: block;
-      width: 100%;
-      text-align: center;
-  }
-
-  footer .redes-sociais .display-icons, footer .telefones a, footer .localizacoes a {
-      display: block;
-      text-align: center;
-  }
-
-  footer .logo {
-      margin-top: 20px;
-  }
-
-  footer .redes-sociais .display-icons {
-      gap: 20px;
-  }
+/* página Home */
+#main-home, .sectionhome, #main-btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
 }
+
+#main-btns {
+  margin: 40px 0 50px 0;
+}
+
+.main-bottomtexts h1.access-main {
+  font-size: 2em;
+  color: black;
+  font-weight: 500;
+}
+
+.main-bottomtexts span.access-text {
+  font-size: 20px;
+  color: black;
+  font-weight: 200;
+  margin-left: 8px;
+}
+
+.main-bottomtexts {
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+}
+
+.plant-btn {
+  font-size: 1.2em;
+  text-align: center;
+  border: 1px solid #00668F;
+  width: 100%;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 200;
+}
+
+
+.img-carousel-home {
+  border-radius: 0 0 0 120px;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.main-carousel {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 64vh;
+  width: 100%;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.carousel-front-text {
+  position: absolute;
+  top: 76.5%;
+  left: 36%;
+  color: white;
+  text-align: right;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  right: 8%;
+}
+
+.buttons-carousel {
+  position: absolute;
+  bottom: 36px;
+  left: 50px;
+  display: flex;
+  gap: 25px;
+  z-index: 2;
+}
+
+.carousel-prev,
+.carousel-next {
+  width: 30px;
+  height: 30px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+button.carousel-prev {
+  background-image: url('../images/img-test/left-arrow-shadow.png');
+}
+
+button.carousel-next {
+  background-image: url('../images/img-test/right-arrow-shadow.png');
+}
+
+.carousel-title {
+  font-weight: 500;
+}
+
+.carousel-description {
+  font-weight: 200;
+}
+
+/* Header */
+div.header-mobile {
+  height: 8%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+section.hamburger-menu {
+
+  display: flex;
+  align-items: center;
+  padding: 11px 4% 7px 6%;
+  width: auto;
+}
+
+section.hamburger-menu img {
+  width: 23px;
+}
+
+section.search-box-block {
+  width: auto;
+  height: auto;
+  padding: 2% 4% 1% 6%;
+}
+
+div.search-box {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  width: 240px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+div.search-box p {
+  padding: 0 0 0 10px;
+  font-family: 'Poppins';
+  font-weight: 400;
+  font-size: 14px;
+  color: black;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.search-box img {
+  width: 25px;
+  margin: 0 10px 0 0;
+  margin-left: auto;
+}
+
