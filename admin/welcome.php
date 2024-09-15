@@ -35,10 +35,7 @@ if (!isset($_SESSION['id']) || empty($_SESSION['id'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="assets/demo/chart-area-demo.js"></script>
-    <script src="assets/demo/chart-bar-demo.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-    <script src="js/datatables-simple-demo.js"></script>
+
 </head>
 <body class="sb-nav-fixed">
     <?php include_once('includes/navbar.php'); ?>
@@ -47,13 +44,12 @@ if (!isset($_SESSION['id']) || empty($_SESSION['id'])) {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Dashboard - Tela inicial</h1>
+                    <h1 class="mt-4">Bem-vindo de volta, <?php echo htmlspecialchars($user['fname']); ?></h1>
                     <hr />
                     <?php if ($user): ?>
                         <div class="row">
                             <div class="col-xl-5 col-md-6">
                                 <div class="card bg-primary text-white mb-4">
-                                    <div class="card-body">Bem-vindo de volta <?php echo htmlspecialchars($user['fname']); ?></div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
                                         <a class="small text-white stretched-link" href="profile.php">Ver Perfil</a>
                                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>

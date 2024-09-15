@@ -40,7 +40,7 @@ echo "<script>alert('Data deleted');</script>";
                     <div class="container-fluid px-4">
                         <h1 class="mt-4">B/w Dates Report Result</h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="dashboard.php">Início</a></li>
                             <li class="breadcrumb-item active">B/w Dates Report Result</li>
                         </ol>
             
@@ -110,8 +110,6 @@ $tdate=$_POST['todate'];
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="../js/scripts.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-        <script src="../js/datatables-simple-demo.js"></script>
     </body>
 </html>
-<?php } ?>
+<?php ?>

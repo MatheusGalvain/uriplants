@@ -6,11 +6,7 @@
             <div class="nav">
                 <a class="nav-link" href="welcome.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    Dashboard
-                </a>
-                <a class="nav-link" href="profile.php">
-                    <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                    Meu Perfil
+                    Início
                 </a>
 
                 <?php if ($isAdmin): ?>

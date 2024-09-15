@@ -11,7 +11,7 @@ if (isset($_POST['login'])) {
     if ($num > 0) {
         $_SESSION['id'] = $num['id'];
         $_SESSION['name'] = $num['fname'];
-        header("location:welcome.php");
+        header("location:dashboard.php");
 
     } else {
         echo "<script>alert('Endereço de E-mail/Senha inválida');</script>";
