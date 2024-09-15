@@ -46,14 +46,14 @@ body {
     height: auto;
 }
 .right-content h1{
-    font-size: 40px;
+    font-size: 35px;
     font-weight: 600;
     color: white;
 }
 .right-content h2{
     text-align: center;
-    font-size: 28px;
-    font-weight: 300;
+    font-size: 22px;
+    font-weight: 200;
     color: white;
 }
 #content-btns{
@@ -125,16 +125,12 @@ body {
     background: #fff;
 }
 .form-label {
-    position: absolute;
-    top: 50%;
-    left: 15px;
-    transform: translateY(-50%);
     font-size: 16px;
     color: #666;
     pointer-events: none;
     transition: all 0.2s;
     background-color: none;
-    background: #f9f9f9;
+    background: #ffffff;
     padding: 0 5px;
     width: 90%;
 }

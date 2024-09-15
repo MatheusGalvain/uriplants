@@ -60,12 +60,12 @@
                 <div id="content-btns">
                 <form class="custom-form" method="post">
                         <div class="form-group">
-                            <input class="form-input" name="uemail" type="email" id="inputEmail" placeholder="name@example.com" required />
-                            <label class="form-label" for="inputEmail">Endereço de e-mail</label>
+                            <label class="form-label" for="inputEmail">Endereço de E-mail:</label>
+                            <input class="form-input" name="uemail" type="email" id="inputEmail" required />
                         </div>
                         <div class="form-group">
-                            <input class="form-input" name="password" type="password" id="inputPassword" placeholder="Password" required />
-                            <label class="form-label" for="inputPassword">Senha</label>
+                            <label class="form-label" for="inputPassword">Senha:</label>
+                            <input class="form-input" name="password" type="password" id="inputPassword"  required />
                         </div>
                         <div class="form-actions">
                             <a class="forgot-password" href="password-recovery.php">Perdeu a Senha?</a>

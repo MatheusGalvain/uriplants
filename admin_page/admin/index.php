@@ -5,6 +5,8 @@ if (isset($_POST['login'])) {
     $adminusername = $_POST['username'];
     $pass = md5($_POST['password']);
     $ret = mysqli_query($con, "SELECT * FROM admin WHERE username='$adminusername' and password='$pass'");
+    
+    // echo("Error description: " . mysqli_error($con));
     $num = mysqli_fetch_array($ret);
     if ($num > 0) {
         $extra = "dashboard.php";
@@ -83,10 +85,9 @@ if (isset($_POST['login'])) {
                 </div>
             </main>
         </div>
-        <?php include('../includes/footer.php'); ?>
+        <?php include('includes/footer.php'); ?>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="../js/scripts.js"></script>
 </body>
 

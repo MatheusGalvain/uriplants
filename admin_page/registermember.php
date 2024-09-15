@@ -105,9 +105,9 @@ if (isset($_POST['submit'])) {
                                         </tr>
                                         </tbody>
                                     </table>
-                                    <div class="d-grid"><button type="submit" class="btn btn-primary btn-block" name="submit">Criar Conta</button></div>
+                                <div class="d-grid"><button type="submit" class="btn btn-primary btn-block" name="submit">Criar Conta</button></div>
                             </form>
-                    </div>
+                        </div>
                 </div>
             </main>
             <?php include('includes/footer.php'); ?>
