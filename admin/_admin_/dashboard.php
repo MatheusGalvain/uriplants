@@ -1,11 +1,12 @@
 <?php if (session_status() === PHP_SESSION_NONE) {
     session_start();
-};
-    include_once('../includes/config.php');
-    if (strlen($_SESSION['adminid'] == 0)) {
-        header('location:logout.php');
-    } else {
-?>
+}
+;
+include_once('../includes/config.php');
+if (strlen($_SESSION['adminid'] == 0)) {
+    header('location:logout.php');
+} else {
+    ?>
 
     <!DOCTYPE html>
     <html lang="en">
@@ -21,6 +22,12 @@
         <link href="../css/styles.css" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
             crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+        <script src="../js/datatables-simple-demo.js"></script>
     </head>
 
     <body class="sb-nav-fixed">
@@ -112,12 +119,6 @@
                 <?php include_once('../includes/footer.php'); ?>
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
-            crossorigin="anonymous"></script>
-        <script src="../js/scripts.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-        <script src="../js/datatables-simple-demo.js"></script>
     </body>
 
     </html>

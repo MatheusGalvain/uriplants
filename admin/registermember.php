@@ -8,15 +8,15 @@ require_once('includes/config.php');
 if (isset($_POST['submit'])) {
     $fname = $_POST['fname'];
     $email = $_POST['email'];
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirmpassword'];
+    $password = md5($_POST['password']);
+    $confirm_password = md5($_POST['confirmpassword']);
     $is_administrator = $_POST['is_administrator'];
 
     // Verifica se as senhas coincidem
     if ($password !== $confirm_password) {
         echo "<script>alert('A senha e a confirmação de senha não coincidem.');</script>";
-    } elseif (strlen($password) != 6) {
-        echo "<script>alert('A senha deve ter exatamente 6 dígitos.');</script>";
+    } elseif (strlen($password) < 6) {
+        echo "<script>alert('A senha deve ter mais de 6 dígitos.');</script>";
     } else {
         // Verifica se o email já existe
         $sql = mysqli_query($con, "SELECT id FROM users WHERE email='$email'");
@@ -29,6 +29,7 @@ if (isset($_POST['submit'])) {
             $msg = mysqli_query($con, "INSERT INTO users (fname, email, password, is_administrator) VALUES ('$fname', '$email', '$password', '$is_administrator')");
             if ($msg) {
                 echo "<script>alert('Registrado com sucesso');</script>";
+                echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
             } else {
                 echo "<script>alert('Erro ao registrar.');</script>";
             }
@@ -41,14 +42,9 @@ if (isset($_POST['submit'])) {
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
+    <?php include_once("includes/head.php"); ?>
     <title>Admin | Novo Usuário</title>
-    <link href="css/styles.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+    
     <script type="text/javascript">
         function checkpass() {
             var password = document.signup.password.value;
@@ -76,8 +72,13 @@ if (isset($_POST['submit'])) {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Cadastrar Novo Usuário</h1>
-                    <div class="card mb-4">
+                <a href="manage-users.php" class="btn btn-outline-primary mt-4"> Voltar</a>
+                    <h1 class="mt-4 mb-4">Cadastrar Novo Usuário</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item">Você está em: </li>
+                        <li class="breadcrumb-item"><a href="welcome.php">dashboard</a></li>
+                        <li class="breadcrumb-item active">cadastro de usuário</li>
+                    </ol>
                         <div class="card-body">
                             <form method="post" name="signup" onsubmit="return checkpass();">
                                 <table class="table table-bordered">
@@ -107,12 +108,11 @@ if (isset($_POST['submit'])) {
                                         </td>
                                     </tr>
                                 </table>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary btn-block" name="submit">Criar Conta</button>
+                                <div class="d-flex justify-content-center">
+                                    <button type="submit" class="btn btn-dark mb-3" name="submit">Criar Conta</button>
                                 </div>
                             </form>
                         </div>
-                    </div>
                 </div>
             </main>
             <?php include('includes/footer.php'); ?>
