@@ -64,11 +64,6 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
             <main>
                 <div class="container-fluid px-4">
                     <h1 class="mt-4 mb-4">Gerenciar Classes</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item">Você está em: </li>
-                        <li class="breadcrumb-item"><a href="welcome.php">dashboard</a></li>
-                        <li class="breadcrumb-item active">classes</li>
-                    </ol>
 
                     <?php if (isset($success)) { ?>
                         <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>

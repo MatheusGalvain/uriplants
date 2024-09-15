@@ -6,7 +6,7 @@
                 <div>
                     <a href="https://www.uricer.edu.br/site/" target="_blank">URI | Erechim</a>
                 </div>
-                <div class="text-muted">Disciplina: Projeto Integrador III</div>
+                <div class="text-muted">Projeto Integrador III</div>
             </div>
         </div>
     </footer>

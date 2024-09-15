@@ -43,7 +43,6 @@
         <div id="layoutSidenav_content">
             <main>
             <div class="container-fluid px-4">
-                <a href="profile.php" class="btn btn-outline-primary mt-4"> Voltar</a>
                 <div class="container-fluid px-4">
                     <?php 
                     $userid = $_SESSION['id'];
@@ -51,11 +50,7 @@
                     
                     if ($result = mysqli_fetch_array($query)) { ?>
                         <h1 class="mt-4 mb-4">Editar meu perfil</h1>
-                        <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item">Você está em: </li>
-                            <li class="breadcrumb-item"><a href="welcome.php">dashboard</a></li>
-                            <li class="breadcrumb-item active">editar meu perfil</li>
-                        </ol>
+
                         <div class="card mb-4">
                             <form method="post">
                                     <table class="table table-bordered">
@@ -80,6 +75,7 @@
                             </form>
                         </div>
                     <?php } ?>
+                    <a href="profile.php" class="btn btn-outline-primary mt-4"> Voltar</a>
                 </div>
                 </div>
             </main>

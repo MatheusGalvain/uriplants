@@ -74,11 +74,7 @@ if (isset($_POST['submit'])) {
                 <div class="container-fluid px-4">
                 <a href="manage-users.php" class="btn btn-outline-primary mt-4"> Voltar</a>
                     <h1 class="mt-4 mb-4">Cadastrar Novo Usuário</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item">Você está em: </li>
-                        <li class="breadcrumb-item"><a href="welcome.php">dashboard</a></li>
-                        <li class="breadcrumb-item active">cadastro de usuário</li>
-                    </ol>
+
                         <div class="card-body">
                             <form method="post" name="signup" onsubmit="return checkpass();">
                                 <table class="table table-bordered">
@@ -109,7 +105,7 @@ if (isset($_POST['submit'])) {
                                     </tr>
                                 </table>
                                 <div class="d-flex justify-content-center">
-                                    <button type="submit" class="btn btn-dark mb-3" name="submit">Criar Conta</button>
+                                    <button type="submit" class="btn btn-primary mb-3" name="submit">Criar Conta</button>
                                 </div>
                             </form>
                         </div>

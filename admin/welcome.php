@@ -34,24 +34,22 @@ if (!isset($_SESSION['id']) || empty($_SESSION['id'])) {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Bem-vindo de volta, <?php echo htmlspecialchars($user['fname']); ?></h1>
+                    <h1 class="h1 mt-4">Bem-vindo de volta, <span class="fw-bold"><?php echo htmlspecialchars($user['fname']); ?> </span></h1>
                     <hr />
-                    <div class="row">
+                    <div class="">
                         <?php if ($user): ?>
-                            <div class="col-xl-6 col-md-12 mb-4">
-                                <div class="card bg-primary text-white h-100">
-                                    <div class="card-body">Bem-vindo de volta <?php echo htmlspecialchars($user['fname']); ?></div>
+                            <div class="col-xl-2 col-md-6 mb-3">
+                                <div class="card bg-primary text-white">
                                     <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="profile.php">Ver Perfil</a>
+                                        <a class="small text-decoration-none text-white stretched-link" href="profile.php">Ver Perfil</a>
                                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-6 col-md-12 mb-4">
-                                <div class="card bg-success text-white h-100">
-                                    <div class="card-body">Total de plantas cadastradas:</div>
+                            <div class="col-xl-2 col-md-6">
+                                <div class="card bg-success text-white">
                                     <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="profile.php">Ver Plantas Cadastradas</a>
+                                        <a class="small text-decoration-none text-white stretched-link" href="plants.php">Ver Plantas Cadastradas</a>
                                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                                     </div>
                                 </div>

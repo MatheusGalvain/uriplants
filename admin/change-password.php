@@ -63,11 +63,6 @@ if (isset($_POST['update'])) {
             <main>
                 <div class="container-fluid px-4">
                     <h1 class="mt-4 mb-4">Mudar sua senha</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item">Você está em: </li>
-                        <li class="breadcrumb-item"><a href="profile.php">meu perfil</a></li>
-                        <li class="breadcrumb-item active">alterar minha senha</li>
-                    </ol>
                     <div class="card mb-4">
                         <form method="post" name="changepassword" onsubmit="return valid();">
                                 <table class="table table-bordered">
@@ -89,6 +84,7 @@ if (isset($_POST['update'])) {
                                 </table>
                         </form>
                     </div>
+                    <a href="profile.php" class="btn btn-outline-primary mt-4"> Voltar</a>
                 </div>
             </main>
             <?php include('includes/footer.php'); ?>

@@ -11,7 +11,7 @@ if (isset($_POST['login'])) {
     if ($num > 0) {
         $_SESSION['id'] = $num['id'];
         $_SESSION['name'] = $num['fname'];
-        header("location:dashboard.php");
+        header("location:welcome.php");
 
     } else {
         echo "<script>alert('Endereço de E-mail/Senha inválida');</script>";
@@ -57,7 +57,6 @@ if (isset($_POST['login'])) {
             <div class="main-admin-right">
                 <div class="right-content">
                     <h1>Coloque seus dados nos campos abaixos!</h1>
-                    <h2><strong>Dica:</strong> Jamais compartilhe a senha com ninguém.</h2>
                 </div>
                 <div id="content-btns">
                     <form class="custom-form" method="post">

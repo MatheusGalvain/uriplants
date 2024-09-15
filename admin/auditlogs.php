@@ -13,12 +13,7 @@
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Histórico de Logs</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item">Você está em: </li>
-                        <li class="breadcrumb-item"><a href="welcome.php">dashboard</a></li>
-                        <li class="breadcrumb-item active">histórico de logs</li>
-                    </ol>
+                    <h1 class="mt-4 mb-4 h1">Histórico de Logs</h1>
                     <div class="card mb-4">
                         <div class="card-body">
                             <table id="logsTable" class="table">

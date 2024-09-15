@@ -29,22 +29,18 @@
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4 mb-4"><?php echo htmlspecialchars($result['fname']); ?>'s perfil</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item">Você está em: </li>
-                        <li class="breadcrumb-item"><a href="welcome.php">dashboard</a></li>
-                        <li class="breadcrumb-item active">meu perfil</li>
-                    </ol>
+                    <h1 class="mt-4 mb-4 h1">Perfil de <span class="fw-bold"> <?php echo htmlspecialchars($result['fname']); ?></span></h1>
+
                     <div class="card mb-4">
                         <div class="card-body">
                             <table class="table table-bordered">
                                 <tr>
-                                    <th>Nome do usuário:</th>
-                                    <td><?php echo htmlspecialchars($result['fname']); ?></td>
+                                    <th class="fw-normal">Nome do usuário:</th>
+                                    <td class="fw-bold"><?php echo htmlspecialchars($result['fname']); ?></td>
                                 </tr>
                                 <tr>
-                                    <th>Email:</th>
-                                    <td colspan="3"><?php echo htmlspecialchars($result['email']); ?></td>
+                                    <th class="fw-normal">Email:</th>
+                                    <td colspan="3" class="fw-bold"><?php echo htmlspecialchars($result['email']); ?></td>
                                 </tr>
                             </table>
                             <a class="btn btn-primary btn-block" href="edit-profile.php">Editar perfil</a>

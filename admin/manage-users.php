@@ -1,7 +1,7 @@
 <?php 
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
-    };
+    }
     include_once('includes/config.php');
 
     // Verifica se o usuário está autenticado
@@ -10,11 +10,14 @@
         exit;
     }
 
+    // Verifica se o admin está logado
+    $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+
     // Código para atualização do perfil
     if (isset($_POST['update'])) {
-        $fname = $_POST['fname'];
-        $email = $_POST['email'];
-        $userid = $_POST['userid'];
+        $fname = mysqli_real_escape_string($con, $_POST['fname']);
+        $email = mysqli_real_escape_string($con, $_POST['email']);
+        $userid = intval($_POST['userid']);
 
         // Prepara a consulta de atualização com o e-mail
         $updateQuery = "UPDATE users SET fname='$fname', email='$email' WHERE id='$userid'";
@@ -66,6 +69,9 @@
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Gerenciamento de Usuários</title>
+
+    <!-- Simple-DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css">
 </head>
 <body class="sb-nav-fixed">
     <?php include_once('includes/navbar.php'); ?>
@@ -76,13 +82,9 @@
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Gerenciamento de Usuários</h1>
-                    <ol class="breadcrumb mt-4 mb-4">
-                    <li class="breadcrumb-item">Você está em: </li>
-                        <li class="breadcrumb-item"><a href="welcome.php">dashboard</a></li>
-                        <li class="breadcrumb-item active">gerenciamento de usuários</li>
-                    </ol>
-                    <a href="registermember.php" class="btn btn-dark mb-3">Adicionar Novo Usuário</a>
+                    <h1 class="mt-4 mb-4 h1">Gerenciamento de Usuários</h1>
+
+                    <a href="registermember.php" class="btn bg-primary text-white mb-3">Novo Usuário</a>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
@@ -92,37 +94,36 @@
                             <?php if ($editUserId): ?>
                                 <!-- Formulário de Edição -->
                                 <div class="card mb-4">
-                                        <form method="post">
-                                            <input type="hidden" name="userid" value="<?php echo htmlspecialchars($editUser['id']); ?>" />
-                                            <table class="table table-bordered">
-                                                <tr>
-                                                    <th>Nome:</th>
-                                                    <td>
-                                                        <input class="form-control" id="fname" name="fname" type="text" value="<?php echo htmlspecialchars($editUser['fname']); ?>" required />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Email:</th>
-                                                    <td colspan="3">
-                                                        <input class="form-control" id="email" name="email" type="email" value="<?php echo htmlspecialchars($editUser['email']); ?>" required />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4" style="text-align:center;">
-                                                        <button type="submit" class="btn btn-primary btn-block" name="update">Atualizar</button>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </form>
+                                    <form method="post">
+                                        <input type="hidden" name="userid" value="<?php echo htmlspecialchars($editUser['id']); ?>" />
+                                        <table class="table table-bordered">
+                                            <tr>
+                                                <th>Nome:</th>
+                                                <td>
+                                                    <input class="form-control" id="fname" name="fname" type="text" value="<?php echo htmlspecialchars($editUser['fname']); ?>" required />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Email:</th>
+                                                <td colspan="3">
+                                                    <input class="form-control" id="email" name="email" type="email" value="<?php echo htmlspecialchars($editUser['email']); ?>" required />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4" style="text-align:center;">
+                                                    <button type="submit" class="btn btn-primary btn-block" name="update">Atualizar</button>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </form>
                                 </div>
                             <?php else: ?>
                                 <!-- Tabela de Usuários -->
-                                
                                 <table id="datatablesSimple" class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Sno.</th>
-                                            <th>Primeiro Nome</th>
+                                            <th>ID</th>
+                                            <th>Nome</th>
                                             <th>E-mail</th>
                                             <?php if ($isAdmin): ?>
                                                 <th>Ação</th>
@@ -157,8 +158,25 @@
                     </div>
                 </div>
             </main>
+        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
+
+        <script>
+        window.addEventListener('DOMContentLoaded', event => {
+            const datatablesSimple = document.getElementById('datatablesSimple');
+            if (datatablesSimple) {
+                new simpleDatatables.DataTable(datatablesSimple, {
+                    labels: {
+                        placeholder: "Buscar...", 
+                        perPage: "por página",
+                        noRows: "Nenhum registro encontrado",
+                        info: "Mostrando {start} a {end} de {rows} entradas",
+                        noResults: "Nenhum resultado correspondente",
+                        perPageSelect: "entradas"
+                    }
+                });
+            }
+        });
+        </script>
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
-</body>
-</html>
