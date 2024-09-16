@@ -17,9 +17,9 @@ if (isset($_POST['add_region'])) {
         $image = file_get_contents($_FILES['image']['tmp_name']);
 
         // Inserir nova região
-        $sql = "INSERT INTO RegionMap (imagem, source, description) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO RegionMap (name, imagem, source, description) VALUES (?, ?, ?, ?)";
         $stmt = mysqli_prepare($con, $sql);
-        mysqli_stmt_bind_param($stmt, 'bss', $image, $source, $description);
+        mysqli_stmt_bind_param($stmt, 'bss', $name, $image, $source, $description);
 
         if (mysqli_stmt_execute($stmt)) {
             $success = "Região adicionada com sucesso.";
@@ -84,6 +84,10 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
                         <div class="card-body">
                             <h5 class="card-title">Adicionar uma Nova Região</h5>
                             <form method="POST" action="" enctype="multipart/form-data">
+                               <div class="mb-3">
+                                    <label for="name" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
                                 <div class="mb-3">
                                     <label for="source" class="form-label">Fonte</label>
                                     <input type="text" class="form-control" id="source" name="source" required>
@@ -118,22 +122,24 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
                                     <th>Imagem</th>
                                     <th>Fonte</th>
-                                    <th>Descrição</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php while ($row = mysqli_fetch_array($regionsQuery)) { ?>
                                     <tr>
+                                        <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['description']); ?></td>
                                         <td>
                                             <?php if ($row['imagem']) { ?>
                                                 <img src="data:image/jpeg;base64,<?php echo base64_encode($row['imagem']); ?>" alt="Imagem" style="width: 100px; height: auto;">
                                             <?php } ?>
                                         </td>
                                         <td><?php echo htmlspecialchars($row['source']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['description']); ?></td>
                                         <td>
                                             <!-- Botão para abrir o modal de confirmação -->
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
