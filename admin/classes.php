@@ -27,6 +27,26 @@ if (isset($_POST['add_class'])) {
     }
 }
 
+// Editar nome da classe
+if (isset($_POST['edit_class'])) {
+    $id = intval($_POST['id']);
+    $name = mysqli_real_escape_string($con, $_POST['name']);
+
+    // Verificar se o nome da classe já existe
+    $query = mysqli_query($con, "SELECT * FROM classes WHERE name='$name' AND id != $id");
+    if (mysqli_num_rows($query) > 0) {
+        $error = "Uma classe com esse nome já existe.";
+    } else {
+        // Atualizar o nome da classe
+        $sql = "UPDATE classes SET name = '$name' WHERE id = $id";
+        if (mysqli_query($con, $sql)) {
+            $success = "Nome da classe atualizado com sucesso.";
+        } else {
+            $error = "Erro ao atualizar nome da classe: " . mysqli_error($con);
+        }
+    }
+}
+
 // Processar a exclusão de uma classe
 if (isset($_POST['delete_class'])) {
     $id = intval($_POST['id']);
@@ -85,48 +105,53 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
                             </form>
                         </div>
                     </div>
-                    
+
                     <!-- Botão de buscar e título -->
                     <div class="card mb-4">
                         <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title mb-0">Classes Cadastradas</h5>
-                            <form method="POST" action="" class="d-flex">
-                                <input type="text" class="form-control me-2" name="search" placeholder="Buscar classes" value="<?php echo htmlspecialchars($search); ?>">
-                                <button class="btn btn-primary" type="submit">Buscar</button>
-                                <?php if ($search) { ?>
-                                    <a href="classes.php" class="btn btn-secondary ms-2 w-100">Remover Filtro</a>
-                                <?php } ?>
-                            </form>
-                        </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Classes Cadastradas</h5>
+                                <form method="POST" action="" class="d-flex">
+                                    <input type="text" class="form-control me-2" name="search" placeholder="Buscar classes" value="<?php echo htmlspecialchars($search); ?>">
+                                    <button class="btn btn-primary" type="submit">Buscar</button>
+                                    <?php if ($search) { ?>
+                                        <a href="classes.php" class="btn btn-secondary ms-2 w-100">Remover Filtro</a>
+                                    <?php } ?>
+                                </form>
+                            </div>
 
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Nome da Classe</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($row = mysqli_fetch_array($classesQuery)) { ?>
+                            <table class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                        <td>
-                                            <!-- Botão para abrir o modal de confirmação -->
-                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
-                                                Excluir
-                                            </button>
-                                        </td>
+                                        <th>Nome da Classe</th>
+                                        <th>Ações</th>
                                     </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = mysqli_fetch_array($classesQuery)) { ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                            <td>
+                                                <!-- Botão para abrir o modal de edição -->
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editClassModal" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">
+                                                    Editar
+                                                </button>
+
+                                                <!-- Botão para abrir o modal de exclusão -->
+                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
+                                                    Excluir
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>
             <?php include('includes/footer.php'); ?>
         </div>
-    </div>
     </div>
 
     <!-- Modal de Confirmação de Exclusão -->
@@ -151,16 +176,54 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
         </div>
     </div>
 
+    <!-- Modal de Edição de Classe -->
+    <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editClassModalLabel">Editar Classe</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Nome da Classe</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                            <input type="hidden" name="id" id="editId">
+                        </div>
+                        <button type="submit" name="edit_class" class="btn btn-success">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Script para preencher o ID da classe no modal
+        // Script para preencher o ID da classe no modal de exclusão
         document.addEventListener('DOMContentLoaded', function() {
-            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
             var deleteIdInput = document.getElementById('deleteId');
-            
+
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');
                     deleteIdInput.value = id;
+                });
+            });
+        });
+
+        // Script para preencher o modal de edição com os dados da classe
+        document.addEventListener('DOMContentLoaded', function() {
+            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editClassModal"]');
+            var editIdInput = document.getElementById('editId');
+            var editNameInput = document.getElementById('editName');
+
+            editButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var id = this.getAttribute('data-id');
+                    var name = this.getAttribute('data-name');
+                    editIdInput.value = id;
+                    editNameInput.value = name;
                 });
             });
         });

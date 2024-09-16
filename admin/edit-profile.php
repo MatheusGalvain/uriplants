@@ -53,7 +53,7 @@
 
                         <div class="card mb-4">
                             <form method="post">
-                                    <table class="table table-bordered">
+                                    <table class="table">
                                         <tr>
                                             <th>Nome:</th>
                                             <td>
