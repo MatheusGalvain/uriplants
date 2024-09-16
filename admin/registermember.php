@@ -99,6 +99,7 @@ if (isset($_POST['submit'])) {
                                         <td><input class="form-control" id="confirmpassword" name="confirmpassword" type="password" placeholder="Confirmar Senha" pattern="[a-zA-Z0-9]{6,}" title="A confirmação da senha deve ter pelo menos 6 caracteres, incluindo letras e números." required /></td>
                                     </tr>
                                     <tr>
+                                        <!-- Isso tá aqui pra não fazer nada mesmo, só pra mostrar que todos podem add plantas -->
                                         <th>Pode cadastrar plantas</th>
                                         <td>
                                             <select class="form-control" id="is_administrator" name="is_administrator">
