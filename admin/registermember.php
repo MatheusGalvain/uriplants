@@ -8,8 +8,8 @@ require_once('includes/config.php');
 if (isset($_POST['submit'])) {
     $fname = $_POST['fname'];
     $email = $_POST['email'];
-    $password = md5($_POST['password']);
-    $confirm_password = md5($_POST['confirmpassword']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirmpassword'];
     $is_administrator = $_POST['is_administrator'];
 
     // Verifica se as senhas coincidem
@@ -25,8 +25,11 @@ if (isset($_POST['submit'])) {
         if ($row > 0) {
             echo "<script>alert('Email já cadastrado em outra conta. Por favor, tente com outro email.');</script>";
         } else {
+            // Criptografa a senha
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            
             // Insere o novo usuário
-            $msg = mysqli_query($con, "INSERT INTO users (fname, email, password, is_administrator) VALUES ('$fname', '$email', '$password', '$is_administrator')");
+            $msg = mysqli_query($con, "INSERT INTO users (fname, email, password, is_administrator) VALUES ('$fname', '$email', '$hashed_password', '$is_administrator')");
             if ($msg) {
                 echo "<script>alert('Registrado com sucesso');</script>";
                 echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
@@ -37,6 +40,7 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -55,11 +59,6 @@ if (isset($_POST['submit'])) {
                 document.signup.confirmpassword.focus();
                 return false;
             } 
-            if (password.length !== 6) {
-                alert('A senha deve ter exatamente 6 dígitos.');
-                document.signup.password.focus();
-                return false;
-            }
             return true;
         }
     </script>
@@ -87,15 +86,28 @@ if (isset($_POST['submit'])) {
                                         <td><input class="form-control" id="email" name="email" type="email" placeholder="exemplo@gmail.com" required /></td>
                                     </tr>
                                     <tr>
-                                        <th>Senha:</th>
-                                        <td><input class="form-control" id="password" name="password" type="password" placeholder="Senha" pattern="\d{6}" title="A senha deve ter exatamente 6 dígitos." required /></td>
+                                        <th>
+                                            <div class="d-flex flex-column">
+                                                <div>Senha:</div> 
+                                                <small class="fw-normal">*A senha deve possuir no mínimo 6 digitos</small>
+                                            </div>
+                                        </th>
+                                        <td><input class="form-control" id="password" name="password" type="password" placeholder="Senha" pattern="[a-zA-Z0-9]{6,}" title="A senha deve ter pelo menos 6 caracteres, incluindo letras e números." required /></td>
                                     </tr>
                                     <tr>
                                         <th>Confirmar Senha:</th>
-                                        <td><input class="form-control" id="confirmpassword" name="confirmpassword" type="password" placeholder="Confirmar Senha" pattern="\d{6}" title="A confirmação da senha deve ter exatamente 6 dígitos." required /></td>
+                                        <td><input class="form-control" id="confirmpassword" name="confirmpassword" type="password" placeholder="Confirmar Senha" pattern="[a-zA-Z0-9]{6,}" title="A confirmação da senha deve ter pelo menos 6 caracteres, incluindo letras e números." required /></td>
                                     </tr>
                                     <tr>
-                                        <th>É Administrador?</th>
+                                        <th>Pode cadastrar plantas</th>
+                                        <td>
+                                            <select class="form-control" id="is_administrator" name="is_administrator">
+                                                <option value="1">Sim</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pode cadastrar mais usuários</th>
                                         <td>
                                             <select class="form-control" id="is_administrator" name="is_administrator">
                                                 <option value="0">Não</option>

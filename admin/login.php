@@ -1,23 +1,33 @@
-<?php if (session_status() === PHP_SESSION_NONE) {
+<?php
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
-};
+}
 include_once('includes/config.php');
+
 if (isset($_POST['login'])) {
     $password = $_POST['password'];
-    $dec_password = $password;
     $useremail = $_POST['uemail'];
-    $ret = mysqli_query($con, "SELECT id,fname FROM users WHERE email='$useremail' and password='$dec_password'");
-    $num = mysqli_fetch_array($ret);
-    if ($num > 0) {
-        $_SESSION['id'] = $num['id'];
-        $_SESSION['name'] = $num['fname'];
-        header("location:welcome.php");
 
+    // Consulta o banco de dados para obter as informações do usuário
+    $ret = mysqli_query($con, "SELECT id, fname, password FROM users WHERE email='$useremail'");
+    $num = mysqli_fetch_array($ret);
+
+    if ($num > 0) {
+        // Verifica se a senha inserida corresponde ao hash armazenado
+        if (password_verify($password, $num['password'])) {
+            // Se a senha estiver correta, inicia a sessão
+            $_SESSION['id'] = $num['id'];
+            $_SESSION['name'] = $num['fname'];
+            header("location:welcome.php");
+        } else {
+            echo "<script>alert('Endereço de E-mail/Senha inválida');</script>";
+        }
     } else {
         echo "<script>alert('Endereço de E-mail/Senha inválida');</script>";
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
