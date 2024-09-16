@@ -120,18 +120,6 @@
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Plantas</title>
-    <style>
-        .d-flex-end {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        #plant-form,
-        #edit-form {
-            display: none;
-        }
-    </style>
 </head>
 
 <body class="sb-nav-fixed">

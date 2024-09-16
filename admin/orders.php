@@ -1,51 +1,65 @@
 <?php
-    session_start();
-    include_once('includes/config.php');
+session_start();
+include_once('includes/config.php');
 
-    // Verificar se o usuário está autenticado
-    if (strlen($_SESSION['id']) == 0) {
-        header('location:logout.php');
-        exit();
-    }
+// Verificar se o usuário está autenticado
+if (strlen($_SESSION['id']) == 0) {
+    header('location:logout.php');
+    exit();
+}
 
-    // Adicionar nova ordem
-    if (isset($_POST['add_order'])) {
-        $name = mysqli_real_escape_string($con, $_POST['name']);
+// Adicionar nova ordem
+if (isset($_POST['add_order'])) {
+    $name = mysqli_real_escape_string($con, $_POST['name']);
 
-        // Verificar se o nome da ordem já existe
-        $query = mysqli_query($con, "SELECT * FROM orders WHERE name='$name'");
-        if (mysqli_num_rows($query) > 0) {
-            $error = "Uma ordem com esse nome já existe.";
-        } else {
-            // Inserir nova ordem
-            $sql = "INSERT INTO orders (name) VALUES ('$name')";
-            if (mysqli_query($con, $sql)) {
-                $success = "Ordem adicionada com sucesso.";
-            } else {
-                $error = "Erro ao adicionar ordem: " . mysqli_error($con);
-            }
-        }
-    }
-
-    // Processar a exclusão de uma ordem
-    if (isset($_POST['delete_order'])) {
-        $id = intval($_POST['id']);
-
-        // Marcar a ordem como excluída
-        $sql = "UPDATE orders SET deleted_at = NOW() WHERE id = $id";
+    // Verificar se o nome da ordem já existe
+    $query = mysqli_query($con, "SELECT * FROM orders WHERE name='$name'");
+    if (mysqli_num_rows($query) > 0) {
+        $error = "Uma ordem com esse nome já existe.";
+    } else {
+        // Inserir nova ordem
+        $sql = "INSERT INTO orders (name) VALUES ('$name')";
         if (mysqli_query($con, $sql)) {
-            $success = "Ordem excluída com sucesso.";
+            $success = "Ordem adicionada com sucesso.";
         } else {
-            $error = "Erro ao excluir ordem: " . mysqli_error($con);
+            $error = "Erro ao adicionar ordem: " . mysqli_error($con);
         }
     }
+}
 
-    // Processar a busca
-    $search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
+// Processar a exclusão de uma ordem
+if (isset($_POST['delete_order'])) {
+    $id = intval($_POST['id']);
 
-    // Obter todas as ordens com base na busca
-    $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
-    $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL $searchQuery");
+    // Marcar a ordem como excluída
+    $sql = "UPDATE orders SET deleted_at = NOW() WHERE id = $id";
+    if (mysqli_query($con, $sql)) {
+        $success = "Ordem excluída com sucesso.";
+    } else {
+        $error = "Erro ao excluir ordem: " . mysqli_error($con);
+    }
+}
+
+// Processar a edição de uma ordem
+if (isset($_POST['edit_order'])) {
+    $id = intval($_POST['id']);
+    $name = mysqli_real_escape_string($con, $_POST['name']);
+
+    // Atualizar o nome da ordem
+    $sql = "UPDATE orders SET name = '$name' WHERE id = $id";
+    if (mysqli_query($con, $sql)) {
+        $success = "Ordem atualizada com sucesso.";
+    } else {
+        $error = "Erro ao atualizar ordem: " . mysqli_error($con);
+    }
+}
+
+// Processar a busca
+$search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
+
+// Obter todas as ordens com base na busca
+$searchQuery = $search ? "AND name LIKE '%$search%'" : "";
+$ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL $searchQuery");
 ?>
 
 <!DOCTYPE html>
@@ -89,44 +103,48 @@
                     <!-- Botão de buscar e título -->
                     <div class="card mb-4">
                         <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title mb-0">Ordens Cadastradas</h5>
-                            <form method="POST" action="" class="d-flex">
-                                <input type="text" class="form-control me-2" name="search" placeholder="Buscar ordens" value="<?php echo htmlspecialchars($search); ?>">
-                                <button class="btn btn-primary" type="submit">Buscar</button>
-                                <?php if ($search) { ?>
-                                    <a href="orders.php" class="btn btn-secondary ms-2 w-100">Remover Filtro</a>
-                                <?php } ?>
-                            </form>
-                        </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Ordens Cadastradas</h5>
+                                <form method="POST" action="" class="d-flex">
+                                    <input type="text" class="form-control me-2" name="search" placeholder="Buscar ordens" value="<?php echo htmlspecialchars($search); ?>">
+                                    <button class="btn btn-primary" type="submit">Buscar</button>
+                                    <?php if ($search) { ?>
+                                        <a href="orders.php" class="btn btn-secondary ms-2 w-100">Remover Filtro</a>
+                                    <?php } ?>
+                                </form>
+                            </div>
 
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Nome da Ordem</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($row = mysqli_fetch_array($ordersQuery)) { ?>
+                            <table class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                        <td>
-                                            <!-- Botão para abrir o modal de confirmação -->
-                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
-                                                Excluir
-                                            </button>
-                                        </td>
+                                        <th>Nome da Ordem</th>
+                                        <th>Ações</th>
                                     </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = mysqli_fetch_array($ordersQuery)) { ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                            <td>
+                                                <!-- Botão para abrir o modal de edição -->
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editOrderModal" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">
+                                                    Editar
+                                                </button>
+                                                <!-- Botão para abrir o modal de confirmação -->
+                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
+                                                    Excluir
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>
             <?php include('includes/footer.php'); ?>
         </div>
-    </div>
     </div>
 
     <!-- Modal de Confirmação de Exclusão -->
@@ -151,12 +169,46 @@
         </div>
     </div>
 
+    <!-- Modal de Edição de Ordem -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOrderModalLabel">Editar Ordem</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="">
+                        <input type="hidden" name="id" id="editId">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Nome da Ordem</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        <button type="submit" name="edit_order" class="btn btn-primary">Atualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Script para preencher o ID da ordem no modal
+        // Script para preencher o ID e nome da ordem nos modais
         document.addEventListener('DOMContentLoaded', function() {
-            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+            var editButtons = document.querySelectorAll('[data-bs-target="#editOrderModal"]');
+            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
+            var editIdInput = document.getElementById('editId');
+            var editNameInput = document.getElementById('editName');
             var deleteIdInput = document.getElementById('deleteId');
             
+            editButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var id = this.getAttribute('data-id');
+                    var name = this.getAttribute('data-name');
+                    editIdInput.value = id;
+                    editNameInput.value = name;
+                });
+            });
+
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');

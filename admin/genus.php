@@ -1,51 +1,65 @@
 <?php
-    session_start();
-    include_once('includes/config.php');
+session_start();
+include_once('includes/config.php');
 
-    // Verificar se o usuário está autenticado
-    if (strlen($_SESSION['id']) == 0) {
-        header('location:logout.php');
-        exit();
-    }
+// Verificar se o usuário está autenticado
+if (strlen($_SESSION['id']) == 0) {
+    header('location:logout.php');
+    exit();
+}
 
-    // Adicionar novo gênero
-    if (isset($_POST['add_genus'])) {
-        $name = mysqli_real_escape_string($con, $_POST['name']);
+// Adicionar novo gênero
+if (isset($_POST['add_genus'])) {
+    $name = mysqli_real_escape_string($con, $_POST['name']);
 
-        // Verificar se o nome do gênero já existe
-        $query = mysqli_query($con, "SELECT * FROM genus WHERE name='$name'");
-        if (mysqli_num_rows($query) > 0) {
-            $error = "Um gênero com esse nome já existe.";
-        } else {
-            // Inserir novo gênero
-            $sql = "INSERT INTO genus (name) VALUES ('$name')";
-            if (mysqli_query($con, $sql)) {
-                $success = "Gênero adicionado com sucesso.";
-            } else {
-                $error = "Erro ao adicionar gênero: " . mysqli_error($con);
-            }
-        }
-    }
-
-    // Processar a exclusão de um gênero
-    if (isset($_POST['delete_genus'])) {
-        $id = intval($_POST['id']);
-
-        // Marcar o gênero como excluído
-        $sql = "UPDATE genus SET deleted_at = NOW() WHERE id = $id";
+    // Verificar se o nome do gênero já existe
+    $query = mysqli_query($con, "SELECT * FROM genus WHERE name='$name'");
+    if (mysqli_num_rows($query) > 0) {
+        $error = "Um gênero com esse nome já existe.";
+    } else {
+        // Inserir novo gênero
+        $sql = "INSERT INTO genus (name) VALUES ('$name')";
         if (mysqli_query($con, $sql)) {
-            $success = "Gênero excluído com sucesso.";
+            $success = "Gênero adicionado com sucesso.";
         } else {
-            $error = "Erro ao excluir gênero: " . mysqli_error($con);
+            $error = "Erro ao adicionar gênero: " . mysqli_error($con);
         }
     }
+}
 
-    // Processar a busca
-    $search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
+// Processar a exclusão de um gênero
+if (isset($_POST['delete_genus'])) {
+    $id = intval($_POST['id']);
 
-    // Obter todos os gêneros com base na busca
-    $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
-    $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $searchQuery");
+    // Marcar o gênero como excluído
+    $sql = "UPDATE genus SET deleted_at = NOW() WHERE id = $id";
+    if (mysqli_query($con, $sql)) {
+        $success = "Gênero excluído com sucesso.";
+    } else {
+        $error = "Erro ao excluir gênero: " . mysqli_error($con);
+    }
+}
+
+// Processar a edição de um gênero
+if (isset($_POST['edit_genus'])) {
+    $id = intval($_POST['id']);
+    $name = mysqli_real_escape_string($con, $_POST['name']);
+
+    // Atualizar o nome do gênero
+    $sql = "UPDATE genus SET name = '$name' WHERE id = $id";
+    if (mysqli_query($con, $sql)) {
+        $success = "Gênero atualizado com sucesso.";
+    } else {
+        $error = "Erro ao atualizar gênero: " . mysqli_error($con);
+    }
+}
+
+// Processar a busca
+$search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
+
+// Obter todos os gêneros com base na busca
+$searchQuery = $search ? "AND name LIKE '%$search%'" : "";
+$genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $searchQuery");
 ?>
 
 <!DOCTYPE html>
@@ -89,44 +103,48 @@
                     <!-- Botão de buscar e título -->
                     <div class="card mb-4">
                         <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title mb-0">Gêneros Cadastrados</h5>
-                            <form method="POST" action="" class="d-flex">
-                                <input type="text" class="form-control me-2" name="search" placeholder="Buscar gêneros" value="<?php echo htmlspecialchars($search); ?>">
-                                <button class="btn btn-primary" type="submit">Buscar</button>
-                                <?php if ($search) { ?>
-                                    <a href="genus.php" class="btn btn-secondary ms-2 w-100">Remover Filtro</a>
-                                <?php } ?>
-                            </form>
-                        </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Gêneros Cadastrados</h5>
+                                <form method="POST" action="" class="d-flex">
+                                    <input type="text" class="form-control me-2" name="search" placeholder="Buscar gêneros" value="<?php echo htmlspecialchars($search); ?>">
+                                    <button class="btn btn-primary" type="submit">Buscar</button>
+                                    <?php if ($search) { ?>
+                                        <a href="genus.php" class="btn btn-secondary ms-2 w-100">Remover Filtro</a>
+                                    <?php } ?>
+                                </form>
+                            </div>
 
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Nome do Gênero</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($row = mysqli_fetch_array($genusQuery)) { ?>
+                            <table class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                        <td>
-                                            <!-- Botão para abrir o modal de confirmação -->
-                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
-                                                Excluir
-                                            </button>
-                                        </td>
+                                        <th>Nome do Gênero</th>
+                                        <th>Ações</th>
                                     </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = mysqli_fetch_array($genusQuery)) { ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                            <td>
+                                                <!-- Botão para abrir o modal de edição -->
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editGenusModal" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">
+                                                    Editar
+                                                </button>
+                                                <!-- Botão para abrir o modal de confirmação -->
+                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
+                                                    Excluir
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>
             <?php include('includes/footer.php'); ?>
         </div>
-    </div>
     </div>
 
     <!-- Modal de Confirmação de Exclusão -->
@@ -151,12 +169,46 @@
         </div>
     </div>
 
+    <!-- Modal de Edição de Gênero -->
+    <div class="modal fade" id="editGenusModal" tabindex="-1" aria-labelledby="editGenusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editGenusModalLabel">Editar Gênero</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="">
+                        <input type="hidden" name="id" id="editId">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Nome do Gênero</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        <button type="submit" name="edit_genus" class="btn btn-primary">Atualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Script para preencher o ID do gênero no modal
+        // Script para preencher o ID e nome do gênero nos modais
         document.addEventListener('DOMContentLoaded', function() {
-            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+            var editButtons = document.querySelectorAll('[data-bs-target="#editGenusModal"]');
+            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
+            var editIdInput = document.getElementById('editId');
+            var editNameInput = document.getElementById('editName');
             var deleteIdInput = document.getElementById('deleteId');
             
+            editButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var id = this.getAttribute('data-id');
+                    var name = this.getAttribute('data-name');
+                    editIdInput.value = id;
+                    editNameInput.value = name;
+                });
+            });
+
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');
