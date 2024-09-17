@@ -10,6 +10,13 @@ CREATE TABLE Users (
   CONSTRAINT UQ_Users_Email UNIQUE (email)
 );
 
+CREATE TABLE PasswordResets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE Divisions (
   id integer AUTO_INCREMENT,
   name varchar(255) NOT NULL,
