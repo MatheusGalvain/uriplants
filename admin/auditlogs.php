@@ -13,7 +13,14 @@ function filter_input_data($con, $data) {
 }
 
 // Consulta à tabela 'auditlogs' usando MySQLi
-$result = mysqli_query($con,"SELECT id, table_name, plant_id, action_id, changed_by, change_time, old_value, new_value FROM auditlogs WHERE deleted_at IS NULL");
+$result = mysqli_query($con,
+"SELECT al.id, al.table_name, al.plant_id, al.action_id, a.name AS actionName, al.changed_by, al.change_time, al.old_value, al.new_value, u.fname AS userName, u.email AS email, p.name AS plantName
+FROM auditlogs AS al
+INNER JOIN actions AS a ON al.action_id = a.id
+INNER JOIN users AS u ON al.changed_by = u.id
+INNER JOIN plants AS p ON al.plant_id = p.id
+WHERE al.deleted_at IS NULL
+");
 
 // Transformar os resultados em um array
 $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -42,9 +49,9 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Nome da Tabela</th>
-                                        <th>ID da Planta</th>
-                                        <th>ID da Ação</th>
+                                        <th>Tabela</th>
+                                        <th>Planta</th>
+                                        <th>Ação</th>
                                         <th>Alterado Por</th>
                                         <th>Hora da Alteração</th>
                                         <th>Valor Antigo</th>
@@ -57,9 +64,9 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                         echo '<tr>';
                                         echo '<td>' . htmlspecialchars($row['id']) . '</td>';
                                         echo '<td>' . htmlspecialchars($row['table_name']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['plant_id']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['action_id']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['changed_by']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['plant_id']) . ' - ' . htmlspecialchars($row['plantName']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['actionName']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['userName']) . ' - ' . htmlspecialchars($row['email']) . '</td>';
                                         echo '<td>' . htmlspecialchars($row['change_time']) . '</td>';
                                         echo '<td>' . htmlspecialchars($row['old_value']) . '</td>';
                                         echo '<td>' . htmlspecialchars($row['new_value']) . '</td>';
