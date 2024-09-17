@@ -120,6 +120,18 @@
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Plantas</title>
+    <style>
+        .d-flex-end {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        #plant-form,
+        #edit-form {
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="sb-nav-fixed">
@@ -229,7 +241,7 @@
                                         <option value="">Selecione a região</option>
                                         <?php foreach ($regionMap as $region) { ?>
                                             <option value="<?php echo htmlspecialchars($region['id']); ?>">
-                                                <?php echo htmlspecialchars($region['name']); ?>
+                                                <?php echo htmlspecialchars($region['description']); ?>
                                             </option>
                                         <?php } ?>
                                     </select>
@@ -328,7 +340,7 @@
                                         <select class="form-control" id="region_id" name="region_id">
                                             <?php while ($row = mysqli_fetch_array($regionsQuery)) { ?>
                                                 <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo $row['id'] == $edit_plant['region_id'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($row['name']); ?>
+                                                    <?php echo htmlspecialchars($row['source']); ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
