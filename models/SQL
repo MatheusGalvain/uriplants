@@ -114,6 +114,7 @@ CREATE TABLE Images (
 CREATE TABLE RegionMap (
   id integer AUTO_INCREMENT,
   imagem blob NOT NULL,
+  name varchar(255),
   source varchar(255),
   description varchar(255),
   deleted_at timestamp NULL,

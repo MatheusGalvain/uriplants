@@ -229,7 +229,7 @@
                                         <option value="">Selecione a região</option>
                                         <?php foreach ($regionMap as $region) { ?>
                                             <option value="<?php echo htmlspecialchars($region['id']); ?>">
-                                                <?php echo htmlspecialchars($region['description']); ?>
+                                                <?php echo htmlspecialchars($region['name']); ?>
                                             </option>
                                         <?php } ?>
                                     </select>
@@ -328,7 +328,7 @@
                                         <select class="form-control" id="region_id" name="region_id">
                                             <?php while ($row = mysqli_fetch_array($regionsQuery)) { ?>
                                                 <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo $row['id'] == $edit_plant['region_id'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($row['source']); ?>
+                                                    <?php echo htmlspecialchars($row['name']); ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
