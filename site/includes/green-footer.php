@@ -1,5 +1,5 @@
-<div class="wrapper-footer">
-        <footer>
+<div class="wrapper-green-footer">
+        <green-footer>
             <div class="footer-left">
 
                 <div class="redes-sociais">
@@ -30,5 +30,5 @@
             <div class="logo">
                 <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" /></a>
             </div>
-        </footer>
+        </greenfooter>
     </div>

@@ -7,13 +7,8 @@
 
 html,
 body {
-  height: 100%;
   background-color: #f0f4f6;
   font-family: 'Poppins', sans-serif;
-}
-
-body {
-  line-height: 1.6;
 }
 
 h1,
@@ -57,7 +52,7 @@ textarea {
   font-family: inherit;
 }
 
-/* footer */
+/* BLUE footer */
 .wrapper-footer {
   background-color: #00668F;
 }
@@ -83,7 +78,7 @@ footer .telefones,
 footer .localizacoes {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
 }
 
 footer .redes-sociais a,
@@ -95,7 +90,6 @@ footer .localizacoes a {
 
 .display-icons {
   display: flex;
-  gap: 10px;
 }
 
 footer .redes-sociais a img {
@@ -129,6 +123,7 @@ footer .logo img {
     justify-content: center;
     align-items: center;
     width: 100%;
+    gap: 20px;
   }
 
   footer .redes-sociais,
@@ -142,12 +137,21 @@ footer .logo img {
   footer .telefones a,
   footer .localizacoes a {
     text-align: center;
+    font-family: 'Poppins';
+    font-weight: 200;
   }
 
   footer .redes-sociais .display-icons {
     gap: 20px;
   }
+
+  .telefones, .redes-sociais, .localizacoes span {
+    font-family: 'Poppins';
+    font-weight: 400;
+  }
+
 }
+
 
 /* página Home */
 #main-home, .sectionhome, #main-btns {
@@ -258,12 +262,11 @@ button.carousel-next {
 
 /* Header */
 div.header-mobile {
-  height: 8%;
+
   width: 100%;
   position: absolute;
   top: 0;
   left: 0;
-
   z-index: 50;
   display: flex;
   justify-content: space-between;
@@ -305,7 +308,7 @@ div.search-box p {
   font-weight: 400;
   font-size: 14px;
   color: black;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); */
 }
 
 .search-box img {
@@ -314,3 +317,40 @@ div.search-box p {
   margin-left: auto;
 }
 
+.wrapper {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+
+
+
+/* Página da planta específica aqui */
+
+.plant-details-top-img img{
+
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  display: flex;
+  }
+
+  section.plant-content{
+    background-color: #cfd4D7;
+    display: flex;
+    border-radius: 20px 20px 0 0;
+
+  }
+
+  .plant-details-content-carousel{
+    display: flex;
+    gap: 10px;
+    margin: 40px auto;
+  }
+
+  .plant-details-content-carousel img{
+  width: 75px;
+  height: 80px;
+  border-radius: 10px;
+  }

@@ -1,0 +1,167 @@
+.list-page-container{
+    position: relative;
+    display: flex;
+    z-index: 20;
+    width: 100%;
+}
+
+.list-page-content {
+    width: 100%;
+}
+
+body{
+    background-image: url(../images/img-test/background.png);
+    background-size: cover;
+    background-clip: border-box;
+    display: block;
+}
+
+div.location-container {
+    padding: 14% 0 0px 5.6%;
+    margin: 0% 0 0 0%;
+    width: 100%;
+}
+
+.location-text {
+    font-family: 'Poppins';
+    font-weight: 400;
+    font-size: 14px;
+}
+
+#location {
+    font-family: 'Poppins';
+    font-weight: 500;
+    font-size: 24px;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    line-height: 1.2;
+}
+
+
+/* Aqui vem as boxes */
+
+section.plant-list {
+    box-sizing: border-box;
+    height: auto;
+    z-index: 51;
+}
+
+
+
+div.plant-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 18px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);   
+    margin: 20px 20px;
+    border: 1px solid #006400;
+}
+
+.plant-info {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.plant-info h2 {
+    font-weight: 400;
+    font-size: 18px;
+    margin: 0;
+}
+
+.plant-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #555;
+}
+
+.plant-photo {
+    padding: 0;
+    margin: 6px 0;
+    height: 100px;
+}
+
+.plant-photo img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+
+.navigation-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 22px;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.page-btn {
+    border: 1px solid #006400;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+
+.dots {
+    color: #555;
+}
+
+.back-to-top-container {
+    display: flex;
+    justify-content: flex-end;
+    box-shadow: -3px 4px 3px rgba(0, 0, 0, 0.3);
+    border-radius: 6px 0 0 6px;
+    overflow: hidden;
+    height: 25px;
+    width: 82px;
+    
+}
+
+.back-to-top-btn {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 6px 0 0 6px;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+}
+
+.btn-side-img {
+    background-color: rgb(23, 55, 23);
+    margin-left: 17px;
+    border-radius: 8px 0 0 0;
+    width: 22px;
+    height: auto;
+    
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-side-img img {
+    width: 12px;
+    height: auto;
+}
