@@ -1,0 +1,194 @@
+CREATE TABLE Users (
+  id integer AUTO_INCREMENT,
+  email varchar(255) NOT NULL,
+  fname varchar(50) NOT NULL,
+  password varchar(255) NOT NULL,
+  is_administrator boolean,
+  created_at timestamp DEFAULT current_timestamp,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Users PRIMARY KEY (id),
+  CONSTRAINT UQ_Users_Email UNIQUE (email)
+);
+
+CREATE TABLE PasswordResets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Divisions (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  created_at timestamp DEFAULT current_timestamp,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Divisions PRIMARY KEY (id),
+  CONSTRAINT UQ_Divisions_Name UNIQUE (name)
+);
+
+CREATE TABLE Classes (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  created_at timestamp DEFAULT current_timestamp,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Classes PRIMARY KEY (id),
+  CONSTRAINT UQ_Classes_Name UNIQUE (name)
+);
+
+CREATE TABLE Orders (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  created_at timestamp DEFAULT current_timestamp,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Orders PRIMARY KEY (id),
+  CONSTRAINT UQ_Orders_Name UNIQUE (name)
+);
+
+CREATE TABLE Families (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  created_at timestamp DEFAULT current_timestamp,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Families PRIMARY KEY (id),
+  CONSTRAINT UQ_Families_Name UNIQUE (name)
+);
+
+CREATE TABLE Genus (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  created_at timestamp DEFAULT current_timestamp,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Genus PRIMARY KEY (id),
+  CONSTRAINT UQ_Genus_Name UNIQUE (name)
+);
+
+CREATE TABLE Properties (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  ordenation integer,
+  CONSTRAINT PK_Properties PRIMARY KEY (id),
+  CONSTRAINT UQ_Properties_Name UNIQUE (name),
+  CONSTRAINT UQ_Properties_Ordenation UNIQUE (ordenation)
+);
+
+CREATE TABLE Plants (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  common_names text,
+  division_id integer,
+  class_id integer,
+  order_id integer,
+  family_id integer,
+  genus_id integer,
+  species varchar(255),
+  region_id integer,
+  applications text,
+  ecology text,
+  created_at timestamp DEFAULT current_timestamp,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Plants PRIMARY KEY (id),
+  CONSTRAINT UQ_Plants_Name UNIQUE (name),
+  CONSTRAINT FK_Divisions_Plants FOREIGN KEY (division_id) REFERENCES Divisions(id),
+  CONSTRAINT FK_Classes_Plants FOREIGN KEY (class_id) REFERENCES Classes(id),
+  CONSTRAINT FK_Orders_Plants FOREIGN KEY (order_id) REFERENCES Orders(id),
+  CONSTRAINT FK_Families_Plants FOREIGN KEY (family_id) REFERENCES Families(id),
+  CONSTRAINT FK_Genus_Plants FOREIGN KEY (genus_id) REFERENCES Genus(id)
+);
+
+CREATE TABLE PlantsProperties (
+  id integer AUTO_INCREMENT,
+  plant_id integer NOT NULL,
+  property_id integer NOT NULL,
+  description text,
+  created_at timestamp DEFAULT current_timestamp,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_PlantsProperties PRIMARY KEY (id),
+  CONSTRAINT FK_Plants_PlantsProperties FOREIGN KEY (plant_id) REFERENCES Plants(id),
+  CONSTRAINT FK_Properties_PlantsProperties FOREIGN KEY (property_id) REFERENCES Properties(id)
+);
+
+CREATE TABLE Images (
+  id integer AUTO_INCREMENT,
+  imagem blob NOT NULL,
+  source varchar(255),
+  plants_property_id integer NOT NULL,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Images PRIMARY KEY (id),
+  CONSTRAINT UQ_Images_Image UNIQUE (imagem),
+  CONSTRAINT FK_PlantsProperties_Images FOREIGN KEY (plants_property_id) REFERENCES PlantsProperties(id)
+);
+
+CREATE TABLE RegionMap (
+  id integer AUTO_INCREMENT,
+  imagem blob NOT NULL,
+  name varchar(255),
+  source varchar(255),
+  description varchar(255),
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_RegionMap PRIMARY KEY (id),
+  CONSTRAINT UQ_RegionMap_Image UNIQUE (imagem)
+);
+
+CREATE TABLE UsefulLinks (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  link varchar(255) NOT NULL,
+  plant_id integer,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_UsefulLinks PRIMARY KEY (id),
+  CONSTRAINT FK_Plants_UsefulLinks FOREIGN KEY (plant_id) REFERENCES Plants(id)
+);
+
+CREATE TABLE Actions (
+  id integer AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_Actions PRIMARY KEY (id),
+  CONSTRAINT UQ_Actions_Name UNIQUE (name)
+);
+
+CREATE TABLE AuditLogs (
+  id integer AUTO_INCREMENT,
+  table_name varchar(255) NOT NULL,
+  plant_id integer,
+  action_id integer NOT NULL,
+  changed_by integer NOT NULL,
+  change_time timestamp DEFAULT current_timestamp,
+  old_value text,
+  new_value text,
+  deleted_at timestamp NULL,
+  CONSTRAINT PK_AuditLogs PRIMARY KEY (id),
+  CONSTRAINT FK_Plants_AuditLogs FOREIGN KEY (plant_id) REFERENCES Plants(id),
+  CONSTRAINT FK_Actions_AuditLogs FOREIGN KEY (action_id) REFERENCES Actions(id),
+  CONSTRAINT FK_Users_AuditLogs FOREIGN KEY (changed_by) REFERENCES Users(id)
+);
+
+-- INSERT INTO Properties (name, ordenation) VALUES ('plant', 0);
+-- INSERT INTO Properties (name, ordenation) VALUES ('trunk', 1);
+-- INSERT INTO Properties (name, ordenation) VALUES ('bark', 2);
+-- INSERT INTO Properties (name, ordenation) VALUES ('leaves', 3);
+-- INSERT INTO Properties (name, ordenation) VALUES ('flowers', 4);
+-- INSERT INTO Properties (name, ordenation) VALUES ('fruit', 5);
+-- INSERT INTO Properties (name, ordenation) VALUES ('seed', 6);
+
+
+-- INSERT INTO actions (name) VALUES ('create');
+-- INSERT INTO actions (name) VALUES ('delete');
+-- INSERT INTO actions (name) VALUES ('edit');
+
+
+-- INSERT INTO divisions (name) VALUES ('Magnoliophyta (Angiospermae)');
+-- INSERT INTO classes (name) VALUES ('Magnoliopsida (Dicotiledonae)');
+-- INSERT INTO orders (name) VALUES ('Fabales');
+-- INSERT INTO families (name) VALUES ('Caesalpiniaceae (Leguminosae: Caesalpinioideae)');
+
+-- RegionMap blob aqui tem que ir pelo phpmyadmin pra upar o arquivo
+
+-- INSERT INTO plants (name, common_names, division_id, class_id, order_id, family_id, genus_id, species, region_id, applications, ecology)
+-- VALUES ('Canafístula', 'Acácia-amarela; amendoim, amendoim-falso, angico-bravo, camurça, curucaia, ibirá e monjoleiro, no Estado de São Paulo; amendoim-bravo; angico; angico-amarelo e angico-cangalha, em Minas Gerais; angico-vermelho e pororoca, no Paraná; barbatimão, cabeça-de-negro e cabelo-de-negro, no Estado do Rio de Janeiro; cambuí, em Mato Grosso do Sul e em Minas Gerais; canafiste; canafrista-branca, no Paraná; canafístula; cancença e favinha, em Pernambuco; canela-de-veado; canhafistula; caobi; cássia-amarela; farinha-seca e faveira, na Bahia e em Minas Gerais; faveiro, no Distrito Federal, em Minas Gerais e no Estado de São Paulo; guarucaia, em Minas Gerais e no Estado de São Paulo; guazu; ibira-puitá, no Rio Grande do Sul e no Estado de São Paulo; jacarandá-de-flor-amarela; madeira-nova, em Pernambuco e na Paraíba; pau-vermelho; quebra-serra, na Bahia; sobrasil; tamboril, na Bahia, em Pernambuco e no Estado do Rio de Janeiro; tamboril–branco; tamboril-bravo, na Bahia e no Estado de São Paulo; e tamburi.', 1,1,1,1,NULL,'Peltophorum dubium (Sprengel) Taubert, Engler et Prantl, Natürl. Pflanzenf. ed. I. 3(3).77:176, 1892.' ,1, 'Madeira serrada e roliça: essa essência constitui-se, atualmente, numa madeira de alto valor econômico, uma vez que já foi desprezada comercialmente. Por isso, permanecia nas derrubadas sem aproveitamento econômico imediato, como é o caso das queimadas do oeste do Paraná, feitas há alguns anos (Pereira, 1978). A madeira de canafístula é indicada em construção civil, para uso em vigas, caibros, ripas, marcos de portas, janelas e assoalhos. Em uso externo, é aproveitada para mourões, dormentes e cruzetas. É usada também na indústria de móveis e guarnições e em construção naval e militar. Em marcenaria e carpintaria, para fabricar carroçarias, chapas e peças para decorações de interiores e parquetes.', 'É uma espécie pioneira, o que significa que ela é uma das primeiras a colonizar áreas degradadas, contribuindo para a recuperação do solo e da vegetação. A canafístula tem a capacidade de fixar nitrogênio no solo, o que melhora a fertilidade do ambiente ao seu redor, beneficiando outras plantas.
+-- '  );
+
+
+-- INSERT INTO `plantsproperties` (`id`, `plant_id`, `property_id`, `description`, `created_at`, `deleted_at`) VALUES (NULL, '1', '1', NULL, current_timestamp(), NULL);
+
+-- Image blob  aqui tem que ir pelo phpmyadmin pra upar o arquivo
