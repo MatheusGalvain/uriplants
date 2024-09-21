@@ -145,16 +145,18 @@ footer .logo img {
     gap: 20px;
   }
 
-  .telefones, .redes-sociais, .localizacoes span {
+  .telefones,
+  .redes-sociais,
+  .localizacoes span {
     font-family: 'Poppins';
     font-weight: 400;
   }
-
 }
 
-
 /* página Home */
-#main-home, .sectionhome, #main-btns {
+#main-home,
+.sectionhome,
+#main-btns {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -196,7 +198,6 @@ footer .logo img {
   font-family: 'Poppins', sans-serif;
   font-weight: 200;
 }
-
 
 .img-carousel-home {
   border-radius: 0 0 0 120px;
@@ -260,13 +261,15 @@ button.carousel-next {
   font-weight: 200;
 }
 
+.wrapper {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
 /* Header */
 div.header-mobile {
-
   width: 100%;
   position: absolute;
-  top: 0;
-  left: 0;
   z-index: 50;
   display: flex;
   justify-content: space-between;
@@ -274,10 +277,9 @@ div.header-mobile {
 }
 
 section.hamburger-menu {
-
   display: flex;
   align-items: center;
-  padding: 11px 4% 7px 6%;
+  padding: 12px 4% 12px 6%;
   width: auto;
 }
 
@@ -308,7 +310,6 @@ div.search-box p {
   font-weight: 400;
   font-size: 14px;
   color: black;
-  /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); */
 }
 
 .search-box img {
@@ -317,40 +318,251 @@ div.search-box p {
   margin-left: auto;
 }
 
-.wrapper {
-  min-height: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+/* Header plant details */
+div.header-plant-details {
+  width: 100%;
+  position: absolute;
+  z-index: 50;
+  display: flex;
+  align-items: center;
 }
 
+div.hamburger-menu {
+  display: flex;
+  align-items: center;
+  padding: 12px 4% 12px 6%;
+  width: auto;
+}
 
+div.hamburger-menu img {
+  width: 23px;
+}
 
+a.back-btn {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  width: 92px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.back-btn img {
+  width: 25px;
+  margin: 0px 8px 0px 8px;
+}
+
+a.back-btn p {
+  font-family: 'Poppins';
+  font-weight: 500;
+  font-size: 14px;
+  color: #2C483C;
+  margin: 1px 0 0 0;
+}
 
 /* Página da planta específica aqui */
+.plant-details-home {
+  box-sizing: border-box;
+}
 
-.plant-details-top-img img{
-
+.plant-details-top-img img {
   width: 100%;
   max-height: 400px;
   object-fit: cover;
   display: flex;
-  }
+}
 
-  section.plant-content{
-    background-color: #cfd4D7;
-    display: flex;
-    border-radius: 20px 20px 0 0;
+section.plant-content {
+  display: block;
+  border-radius: 20px 20px 0 0;
+  box-sizing: border-box;
+  background-color: #dee7ec;
+  position: relative;
+  top: -20px;
+  margin: 0 0 -20px 0px;
+}
 
-  }
+.carousel-container {
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  gap: 48px;
+}
 
-  .plant-details-content-carousel{
-    display: flex;
-    gap: 10px;
-    margin: 40px auto;
-  }
+.arrow.left-arrow {
+  cursor: pointer;
+  width: 30px;
+  height: auto;
+  margin: 0 auto;
+  position: absolute;
+  top: 46px;
+  left: 4px;
+}
 
-  .plant-details-content-carousel img{
-  width: 75px;
-  height: 80px;
-  border-radius: 10px;
-  }
+.arrow.right-arrow {
+  cursor: pointer;
+  width: 30px;
+  height: auto;
+  margin: 0 auto;
+  position: absolute;
+  top: 46px;
+  right: 4px;
+}
+
+.plant-details-carousel-imgs {
+  display: flex;
+  gap: 12px;
+  margin: 25px auto;
+  justify-content: center;
+}
+
+.plant-details-carousel-imgs img {
+  width: 74px;
+  height: 74px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.floating-menu {
+  margin: 0 15px 30px 15px;
+}
+
+div.buttons-floating-menu {
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #2C483C;
+  flex-wrap: wrap;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+}
+
+div.buttons-floating-menu a {
+  justify-content: center;
+  margin: 0 auto;
+  font-family: 'Poppins';
+  font-weight: 400;
+  color: white;
+  font-size: 12px;
+}
+
+.resume {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 10px 20px 10px;
+}
+
+.name-container {
+  padding: 10px;
+}
+
+.scientific-name-container {
+  padding: 10px;
+}
+
+.resume-description {
+  padding: 10px;
+}
+
+.detailed-description {
+  padding: 10px;
+}
+
+.plant-details-wrapper {
+  padding: 30px 10px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.resume h1 {
+  font-size: 12px;
+}
+
+.resume h2 {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.resume p {
+  font-size: 16px;
+  font-weight: 400;
+  text-align: justify;
+}
+
+.detailed-description-flag {
+  padding: 6px;
+  background-color: #2C483C;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0 10px;
+  display: inline;
+  position: relative;
+}
+
+.detailed-description-flag p {
+  font-family: 'Poppins';
+  font-weight: 400;
+  color: white;
+  font-size: 12px;
+  display: inline;
+  padding: 0px 10px 0px 4px;
+}
+
+.detailed-description-flag img {
+  height: 45px;
+  display: inline-block;
+  top: -10px;
+  position: relative;
+  vertical-align: middle;
+}
+
+.growth-form h1,
+.tree-trunk h1,
+.tree-bark h1,
+.leaf-blades h1,
+.flower-buds h1,
+.fruit-bodies h1,
+.seed-pods h1 {
+  font-size: 12px;
+}
+
+.growth-form p,
+.tree-trunk p,
+.tree-bark p,
+.leaf-blades p,
+.flower-buds p,
+.fruit-bodies p,
+.seed-pods p {
+  font-size: 16px;
+  font-weight: 400;
+  text-align: justify;
+}
+
+.growth-form-photos,
+.tree-trunk-photos,
+.tree-bark-photos,
+.leaf-blades-photos,
+.flower-buds-photos,
+.fruit-bodies-photos,
+.seed-pods-photos {
+  display: flex;
+  gap: 12px;
+  margin: 10px auto 28px auto;
+  justify-content: center;
+}
+
+.growth-form img,
+.tree-trunk img,
+.tree-bark img,
+.leaf-blades img,
+.flower-buds img,
+.fruit-bodies img,
+.seed-pods img {
+  width: 74px;
+  height: 74px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

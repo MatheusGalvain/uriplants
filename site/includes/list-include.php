@@ -1,29 +1,33 @@
-<?php 
+<script>
 
-$objects = [
-    (object)[
-        'title' => 'Renan Plant',
-        'description' => 'Descrição Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed justo.'
-    ],
-    (object)[
-        'title' => 'Renan Plant',
-        'description' => 'Descrição Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed justo.'
-    ],
-    (object)[
-        'title' => 'Renan Plant',
-        'description' => 'Descrição Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed justo.'
-    ],
-    (object)[
-        'title' => 'Renan Plant',
-        'description' => 'Descrição Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed justo.'
-    ],
-    (object)[
-        'title' => 'Renan Plant',
-        'description' => 'Descrição Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed justo.'
-    ]
-];
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('http://localhost/uriplants/public/plants')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('plants-container');
+            let html = '';
 
-?>
+            data.forEach(plant => {
+                html += `
+                    <div class="plant-box">
+                        <div class="plant-info">
+                            <h1>${plant.name}</h1>
+                            <p>${plant.ecology}</p>
+                        </div>
+                        <div class="plant-photo">
+                            <img src="${plant.image_source}" alt="Foto da planta">
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        })
+        .catch(error => console.error('Erro ao buscar as plantas:', error));
+    }
+);
+
+</script>
 <div class="list-page-container">
     <div class="list-page-content">
         <div class="location-container">
@@ -34,18 +38,6 @@ $objects = [
                 URI Plantas
             </h1>
         </div>
-        <section class="plant-list"> <!-- lista plantas -->
-            <?php foreach($objects as $object){ ?>
-            <div class="plant-box">
-                <div class="plant-info">
-                    <h1><?= $object->title;?></h1>
-                    <p><?= $object->description;?></p>
-                </div>
-                <div class="plant-photo">
-                    <img src="https://picsum.photos/536/354" alt="Foto da planta">
-                </div>
-            </div>
-            <?php }?>
-        </section>
+        <section class="plant-list" id="plants-container"></section>
     </div>
 </div>

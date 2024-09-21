@@ -14,7 +14,7 @@
 
 <body>
     <div class="wrapper">
-        <?php include("includes/header.php"); ?>
+        <?php include("includes/header-plant-details.php"); ?>
 
         <?php include("includes/plant-details-main.php"); ?>
 
