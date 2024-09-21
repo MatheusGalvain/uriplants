@@ -1,3 +1,21 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('http://localhost/uriplants/public/plants')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('plants-container');
+            let html = '';
+            let plant = data[0];
+            
+            let plant_name_h2 = document.getElementById('plant-name');
+
+            plant_name_h2.innerHTML = plant.name;
+        })
+        .catch(error => console.error('Erro ao buscar as plantas:', error));
+    }
+);
+</script>
+
 <main class="plant-details-home">
     <div class="plant-details-top-img">
         <img src="images/img-test/baoba.jpg" alt="Imagem">
@@ -25,7 +43,7 @@
         <section class="resume">
             <div class="name-container">
                 <h1>Nome</h1>
-                <h2 id="plant-name">RENAN NOME NORMAL</h2>
+                <h2 id="plant-name"></h2>
             </div>
 
             <div class="scientific-name-container">

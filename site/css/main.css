@@ -566,3 +566,91 @@ div.buttons-floating-menu a {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+
+
+
+
+
+/* PLANT DETAILS APENAS ECOLOGYYYYYYYY */
+
+.plant-taxonomy {
+  padding: 10px;
+}
+
+.taxonomy-details-wrapper {
+  padding: 30px 10px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.plant-taxonomy-flag {
+  padding: 6px;
+  background-color: #2C483C;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0 10px;
+  display: inline;
+  position: relative;
+}
+
+.plant-taxonomy-flag p {
+  font-family: 'Poppins';
+  font-weight: 400;
+  color: white;
+  font-size: 12px;
+  display: inline;
+  padding: 0px 10px 0px 4px;
+}
+
+.plant-taxonomy-flag img {
+  height: 45px;
+  display: inline-block;
+  top: -10px;
+  position: relative;
+  vertical-align: middle;
+}
+
+.plant-division h1,
+.plant-class h1,
+.plant-order h1,
+.plant-family h1,
+.plant-gender h1,
+.plant-species h1 {
+  font-size: 12px;
+}
+
+.plant-division p,
+.plant-class p,
+.plant-order p,
+.plant-family p,
+.plant-gender p,
+.plant-species p {
+  font-size: 16px;
+  font-weight: 400;
+  text-align: justify;
+}
+
+.plant-division-photos,
+.plant-class-photos,
+.plant-order-photos,
+.plant-family-photos,
+.plant-gender-photos,
+.plant-species-photos {
+  display: flex;
+  gap: 12px;
+  margin: 10px auto 28px auto;
+  justify-content: center;
+}
+
+.plant-division img,
+.plant-class img,
+.plant-order img,
+.plant-family img,
+.plant-gender img,
+.plant-species img {
+  width: 74px;
+  height: 74px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
