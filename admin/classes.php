@@ -1,69 +1,101 @@
 <?php
 session_start();
 include_once('includes/config.php');
+require_once('includes/audit.php');
 
-// Verificar se o usuário está autenticado
 if (strlen($_SESSION['id']) == 0) {
     header('location:logout.php');
     exit();
 }
 
-// Adicionar nova classe
 if (isset($_POST['add_class'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    // Verificar se o nome da classe já existe
     $query = mysqli_query($con, "SELECT * FROM classes WHERE name='$name'");
     if (mysqli_num_rows($query) > 0) {
         $error = "Uma classe com esse nome já existe.";
     } else {
-        // Inserir nova classe
+
         $sql = "INSERT INTO classes (name) VALUES ('$name')";
         if (mysqli_query($con, $sql)) {
             $success = "Classe adicionada com sucesso.";
+
+            $new_class_id = mysqli_insert_id($con);
+
+            $table = 'classes';
+            $action_id = 1; 
+            $changed_by = $_SESSION['id'];
+            $old_value = null; 
+            $new_value = "ID: $new_class_id, Nome: $name";
+            $plant_id = null;
+
+            log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
         } else {
             $error = "Erro ao adicionar classe: " . mysqli_error($con);
         }
     }
 }
 
-// Editar nome da classe
 if (isset($_POST['edit_class'])) {
     $id = intval($_POST['id']);
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    // Verificar se o nome da classe já existe
     $query = mysqli_query($con, "SELECT * FROM classes WHERE name='$name' AND id != $id");
     if (mysqli_num_rows($query) > 0) {
         $error = "Uma classe com esse nome já existe.";
     } else {
-        // Atualizar o nome da classe
+
+        $old_query = mysqli_query($con, "SELECT name FROM classes WHERE id = $id");
+        $old_row = mysqli_fetch_assoc($old_query);
+        $old_name = $old_row['name'];
+
         $sql = "UPDATE classes SET name = '$name' WHERE id = $id";
         if (mysqli_query($con, $sql)) {
             $success = "Nome da classe atualizado com sucesso.";
+
+            $table = 'classes';
+            $action_id = 3; 
+            $changed_by = $_SESSION['id'];
+            $old_value = "$old_name";
+            $new_value = "$name";
+            $plant_id = null; 
+
+            log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
         } else {
             $error = "Erro ao atualizar nome da classe: " . mysqli_error($con);
         }
     }
 }
 
-// Processar a exclusão de uma classe
 if (isset($_POST['delete_class'])) {
     $id = intval($_POST['id']);
 
-    // Marcar a classe como excluída
+    $old_query = mysqli_query($con, "SELECT name FROM classes WHERE id = $id");
+    $old_row = mysqli_fetch_assoc($old_query);
+    $old_name = $old_row['name'];
+
     $sql = "UPDATE classes SET deleted_at = NOW() WHERE id = $id";
     if (mysqli_query($con, $sql)) {
         $success = "Classe excluída com sucesso.";
+
+        $table = 'classes';
+        $action_id = 2; 
+        $changed_by = $_SESSION['id'];
+        $old_value = "Nome: $old_name";
+        $new_value = null; 
+        $plant_id = null; 
+
+        log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
     } else {
         $error = "Erro ao excluir classe: " . mysqli_error($con);
     }
 }
 
-// Processar a busca
+
 $search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
 
-// Obter todas as classes com base na busca
 $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
 $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NULL $searchQuery");
 ?>
@@ -106,7 +138,6 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
                         </div>
                     </div>
 
-                    <!-- Botão de buscar e título -->
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -132,12 +163,11 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
                                         <tr>
                                             <td><?php echo htmlspecialchars($row['name']); ?></td>
                                             <td>
-                                                <!-- Botão para abrir o modal de edição -->
+
                                                 <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editClassModal" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">
                                                     Editar
                                                 </button>
 
-                                                <!-- Botão para abrir o modal de exclusão -->
                                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
                                                     Excluir
                                                 </button>
@@ -154,7 +184,6 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Exclusão -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -176,7 +205,6 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
         </div>
     </div>
 
-    <!-- Modal de Edição de Classe -->
     <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -199,7 +227,7 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
     </div>
 
     <script>
-        // Script para preencher o ID da classe no modal de exclusão
+
         document.addEventListener('DOMContentLoaded', function() {
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
             var deleteIdInput = document.getElementById('deleteId');
@@ -212,7 +240,6 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
             });
         });
 
-        // Script para preencher o modal de edição com os dados da classe
         document.addEventListener('DOMContentLoaded', function() {
             var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editClassModal"]');
             var editIdInput = document.getElementById('editId');

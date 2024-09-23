@@ -1,69 +1,100 @@
 <?php
     session_start();
     include_once('includes/config.php');
+    require_once('includes/audit.php');
 
-    // Verificar se o usuário está autenticado
     if (strlen($_SESSION['id']) == 0) {
         header('location:logout.php');
         exit();
     }
 
-    // Adicionar nova divisão
     if (isset($_POST['add_division'])) {
         $name = mysqli_real_escape_string($con, $_POST['name']);
 
-        // Verificar se o nome da divisão já existe
         $query = mysqli_query($con, "SELECT * FROM Divisions WHERE name='$name'");
         if (mysqli_num_rows($query) > 0) {
             $error = "Uma divisão com esse nome já existe.";
         } else {
-            // Inserir nova divisão
+
             $sql = "INSERT INTO Divisions (name) VALUES ('$name')";
             if (mysqli_query($con, $sql)) {
                 $success = "Divisão adicionada com sucesso.";
+
+                $new_class_id = mysqli_insert_id($con);
+
+                $table = 'divisions';
+                $action_id = 1; 
+                $changed_by = $_SESSION['id'];
+                $old_value = null; 
+                $new_value = "ID: $new_class_id, Nome: $name";
+                $plant_id = null;
+    
+    
+                log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
             } else {
                 $error = "Erro ao adicionar divisão: " . mysqli_error($con);
             }
         }
     }
 
-    // Processar a exclusão de uma divisão
     if (isset($_POST['delete_division'])) {
         $id = intval($_POST['id']);
 
-        // Marcar a divisão como excluída
+        $old_query = mysqli_query($con, "SELECT name FROM divisions WHERE id = $id");
+        $old_row = mysqli_fetch_assoc($old_query);
+        $old_name = $old_row['name'];
+
         $sql = "UPDATE Divisions SET deleted_at = NOW() WHERE id = $id";
         if (mysqli_query($con, $sql)) {
             $success = "Divisão excluída com sucesso.";
+
+            $table = 'divisions';
+            $action_id = 2; 
+            $changed_by = $_SESSION['id'];
+            $old_value = "Nome: $old_name";
+            $new_value = null; 
+            $plant_id = null; 
+    
+            log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
         } else {
             $error = "Erro ao excluir divisão: " . mysqli_error($con);
         }
     }
 
-    // Processar a edição do nome da divisão
     if (isset($_POST['edit_division'])) {
         $id = intval($_POST['id']);
         $name = mysqli_real_escape_string($con, $_POST['name']);
 
-        // Verificar se o nome da divisão já existe
         $query = mysqli_query($con, "SELECT * FROM Divisions WHERE name='$name' AND id != $id");
         if (mysqli_num_rows($query) > 0) {
             $error = "Uma divisão com esse nome já existe.";
         } else {
-            // Atualizar o nome da divisão
+            $old_query = mysqli_query($con, "SELECT name FROM divisions WHERE id = $id");
+            $old_row = mysqli_fetch_assoc($old_query);
+            $old_name = $old_row['name'];
+
             $sql = "UPDATE Divisions SET name='$name' WHERE id=$id";
             if (mysqli_query($con, $sql)) {
                 $success = "Divisão editada com sucesso.";
+
+            $table = 'divisions';
+            $action_id = 3; 
+            $changed_by = $_SESSION['id'];
+            $old_value = "$old_name";
+            $new_value = "$name";
+            $plant_id = null; 
+
+            log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
             } else {
                 $error = "Erro ao editar divisão: " . mysqli_error($con);
             }
         }
     }
 
-    // Processar a busca
     $search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
 
-    // Obter todas as divisões com base na busca
     $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
     $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at IS NULL $searchQuery");
 ?>
@@ -105,8 +136,7 @@
                             </form>
                         </div>
                     </div>
-                    
-                    <!-- Botão de buscar e titulo -->
+
                     <div class="card mb-4">
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -132,12 +162,10 @@
                                     <tr>
                                         <td><?php echo htmlspecialchars($row['name']); ?></td>
                                         <td>
-                                            <!-- Botão para abrir o modal de edição -->
                                             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editDivisionModal" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">
                                                 Editar
                                             </button>
 
-                                            <!-- Botão para abrir o modal de exclusão -->
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
                                                 Excluir
                                             </button>
@@ -154,7 +182,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Exclusão -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -176,7 +203,6 @@
         </div>
     </div>
 
-    <!-- Modal de Edição -->
     <div class="modal fade" id="editDivisionModal" tabindex="-1" aria-labelledby="editDivisionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -199,7 +225,6 @@
     </div>
 
     <script>
-        // Script para preencher o ID da divisão no modal de exclusão
         document.addEventListener('DOMContentLoaded', function() {
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
             var deleteIdInput = document.getElementById('deleteId');
@@ -213,7 +238,6 @@
                 });
             });
 
-            // Script para preencher os dados de edição no modal
             var editButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
