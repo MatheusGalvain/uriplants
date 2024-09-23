@@ -2,30 +2,41 @@
 session_start();
 include_once('includes/config.php');
 
-// Verificar autenticação
 if (!isset($_SESSION['id']) || strlen($_SESSION['id']) == 0) {
     header('location:logout.php');
     exit();
 }
 
-function filter_input_data($con, $data) {
-    return mysqli_real_escape_string($con, trim($data));
+function display_value($value) {
+    return isset($value) ? htmlspecialchars($value) : 'N/A';
 }
 
-// Consulta à tabela 'auditlogs' usando MySQLi
-$result = mysqli_query($con,
-"SELECT al.id, al.table_name, al.plant_id, al.action_id, a.name AS actionName, al.changed_by, al.change_time, al.old_value, al.new_value, u.fname AS userName, u.email AS email, p.name AS plantName
-FROM auditlogs AS al
-INNER JOIN actions AS a ON al.action_id = a.id
-INNER JOIN users AS u ON al.changed_by = u.id
-INNER JOIN plants AS p ON al.plant_id = p.id
-WHERE al.deleted_at IS NULL
-");
+$query = "
+    SELECT 
+        al.id, 
+        al.table_name, 
+        al.plant_id, 
+        al.action_id, 
+        a.name AS actionName, 
+        al.changed_by, 
+        al.change_time, 
+        al.old_value, 
+        al.new_value, 
+        u.fname AS userName, 
+        u.email AS email, 
+        p.name AS plantName
+    FROM auditlogs AS al
+    INNER JOIN actions AS a ON al.action_id = a.id
+    INNER JOIN users AS u ON al.changed_by = u.id
+    LEFT JOIN plants AS p ON al.plant_id = p.id
+    WHERE al.deleted_at IS NULL
+    ORDER BY id
+";
 
-// Transformar os resultados em um array
+$result = mysqli_query($con, $query);
+
 $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -59,20 +70,40 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                     foreach ($logs as $row) {
-                                        echo '<tr>';
-                                        echo '<td>' . htmlspecialchars($row['id']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['table_name']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['plant_id']) . ' - ' . htmlspecialchars($row['plantName']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['actionName']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['userName']) . ' - ' . htmlspecialchars($row['email']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['change_time']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['old_value']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($row['new_value']) . '</td>';
-                                        echo '</tr>';
-                                    }
-                                    ?>
+                                    <?php if (count($logs) > 0): ?>
+                                        <?php foreach ($logs as $row): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($row['id']); ?></td>
+                                                <td><?php echo display_value($row['table_name']); ?></td>
+                                                <td>
+                                                    <?php 
+                                                    if (!empty($row['plant_id']) && !empty($row['plantName'])) {
+                                                        echo htmlspecialchars($row['plant_id']) . ' - ' . htmlspecialchars($row['plantName']);
+                                                    } else {
+                                                        echo 'N/A';
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td><?php echo display_value($row['actionName']); ?></td>
+                                                <td>
+                                                    <?php 
+                                                    if (!empty($row['userName']) && !empty($row['email'])) {
+                                                        echo htmlspecialchars($row['userName']) . ' - ' . htmlspecialchars($row['email']);
+                                                    } else {
+                                                        echo 'N/A';
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td><?php echo display_value($row['change_time']); ?></td>
+                                                <td><?php echo display_value($row['old_value']); ?></td>
+                                                <td><?php echo display_value($row['new_value']); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="8" class="text-center">Nenhum log encontrado.</td>
+                                        </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -83,6 +114,5 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
         </div>
     </div>
 
-    <!-- Scripts adicionais, se necessário -->
 </body>
 </html>
