@@ -1,6 +1,7 @@
 <?php
 session_start();
 include_once('includes/config.php');
+require_once('includes/audit.php'); // Se precisar de auditoria para edição
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -11,13 +12,19 @@ if (strlen($_SESSION['id']) == 0) {
     exit();
 }
 
+// Função para log de auditoria (opcional)
+function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id = null) {
+    // Implemente conforme sua necessidade ou utilize a função log_audit se disponível
+    // Exemplo:
+    log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+}
 
+// Adicionar uma nova propriedade
 if (isset($_POST['add_property'])) {
     $plant_id = intval($_POST['plant_id']);
     $property_id = intval($_POST['property_id']);
     $description = mysqli_real_escape_string($con, $_POST['description']);
     $source = mysqli_real_escape_string($con, $_POST['source']);
-
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
@@ -27,10 +34,9 @@ if (isset($_POST['add_property'])) {
     }
 
     if (!isset($error)) {
-
         mysqli_begin_transaction($con);
         try {
-
+            // Inserir na tabela PlantsProperties
             $sql = "INSERT INTO PlantsProperties (plant_id, property_id, description, created_at) VALUES (?, ?, ?, NOW())";
             $stmt = mysqli_prepare($con, $sql);
             if ($stmt === false) {
@@ -44,6 +50,7 @@ if (isset($_POST['add_property'])) {
 
             $plants_property_id = mysqli_insert_id($con);
 
+            // Inserir imagem, se fornecida
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
                 $image = file_get_contents($_FILES['image']['tmp_name']);
 
@@ -59,36 +66,138 @@ if (isset($_POST['add_property'])) {
                     throw new Exception("Erro ao adicionar a imagem: " . mysqli_error($con));
                 }
 
-                $success = "Imaagem adicionada com sucesso.";
-            } else {
                 $success = "Imagem adicionada com sucesso.";
+            } else {
+                $success = "Propriedade adicionada com sucesso.";
             }
 
             mysqli_commit($con);
         } catch (Exception $e) {
-
             mysqli_rollback($con);
             $error = $e->getMessage();
         }
     }
 }
 
+// Editar uma propriedade existente
+if (isset($_POST['edit_property'])) {
+    $id = intval($_POST['id']);
+    $plant_id = intval($_POST['plant_id']);
+    $property_id = intval($_POST['property_id']);
+    $description = mysqli_real_escape_string($con, $_POST['description']);
+    $source = mysqli_real_escape_string($con, $_POST['source']);
+
+    // Obter os dados atuais para auditoria
+    $current_query = mysqli_query($con, "SELECT * FROM PlantsProperties WHERE id = $id");
+    if (mysqli_num_rows($current_query) == 0) {
+        $error = "Propriedade não encontrada.";
+    } else {
+        $current_data = mysqli_fetch_assoc($current_query);
+        $old_plant_id = $current_data['plant_id'];
+        $old_property_id = $current_data['property_id'];
+        $old_description = $current_data['description'];
+
+        // Iniciar transação
+        mysqli_begin_transaction($con);
+        try {
+            // Atualizar PlantsProperties
+            $update_sql = "UPDATE PlantsProperties SET plant_id = ?, property_id = ?, description = ? WHERE id = ?";
+            $update_stmt = mysqli_prepare($con, $update_sql);
+            if ($update_stmt === false) {
+                throw new Exception("Erro na preparação da consulta de atualização: " . mysqli_error($con));
+            }
+            mysqli_stmt_bind_param($update_stmt, 'iisi', $plant_id, $property_id, $description, $id);
+
+            if (!mysqli_stmt_execute($update_stmt)) {
+                throw new Exception("Erro ao atualizar propriedade da planta: " . mysqli_error($con));
+            }
+
+            // Atualizar imagem, se fornecida
+            if (isset($_FILES['edit_image']) && $_FILES['edit_image']['error'] == 0) {
+                $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!in_array($_FILES['edit_image']['type'], $allowed_types)) {
+                    throw new Exception("Tipo de imagem inválido. Apenas JPEG, PNG e GIF são permitidos.");
+                }
+
+                $image = file_get_contents($_FILES['edit_image']['tmp_name']);
+
+                // Atualizar a tabela images
+                // Assumindo que cada PlantsProperty tem apenas uma imagem. Caso contrário, adapte conforme necessário.
+                $image_sql = "UPDATE images SET imagem = ?, source = ? WHERE plants_property_id = ?";
+                $image_stmt = mysqli_prepare($con, $image_sql);
+                if ($image_stmt === false) {
+                    throw new Exception("Erro na preparação da consulta de imagem: " . mysqli_error($con));
+                }
+
+                mysqli_stmt_bind_param($image_stmt, 'ssi', $image, $source, $id);
+
+                if (!mysqli_stmt_execute($image_stmt)) {
+                    throw new Exception("Erro ao atualizar a imagem: " . mysqli_error($con));
+                }
+
+                $success = "Propriedade e imagem atualizadas com sucesso.";
+            } else {
+                $success = "Propriedade atualizada com sucesso.";
+            }
+
+            // Auditoria (opcional)
+            $table = 'PlantsProperties';
+            $action_id = 3; // Defina conforme sua lógica de auditoria
+            $changed_by = $_SESSION['id'];
+            $old_value = "Plant ID: $old_plant_id, Property ID: $old_property_id, Description: $old_description";
+            $new_value = "Plant ID: $plant_id, Property ID: $property_id, Description: $description";
+            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
+            mysqli_commit($con);
+        } catch (Exception $e) {
+            mysqli_rollback($con);
+            $error = $e->getMessage();
+        }
+    }
+}
+
+// Deletar uma propriedade
 if (isset($_POST['delete_property'])) {
     $id = intval($_POST['id']);
 
-    $delete_images_sql = "DELETE FROM images WHERE plants_property_id = ?";
-    $delete_images_stmt = mysqli_prepare($con, $delete_images_sql);
-    mysqli_stmt_bind_param($delete_images_stmt, 'i', $id);
-    mysqli_stmt_execute($delete_images_stmt);
+    mysqli_begin_transaction($con);
+    try {
+        // Deletar imagens relacionadas
+        $delete_images_sql = "DELETE FROM images WHERE plants_property_id = ?";
+        $delete_images_stmt = mysqli_prepare($con, $delete_images_sql);
+        if ($delete_images_stmt === false) {
+            throw new Exception("Erro na preparação da consulta de exclusão de imagens: " . mysqli_error($con));
+        }
+        mysqli_stmt_bind_param($delete_images_stmt, 'i', $id);
+        if (!mysqli_stmt_execute($delete_images_stmt)) {
+            throw new Exception("Erro ao excluir imagens da propriedade: " . mysqli_error($con));
+        }
 
-    $sql = "DELETE FROM PlantsProperties WHERE id = ?";
-    $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, 'i', $id);
+        // Deletar da tabela PlantsProperties
+        $sql = "DELETE FROM PlantsProperties WHERE id = ?";
+        $stmt = mysqli_prepare($con, $sql);
+        if ($stmt === false) {
+            throw new Exception("Erro na preparação da consulta de exclusão: " . mysqli_error($con));
+        }
+        mysqli_stmt_bind_param($stmt, 'i', $id);
 
-    if (mysqli_stmt_execute($stmt)) {
-        $success = "Imagem da planta excluída com sucesso.";
-    } else {
-        $error = "Erro ao excluir imagem da planta: " . mysqli_error($con);
+        if (!mysqli_stmt_execute($stmt)) {
+            throw new Exception("Erro ao excluir propriedade da planta: " . mysqli_error($con));
+        }
+
+        // Auditoria (opcional)
+        $table = 'PlantsProperties';
+        $action_id = 2; // Defina conforme sua lógica de auditoria
+        $changed_by = $_SESSION['id'];
+        $old_value = "ID: $id";
+        $new_value = null;
+        log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value);
+
+        mysqli_commit($con);
+        $success = "Propriedade da planta excluída com sucesso.";
+    } catch (Exception $e) {
+        mysqli_rollback($con);
+        $error = $e->getMessage();
     }
 }
 
@@ -106,7 +215,6 @@ $propertiesQuery = mysqli_query($con, "
     WHERE pp.deleted_at IS NULL $searchQuery
     ORDER BY pp.created_at DESC
 ");
-
 ?>
 
 <!DOCTYPE html>
@@ -134,6 +242,7 @@ $propertiesQuery = mysqli_query($con, "
                         <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                     <?php } ?>
 
+                    <!-- Formulário de Adição -->
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Adicionar uma Nova Imagem</h5>
@@ -179,11 +288,11 @@ $propertiesQuery = mysqli_query($con, "
                         </div>
                     </div>
 
-        
+                    <!-- Tabela de Propriedades -->
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="card-title mb-0">Imaagens Cadastradas</h5>
+                                <h5 class="card-title mb-0">Imagens Cadastradas</h5>
                                 <form method="POST" action="" class="d-flex">
                                     <input type="text" class="form-control me-2" name="search" placeholder="Buscar" value="<?php echo htmlspecialchars($search); ?>">
                                     <button class="btn btn-primary" type="submit">Buscar</button>
@@ -210,7 +319,7 @@ $propertiesQuery = mysqli_query($con, "
                                     <?php
                                     if (mysqli_num_rows($propertiesQuery) > 0) {
                                         while ($row = mysqli_fetch_assoc($propertiesQuery)) {
-          
+
                                             $created_at = date("d/m/Y H:i", strtotime($row['created_at']));
                                             $deleted_at = $row['deleted_at'] ? date("d/m/Y H:i", strtotime($row['deleted_at'])) : 'Ativo';
                                     ?>
@@ -229,7 +338,17 @@ $propertiesQuery = mysqli_query($con, "
                                                 <td><?php echo htmlspecialchars($created_at); ?></td>
                                                 <td><?php echo htmlspecialchars($deleted_at); ?></td>
                                                 <td>
-                                                    
+                                                    <!-- Botão de Editar -->
+                                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editPropertyModal"
+                                                        data-id="<?php echo htmlspecialchars($row['id']); ?>"
+                                                        data-plant_id="<?php echo htmlspecialchars($row['plant_id']); ?>"
+                                                        data-property_id="<?php echo htmlspecialchars($row['property_id']); ?>"
+                                                        data-description="<?php echo htmlspecialchars($row['description']); ?>"
+                                                        data-source="<?php echo htmlspecialchars($row['image_source']); ?>">
+                                                        Editar
+                                                    </button>
+
+                                                    <!-- Botão de Excluir -->
                                                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
                                                         Excluir
                                                     </button>
@@ -251,6 +370,7 @@ $propertiesQuery = mysqli_query($con, "
         </div>
     </div>
 
+    <!-- Modal de Exclusão -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -272,15 +392,99 @@ $propertiesQuery = mysqli_query($con, "
         </div>
     </div>
 
+    <!-- Modal de Edição -->
+    <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPropertyModalLabel">Editar Propriedade da Planta</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="editPropertyId">
+                        <div class="mb-3">
+                            <label for="editPlantId" class="form-label">Planta</label>
+                            <select class="form-select" id="editPlantId" name="plant_id" required>
+                                <option value="">Selecione uma planta</option>
+                                <?php
+                                mysqli_data_seek($plants, 0); // Resetar o ponteiro do resultado
+                                while ($plant = mysqli_fetch_assoc($plants)) {
+                                    echo "<option value=\"" . htmlspecialchars($plant['id']) . "\">" . htmlspecialchars($plant['name']) . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPropertyIdSelect" class="form-label">Propriedade</label>
+                            <select class="form-select" id="editPropertyIdSelect" name="property_id" required>
+                                <option value="">Selecione uma propriedade</option>
+                                <?php
+                                mysqli_data_seek($properties, 0); // Resetar o ponteiro do resultado
+                                while ($property = mysqli_fetch_assoc($properties)) {
+                                    echo "<option value=\"" . htmlspecialchars($property['id']) . "\">" . htmlspecialchars($property['name']) . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDescription" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSource" class="form-label">Fonte da Imagem</label>
+                            <input type="text" class="form-control" id="editSource" name="source" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editImage" class="form-label">Imagem (deixe em branco para não alterar)</label>
+                            <input type="file" class="form-control" id="editImage" name="edit_image" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" name="edit_property" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Script para preencher o modal de exclusão com o ID correto
         document.addEventListener('DOMContentLoaded', function() {
-            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
             var deleteIdInput = document.getElementById('deleteId');
 
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');
                     deleteIdInput.value = id;
+                });
+            });
+        });
+
+        // Script para preencher o modal de edição com os dados corretos
+        document.addEventListener('DOMContentLoaded', function() {
+            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editPropertyModal"]');
+            var editPropertyIdInput = document.getElementById('editPropertyId');
+            var editPlantIdSelect = document.getElementById('editPlantId');
+            var editPropertyIdSelect = document.getElementById('editPropertyIdSelect');
+            var editDescriptionTextarea = document.getElementById('editDescription');
+            var editSourceInput = document.getElementById('editSource');
+
+            editButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var id = this.getAttribute('data-id');
+                    var plant_id = this.getAttribute('data-plant_id');
+                    var property_id = this.getAttribute('data-property_id');
+                    var description = this.getAttribute('data-description');
+                    var source = this.getAttribute('data-source');
+
+                    editPropertyIdInput.value = id;
+                    editPlantIdSelect.value = plant_id;
+                    editPropertyIdSelect.value = property_id;
+                    editDescriptionTextarea.value = description;
+                    editSourceInput.value = source;
                 });
             });
         });
