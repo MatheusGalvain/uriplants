@@ -357,7 +357,6 @@ $propertiesQuery = mysqli_query($con, "
                                         <th>Imagem</th>
                                         <th>Fonte da Imagem</th>
                                         <th>Criado em</th>
-                                        <th>Deletado em</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
@@ -382,7 +381,6 @@ $propertiesQuery = mysqli_query($con, "
                                                 </td>
                                                 <td><?php echo htmlspecialchars($row['image_source']); ?></td>
                                                 <td><?php echo htmlspecialchars($created_at); ?></td>
-                                                <td><?php echo htmlspecialchars($deleted_at); ?></td>
                                                 <td>
 
                                                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editPropertyModal"
