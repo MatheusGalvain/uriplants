@@ -2,67 +2,93 @@
 session_start();
 include_once('includes/config.php');
 
-// Verificar se o usuário está autenticado
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if (strlen($_SESSION['id']) == 0) {
     header('location:logout.php');
     exit();
 }
 
-// Adicionar nova propriedade de planta
+
 if (isset($_POST['add_property'])) {
     $plant_id = intval($_POST['plant_id']);
     $property_id = intval($_POST['property_id']);
     $description = mysqli_real_escape_string($con, $_POST['description']);
     $source = mysqli_real_escape_string($con, $_POST['source']);
 
-    // Inserir nova propriedade de planta
-    $sql = "INSERT INTO PlantsProperties (plant_id, property_id, description, created_at) VALUES (?, ?, ?, NOW())";
-    $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, 'iis', $plant_id, $property_id, $description);
 
-    if (mysqli_stmt_execute($stmt)) {
-        $plants_property_id = mysqli_insert_id($con);
-
-        // Inserir imagem, se fornecida
-        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            $image = file_get_contents($_FILES['image']['tmp_name']);
-
-            $image_sql = "INSERT INTO images (imagem, source, plants_property_id) VALUES (?, ?, ?)";
-            $image_stmt = mysqli_prepare($con, $image_sql);
-            mysqli_stmt_bind_param($image_stmt, 'bsi', $image, $source, $plants_property_id);
-
-            if (mysqli_stmt_execute($image_stmt)) {
-                $success = "Propriedade da planta adicionada com sucesso, incluindo a imagem.";
-            } else {
-                $error = "Propriedade adicionada, mas erro ao adicionar a imagem: " . mysqli_error($con);
-            }
-        } else {
-            $success = "Propriedade da planta adicionada com sucesso.";
+    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($_FILES['image']['type'], $allowed_types)) {
+            $error = "Tipo de imagem inválido. Apenas JPEG, PNG e GIF são permitidos.";
         }
-    } else {
-        $error = "Erro ao adicionar propriedade da planta: " . mysqli_error($con);
+    }
+
+    if (!isset($error)) {
+
+        mysqli_begin_transaction($con);
+        try {
+
+            $sql = "INSERT INTO PlantsProperties (plant_id, property_id, description, created_at) VALUES (?, ?, ?, NOW())";
+            $stmt = mysqli_prepare($con, $sql);
+            if ($stmt === false) {
+                throw new Exception("Erro na preparação da consulta: " . mysqli_error($con));
+            }
+            mysqli_stmt_bind_param($stmt, 'iis', $plant_id, $property_id, $description);
+
+            if (!mysqli_stmt_execute($stmt)) {
+                throw new Exception("Erro ao adicionar propriedade da planta: " . mysqli_error($con));
+            }
+
+            $plants_property_id = mysqli_insert_id($con);
+
+            if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                $image = file_get_contents($_FILES['image']['tmp_name']);
+
+                $image_sql = "INSERT INTO images (imagem, source, plants_property_id) VALUES (?, ?, ?)";
+                $image_stmt = mysqli_prepare($con, $image_sql);
+                if ($image_stmt === false) {
+                    throw new Exception("Erro na preparação da consulta de imagem: " . mysqli_error($con));
+                }
+
+                mysqli_stmt_bind_param($image_stmt, 'ssi', $image, $source, $plants_property_id);
+
+                if (!mysqli_stmt_execute($image_stmt)) {
+                    throw new Exception("Erro ao adicionar a imagem: " . mysqli_error($con));
+                }
+
+                $success = "Imaagem adicionada com sucesso.";
+            } else {
+                $success = "Imagem adicionada com sucesso.";
+            }
+
+            mysqli_commit($con);
+        } catch (Exception $e) {
+
+            mysqli_rollback($con);
+            $error = $e->getMessage();
+        }
     }
 }
 
-// Processar a exclusão de uma propriedade de planta
 if (isset($_POST['delete_property'])) {
     $id = intval($_POST['id']);
 
-    // Excluir imagens relacionadas
     $delete_images_sql = "DELETE FROM images WHERE plants_property_id = ?";
     $delete_images_stmt = mysqli_prepare($con, $delete_images_sql);
     mysqli_stmt_bind_param($delete_images_stmt, 'i', $id);
     mysqli_stmt_execute($delete_images_stmt);
 
-    // Excluir a propriedade de planta
     $sql = "DELETE FROM PlantsProperties WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
     mysqli_stmt_bind_param($stmt, 'i', $id);
 
     if (mysqli_stmt_execute($stmt)) {
-        $success = "Propriedade da planta excluída com sucesso.";
+        $success = "Imagem da planta excluída com sucesso.";
     } else {
-        $error = "Erro ao excluir propriedade da planta: " . mysqli_error($con);
+        $error = "Erro ao excluir imagem da planta: " . mysqli_error($con);
     }
 }
 
@@ -70,7 +96,7 @@ if (isset($_POST['delete_property'])) {
 $search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
 
 // Obter todas as propriedades de plantas com base na busca
-$searchQuery = $search ? "AND (plants.name LIKE '%$search%' OR properties.name LIKE '%$search%' OR images.source LIKE '%$search%')" : "";
+$searchQuery = $search ? "AND (p.name LIKE '%$search%' OR pr.name LIKE '%$search%' OR i.source LIKE '%$search%')" : "";
 $propertiesQuery = mysqli_query($con, "
     SELECT pp.*, p.name as plant_name, pr.name as property_name, i.imagem, i.source as image_source
     FROM PlantsProperties pp
@@ -80,6 +106,7 @@ $propertiesQuery = mysqli_query($con, "
     WHERE pp.deleted_at IS NULL $searchQuery
     ORDER BY pp.created_at DESC
 ");
+
 ?>
 
 <!DOCTYPE html>
@@ -147,21 +174,21 @@ $propertiesQuery = mysqli_query($con, "
                                     <label for="image" class="form-label">Imagem</label>
                                     <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
                                 </div>
-                                <button type="submit" name="add_property" class="btn btn-primary">Adicionar Propriedade</button>
+                                <button type="submit" name="add_property" class="btn btn-primary">Adicionar Imagem</button>
                             </form>
                         </div>
                     </div>
 
-                    <!-- Botão de buscar e título -->
+        
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="card-title mb-0">Propriedades das Plantas Cadastradas</h5>
+                                <h5 class="card-title mb-0">Imaagens Cadastradas</h5>
                                 <form method="POST" action="" class="d-flex">
-                                    <input type="text" class="form-control me-2" name="search" placeholder="Buscar propriedades" value="<?php echo htmlspecialchars($search); ?>">
+                                    <input type="text" class="form-control me-2" name="search" placeholder="Buscar" value="<?php echo htmlspecialchars($search); ?>">
                                     <button class="btn btn-primary" type="submit">Buscar</button>
                                     <?php if ($search) { ?>
-                                        <a href="plants_properties.php" class="btn btn-secondary ms-2">Remover Filtro</a>
+                                        <a href="images.php" class="btn btn-secondary ms-2">Remover Filtro</a>
                                     <?php } ?>
                                 </form>
                             </div>
@@ -183,7 +210,7 @@ $propertiesQuery = mysqli_query($con, "
                                     <?php
                                     if (mysqli_num_rows($propertiesQuery) > 0) {
                                         while ($row = mysqli_fetch_assoc($propertiesQuery)) {
-                                            // Formatar datas
+          
                                             $created_at = date("d/m/Y H:i", strtotime($row['created_at']));
                                             $deleted_at = $row['deleted_at'] ? date("d/m/Y H:i", strtotime($row['deleted_at'])) : 'Ativo';
                                     ?>
@@ -202,7 +229,7 @@ $propertiesQuery = mysqli_query($con, "
                                                 <td><?php echo htmlspecialchars($created_at); ?></td>
                                                 <td><?php echo htmlspecialchars($deleted_at); ?></td>
                                                 <td>
-                                                    <!-- Botão para abrir o modal de confirmação -->
+                                                    
                                                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
                                                         Excluir
                                                     </button>
@@ -211,7 +238,7 @@ $propertiesQuery = mysqli_query($con, "
                                     <?php
                                         }
                                     } else {
-                                        echo "<tr><td colspan='8' class='text-center'>Nenhuma propriedade encontrada.</td></tr>";
+                                        echo "<tr><td colspan='8' class='text-center'>Nenhuma imagem encontrada.</td></tr>";
                                     }
                                     ?>
                                 </tbody>
@@ -224,7 +251,6 @@ $propertiesQuery = mysqli_query($con, "
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Exclusão -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -233,7 +259,7 @@ $propertiesQuery = mysqli_query($con, "
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
-                    Você realmente deseja excluir esta propriedade da planta?
+                    Você realmente deseja excluir esta imagem?
                 </div>
                 <div class="modal-footer">
                     <form method="POST" action="">
@@ -247,7 +273,6 @@ $propertiesQuery = mysqli_query($con, "
     </div>
 
     <script>
-        // Script para preencher o ID da propriedade no modal
         document.addEventListener('DOMContentLoaded', function() {
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
             var deleteIdInput = document.getElementById('deleteId');
