@@ -15,67 +15,108 @@
 
     // Adicionar planta
     if (isset($_POST['add_plant'])) {
-        $name = filter_input_data($con, $_POST['name']);
-        $common_names = filter_input_data($con, $_POST['common_names']);
+        $name = trim($_POST['name']);
+        $common_names = trim($_POST['common_names']);
         $division_id = intval($_POST['division_id']);
         $class_id = intval($_POST['class_id']);
         $order_id = intval($_POST['order_id']);
         $family_id = intval($_POST['family_id']);
         $genus_id = intval($_POST['genus_id']);
         $region_id = intval($_POST['region_id']);
-        $species = filter_input_data($con, $_POST['species']);
-        $applications = filter_input_data($con, $_POST['applications']);
-        $ecology = filter_input_data($con, $_POST['ecology']);
+        $species = trim($_POST['species']);
+        $applications = trim($_POST['applications']);
+        $ecology = trim($_POST['ecology']);
 
         // Verifica se a planta já existe
-        $query = mysqli_query($con, "SELECT id FROM Plants WHERE name='$name'");
-        if (mysqli_num_rows($query) > 0) {
-            $error = "Uma planta com esse nome já existe.";
-        } else {
-            $sql = "INSERT INTO Plants (name, common_names, division_id, class_id, order_id, family_id, genus_id, region_id, species, applications, ecology) 
-                    VALUES ('$name', '$common_names', $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, '$species', '$applications', '$ecology')";
-            $success = mysqli_query($con, $sql) ? "Planta adicionada com sucesso." : "Erro ao adicionar planta: " . mysqli_error($con);
+        $stmt = $con->prepare("SELECT id FROM Plants WHERE name = ?");
+        if (!$stmt) {
+            header('location:plants.php?error=Erro na preparação da consulta: ' . urlencode($con->error));
+            exit();
         }
+        $stmt->bind_param("s", $name);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            // Redireciona com mensagem de erro
+            header('location:plants.php?error=Uma planta com esse nome já existe.');
+            exit();
+        } else {
+            // Inserir nova planta
+            $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, order_id, family_id, genus_id, region_id, species, applications, ecology) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            if (!$stmt) {
+                header('location:plants.php?error=Erro na preparação da inserção: ' . urlencode($con->error));
+                exit();
+            }
+            $stmt->bind_param("ssiiiiissss", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology);
+            if ($stmt->execute()) {
+                // Redireciona com mensagem de sucesso
+                header('location:plants.php?success=Planta adicionada com sucesso.');
+                exit();
+            } else {
+                // Redireciona com mensagem de erro
+                header('location:plants.php?error=Erro ao adicionar planta: ' . urlencode($stmt->error));
+                exit();
+            }
+        }
+        $stmt->close();
     }
 
     // Atualizar planta
     if (isset($_POST['update_plant'])) {
         $id = intval($_POST['id']);
-        $name = filter_input_data($con, $_POST['name']);
-        $common_names = filter_input_data($con, $_POST['common_names']);
+        $name = trim($_POST['name']);
+        $common_names = trim($_POST['common_names']);
         $division_id = intval($_POST['division_id']);
         $class_id = intval($_POST['class_id']);
         $order_id = intval($_POST['order_id']);
         $family_id = intval($_POST['family_id']);
         $genus_id = intval($_POST['genus_id']);
         $region_id = intval($_POST['region_id']);
-        $species = filter_input_data($con, $_POST['species']);
-        $applications = filter_input_data($con, $_POST['applications']);
-        $ecology = filter_input_data($con, $_POST['ecology']);
+        $species = trim($_POST['species']);
+        $applications = trim($_POST['applications']);
+        $ecology = trim($_POST['ecology']);
 
-        $sql = "UPDATE Plants SET name='$name', common_names='$common_names', division_id=$division_id, class_id=$class_id, 
-                order_id=$order_id, family_id=$family_id, genus_id=$genus_id, region_id=$region_id, species='$species', 
-                applications='$applications', ecology='$ecology' WHERE id=$id";
-        
-        if (mysqli_query($con, $sql)) {
-            header('location:plants.php');
+        $stmt = $con->prepare("UPDATE Plants SET name = ?, common_names = ?, division_id = ?, class_id = ?, order_id = ?, family_id = ?, genus_id = ?, region_id = ?, species = ?, applications = ?, ecology = ? WHERE id = ?");
+        if (!$stmt) {
+            header('location:plants.php?error=Erro na preparação da atualização: ' . urlencode($con->error));
+            exit();
+        }
+        $stmt->bind_param("ssiiiiissssi", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $id);
+        if ($stmt->execute()) {
+            header('location:plants.php?success=Planta atualizada com sucesso.');
             exit();
         } else {
-            $error = "Erro ao atualizar planta: " . mysqli_error($con);
+            header('location:plants.php?error=Erro ao atualizar planta: ' . urlencode($stmt->error));
+            exit();
         }
+        $stmt->close();
     }
 
     // Excluir planta
     if (isset($_POST['delete_plant'])) {
         $id = intval($_POST['id']);
         $sql = "UPDATE Plants SET deleted_at = NOW() WHERE id = $id";
-        $success = mysqli_query($con, $sql) ? "Planta excluída com sucesso." : "Erro ao excluir planta: " . mysqli_error($con);
+        if (mysqli_query($con, $sql)) {
+            header('location:plants.php?success=Planta excluída com sucesso.');
+            exit();
+        } else {
+            header('location:plants.php?error=Erro ao excluir planta: ' . urlencode(mysqli_error($con)));
+            exit();
+        }
     }
 
     // Busca e exibição de plantas
     $search = isset($_POST['search']) ? filter_input_data($con, $_POST['search']) : '';
     $searchQuery = $search ? "AND name LIKE '%$search%'" : '';
-    $plantsQuery = mysqli_query($con, "SELECT * FROM Plants WHERE deleted_at IS NULL $searchQuery");
+    $queryString = "SELECT * FROM Plants WHERE deleted_at IS NULL $searchQuery";
+
+    $plantsQuery = mysqli_query($con, $queryString);
+
+    if (!$plantsQuery) {
+        // Redireciona com mensagem de erro
+        header('location:plants.php?error=Erro na consulta de plantas: ' . urlencode(mysqli_error($con)));
+        exit();
+    }
 
     // Dados para selects
     $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at IS NULL");
@@ -109,11 +150,17 @@
             $familiesQuery = mysqli_query($con, "SELECT * FROM Families WHERE deleted_at IS NULL");
             $genusQuery = mysqli_query($con, "SELECT * FROM Genus WHERE deleted_at IS NULL");
             $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE deleted_at IS NULL");
+
+            // Atualizar arrays após reconsultas
+            $divisions = $divisionsQuery ? mysqli_fetch_all($divisionsQuery, MYSQLI_ASSOC) : [];
+            $classes = $classesQuery ? mysqli_fetch_all($classesQuery, MYSQLI_ASSOC) : [];
+            $orders = $ordersQuery ? mysqli_fetch_all($ordersQuery, MYSQLI_ASSOC) : [];
+            $families = $familiesQuery ? mysqli_fetch_all($familiesQuery, MYSQLI_ASSOC) : [];
+            $genus = $genusQuery ? mysqli_fetch_all($genusQuery, MYSQLI_ASSOC) : [];
+            $regionMap = $regionsQuery ? mysqli_fetch_all($regionsQuery, MYSQLI_ASSOC) : [];
         }
     }
-   
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -143,15 +190,14 @@
                 <div class="container-fluid px-4">
                     <h1 class="mt-4 mb-4 h1">Gerenciar Plantas</h1>
 
-                    <?php if (isset($success)) { ?>
-                        <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+                    <?php if (isset($_GET['success'])) { ?>
+                        <div class="alert alert-success"><?php echo htmlspecialchars($_GET['success']); ?></div>
                     <?php } ?>
 
-                    <?php if (isset($error)) { ?>
-                        <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+                    <?php if (isset($_GET['error'])) { ?>
+                        <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
                     <?php } ?>
 
-                    
                     <!-- Botão para expandir o formulário de cadastro -->
                     <button id="toggleForm" class="btn btn-primary mb-4">Nova Planta</button>
 
@@ -172,7 +218,7 @@
                                 <!-- Seleção da Divisão -->
                                 <div class="mb-3">
                                     <label for="division_id" class="form-label fw-bold">*Divisão</label>
-                                    <select class="form-control" id="division_id" name="division_id">
+                                    <select class="form-control" id="division_id" name="division_id" required>
                                         <option value="">Selecione a divisão</option>
                                         <?php foreach ($divisions as $division) { ?>
                                             <option value="<?php echo htmlspecialchars($division['id']); ?>">
@@ -185,7 +231,7 @@
                                 <!-- Seleção da Classe -->
                                 <div class="mb-3">
                                     <label for="class_id" class="form-label fw-bold">*Classe</label>
-                                    <select class="form-control" id="class_id" name="class_id">
+                                    <select class="form-control" id="class_id" name="class_id" required>
                                         <option value="">Selecione a classe</option>
                                         <?php foreach ($classes as $class) { ?>
                                             <option value="<?php echo htmlspecialchars($class['id']); ?>">
@@ -198,7 +244,7 @@
                                 <!-- Seleção da Ordem -->
                                 <div class="mb-3">
                                     <label for="order_id" class="form-label fw-bold">*Ordem</label>
-                                    <select class="form-control" id="order_id" name="order_id">
+                                    <select class="form-control" id="order_id" name="order_id" required>
                                         <option value="">Selecione a ordem</option>
                                         <?php foreach ($orders as $order) { ?>
                                             <option value="<?php echo htmlspecialchars($order['id']); ?>">
@@ -211,7 +257,7 @@
                                 <!-- Seleção da Família -->
                                 <div class="mb-3">
                                     <label for="family_id" class="form-label fw-bold">*Família</label>
-                                    <select class="form-control" id="family_id" name="family_id">
+                                    <select class="form-control" id="family_id" name="family_id" required>
                                         <option value="">Selecione a família</option>
                                         <?php foreach ($families as $family) { ?>
                                             <option value="<?php echo htmlspecialchars($family['id']); ?>">
@@ -223,12 +269,12 @@
 
                                 <!-- Seleção do Gênero -->
                                 <div class="mb-3">
-                                    <label for="gender_id" class="form-label fw-bold">Gênero</label>
-                                    <select class="form-control" id="gender_id" name="gender_id">
+                                    <label for="genus_id" class="form-label fw-bold">Gênero</label>
+                                    <select class="form-control" id="genus_id" name="genus_id" required>
                                         <option value="">Selecione o gênero</option>
-                                        <?php foreach ($genus as $gender) { ?>
-                                            <option value="<?php echo htmlspecialchars($gender['id']); ?>">
-                                                <?php echo htmlspecialchars($gender['name']); ?>
+                                        <?php foreach ($genus as $genusItem) { ?>
+                                            <option value="<?php echo htmlspecialchars($genusItem['id']); ?>">
+                                                <?php echo htmlspecialchars($genusItem['name']); ?>
                                             </option>
                                         <?php } ?>
                                     </select>
@@ -269,12 +315,10 @@
                     </div>
 
                     <!-- Formulário de Edição -->
-                    <button id="toggleEditForm" class="btn btn-success mb-4" style="display:none;">Editar</button>
                     <?php if ($edit_plant) { ?>
                         <div id="edit-form" class="card mb-4">
                             <div class="card-body">
                                 <h5 class="card-title h2 mb-3">Editar</h5>
-                                <form method="POST" action="">
                                 <form method="POST" action="">
                                     <input type="hidden" name="id" value="<?php echo htmlspecialchars($edit_plant['id']); ?>">
                                     <div class="mb-3">
@@ -287,50 +331,55 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="division_id" class="form-label fw-bold">Divisão</label>
-                                        <select class="form-control" id="division_id" name="division_id">
-                                            <?php while ($row = mysqli_fetch_array($divisionsQuery)) { ?>
-                                                <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo $row['id'] == $edit_plant['division_id'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($row['name']); ?>
+                                        <select class="form-control" id="division_id" name="division_id" required>
+                                            <option value="">Selecione a divisão</option>
+                                            <?php foreach ($divisions as $division) { ?>
+                                                <option value="<?php echo htmlspecialchars($division['id']); ?>" <?php echo $division['id'] == $edit_plant['division_id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($division['name']); ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
                                     </div>
                                     <div class="mb-3">
                                         <label for="class_id" class="form-label fw-bold">Classe</label>
-                                        <select class="form-control" id="class_id" name="class_id">
-                                            <?php while ($row = mysqli_fetch_array($classesQuery)) { ?>
-                                                <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo $row['id'] == $edit_plant['class_id'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($row['name']); ?>
+                                        <select class="form-control" id="class_id" name="class_id" required>
+                                            <option value="">Selecione a classe</option>
+                                            <?php foreach ($classes as $class) { ?>
+                                                <option value="<?php echo htmlspecialchars($class['id']); ?>" <?php echo $class['id'] == $edit_plant['class_id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($class['name']); ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
                                     </div>
                                     <div class="mb-3">
                                         <label for="order_id" class="form-label fw-bold">Ordem</label>
-                                        <select class="form-control" id="order_id" name="order_id">
-                                            <?php while ($row = mysqli_fetch_array($ordersQuery)) { ?>
-                                                <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo $row['id'] == $edit_plant['order_id'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($row['name']); ?>
+                                        <select class="form-control" id="order_id" name="order_id" required>
+                                            <option value="">Selecione a ordem</option>
+                                            <?php foreach ($orders as $order) { ?>
+                                                <option value="<?php echo htmlspecialchars($order['id']); ?>" <?php echo $order['id'] == $edit_plant['order_id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($order['name']); ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
                                     </div>
                                     <div class="mb-3">
                                         <label for="family_id" class="form-label fw-bold">Família</label>
-                                        <select class="form-control" id="family_id" name="family_id">
-                                            <?php while ($row = mysqli_fetch_array($familiesQuery)) { ?>
-                                                <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo $row['id'] == $edit_plant['family_id'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($row['name']); ?>
+                                        <select class="form-control" id="family_id" name="family_id" required>
+                                            <option value="">Selecione a família</option>
+                                            <?php foreach ($families as $family) { ?>
+                                                <option value="<?php echo htmlspecialchars($family['id']); ?>" <?php echo $family['id'] == $edit_plant['family_id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($family['name']); ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
                                     </div>
                                     <div class="mb-3">
                                         <label for="genus_id" class="form-label fw-bold">Gênero</label>
-                                        <select class="form-control" id="genus_id" name="genus_id">
-                                            <?php while ($row = mysqli_fetch_array($genusQuery)) { ?>
-                                                <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo $row['id'] == $edit_plant['genus_id'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($row['name']); ?>
+                                        <select class="form-control" id="genus_id" name="genus_id" required>
+                                            <option value="">Selecione o gênero</option>
+                                            <?php foreach ($genus as $genusItem) { ?>
+                                                <option value="<?php echo htmlspecialchars($genusItem['id']); ?>" <?php echo $genusItem['id'] == $edit_plant['genus_id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($genusItem['name']); ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
@@ -338,9 +387,10 @@
                                     <div class="mb-3">
                                         <label for="region_id" class="form-label fw-bold">Região</label>
                                         <select class="form-control" id="region_id" name="region_id">
-                                            <?php while ($row = mysqli_fetch_array($regionsQuery)) { ?>
-                                                <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo $row['id'] == $edit_plant['region_id'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($row['name']); ?>
+                                            <option value="">Selecione a região</option>
+                                            <?php foreach ($regionMap as $region) { ?>
+                                                <option value="<?php echo htmlspecialchars($region['id']); ?>" <?php echo $region['id'] == $edit_plant['region_id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($region['name']); ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
@@ -360,7 +410,6 @@
                                     <button type="submit" name="update_plant" class="btn btn-primary" style="width: 10%;">Salvar</button>
                                     <button type="button" id="cancelEditPlant" class="btn btn-secondary">Cancelar</button>
                                 </form>
-
                             </div>
                         </div>
                     <?php } ?>
@@ -387,18 +436,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php while ($row = mysqli_fetch_array($plantsQuery)) { ?>
+                                    <?php 
+                                        $plantCount = 0;
+                                        while ($row = mysqli_fetch_array($plantsQuery)) { 
+                                            $plantCount++;
+                                    ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($row['name']); ?></td>
                                             <td>
-                                                <!-- Botão para abrir o modal de exclusão -->
-                                            </button>
-                                            <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-m" style="width: 15%;">
-                                                Editar</a>
-                                            <!-- Botão para abrir o formulário de edição -->
-                                            <button type="button" class="btn btn-danger btn-m" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
-                                                Excluir
+                                                <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-m" style="width: 15%;">Editar</a>
+                                                <button type="button" class="btn btn-danger btn-m" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">Excluir</button>
                                             </td>
+                                        </tr>
+                                    <?php } ?>
+                                    <?php if ($plantCount === 0) { ?>
+                                        <tr>
+                                            <td colspan="2" class="text-center">Nenhuma planta encontrada.</td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>
@@ -416,7 +469,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Exclusão</h5>
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -425,57 +478,87 @@
                 <div class="modal-footer">
                     <form method="POST" action="">
                         <input type="hidden" name="id" id="deleteId">
+                        <button type="submit" name="delete_plant" class="btn btn-danger">Confirmar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     </form>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 </div>
-                <button type="button" id="cancelEditPlant" class="btn btn-secondary">Cancelar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Script para mostrar e esconder o formulário de cadastro
-        document.getElementById('toggleForm').addEventListener('click', function() {
-            var form = document.getElementById('plant-form');
-            var plantList = document.getElementById('plant-list');
-            var toggleButton = document.getElementById('toggleForm');            
-
-            if (form.style.display === 'none' || form.style.display === '') {
-                form.style.display = 'block';
-                plantList.style.display = 'none';
-                toggleButton.style.display = 'none';    
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal de Confirmação de Exclusão
+            var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            if (confirmDeleteModal) {
+                confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var id = button.getAttribute('data-id');
+                    var deleteIdInput = confirmDeleteModal.querySelector('#deleteId');
+                    if (deleteIdInput) {
+                        deleteIdInput.value = id;
+                    }
+                });
             }
+
+            // Botão para mostrar o formulário de cadastro
+            var toggleFormButton = document.getElementById('toggleForm');
+            if (toggleFormButton) {
+                toggleFormButton.addEventListener('click', function() {
+                    var form = document.getElementById('plant-form');
+                    var plantList = document.getElementById('plant-list');
+                    var toggleButton = document.getElementById('toggleForm');            
+
+                    if (form.style.display === 'none' || form.style.display === '') {
+                        form.style.display = 'block';
+                        plantList.style.display = 'none';
+                        toggleButton.style.display = 'none';    
+                    }
+                });
+            }
+
+            // Função para esconder formulário e mostrar lista de plantas
+            function hideFormAndShowList(formId) {
+                var form = document.getElementById(formId);
+                var plantList = document.getElementById('plant-list');
+                var toggleButton = document.getElementById('toggleForm');
+
+                if (form && plantList && toggleButton) {
+                    form.style.display = 'none';
+                    plantList.style.display = 'block';
+                    toggleButton.style.display = 'block';
+                }
+            }
+
+            // Botão de Cancelar no formulário de adição
+            var cancelAddPlant = document.getElementById('cancelAddPlant');
+            if (cancelAddPlant) {
+                cancelAddPlant.addEventListener('click', function() {
+                    hideFormAndShowList('plant-form');
+                });
+            }
+
+            // Botão de Cancelar no formulário de edição
+            var cancelEditPlant = document.getElementById('cancelEditPlant');
+            if (cancelEditPlant) {
+                cancelEditPlant.addEventListener('click', function() {
+                    hideFormAndShowList('edit-form');
+                });
+            }
+
+            // Exibir o formulário de edição se estiver em modo de edição
+            <?php if ($edit_plant) { ?>
+                var editForm = document.getElementById('edit-form');
+                var plantList = document.getElementById('plant-list');
+                var toggleButton = document.getElementById('toggleForm');  
+
+                if (editForm && plantList && toggleButton) {
+                    editForm.style.display = 'block';
+                    plantList.style.display = 'none';
+                    toggleButton.style.display = 'none';  
+                }
+            <?php } ?>
         });
-
-        // Função para esconder formulário e mostrar lista de plantas
-        function hideFormAndShowList(formId) {
-            var form = document.getElementById(formId);
-            var plantList = document.getElementById('plant-list');
-            var toggleButton = document.getElementById('toggleForm');
-
-            form.style.display = 'none';
-            plantList.style.display = 'block';
-            toggleButton.style.display = 'block';
-        }
-
-        // Script para o botão de Cancelar no formulário de adição
-        document.getElementById('cancelAddPlant').addEventListener('click', function() {
-            hideFormAndShowList('plant-form');
-        });
-
-        // Script para o botão de Cancelar no formulário de edição
-        document.getElementById('cancelEditPlant').addEventListener('click', function() {
-            hideFormAndShowList('edit-form');
-        });
-
-        // Script para exibir o formulário de edição se a planta estiver em edição
-        <?php if ($edit_plant) { ?>
-            document.getElementById('edit-form').style.display = 'block';
-            document.getElementById('plant-list').style.display = 'none';
-            var toggleButton = document.getElementById('toggleForm');  
-            toggleButton.style.display = 'none';  
-
-        <?php } ?>
     </script>
 </body>
 

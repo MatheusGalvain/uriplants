@@ -16,7 +16,6 @@ function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $ne
     log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 }
 
-
 function get_plant_name($con, $plant_id) {
     $sql = "SELECT name FROM plants WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
@@ -146,6 +145,9 @@ if (isset($_POST['edit_property'])) {
                 throw new Exception("Erro ao atualizar propriedade da planta: " . mysqli_error($con));
             }
 
+            $image_updated = false;
+            $image_id = null;
+
             if (isset($_FILES['edit_image']) && $_FILES['edit_image']['error'] == 0) {
                 $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
                 if (!in_array($_FILES['edit_image']['type'], $allowed_types)) {
@@ -166,9 +168,22 @@ if (isset($_POST['edit_property'])) {
                     throw new Exception("Erro ao atualizar a imagem: " . mysqli_error($con));
                 }
 
-                $success = "Propriedade e imagem atualizadas com sucesso.";
-            } else {
-                $success = "Propriedade atualizada com sucesso.";
+                // Recupera o ID da imagem atualizada
+                $image_select_sql = "SELECT id FROM images WHERE plants_property_id = ?";
+                $image_select_stmt = mysqli_prepare($con, $image_select_sql);
+                if ($image_select_stmt) {
+                    mysqli_stmt_bind_param($image_select_stmt, 'i', $id);
+                    mysqli_stmt_execute($image_select_stmt);
+                    mysqli_stmt_bind_result($image_select_stmt, $image_id);
+                    mysqli_stmt_fetch($image_select_stmt);
+                    mysqli_stmt_close($image_select_stmt);
+                }
+
+                if ($image_id !== null) {
+                    $image_updated = true;
+                } else {
+                    throw new Exception("Imagem atualizada, mas não foi possível recuperar o ID da imagem.");
+                }
             }
 
             $new_plant_name = get_plant_name($con, $plant_id);
@@ -177,8 +192,11 @@ if (isset($_POST['edit_property'])) {
             $old_value = "Planta: $old_plant_name, Propriedade: $old_property_name, Descrição: $old_description";
             $new_value = "Planta: $new_plant_name, Propriedade: $new_property_name, Descrição: $description";
 
-            if (isset($_FILES['edit_image']) && $_FILES['edit_image']['error'] == 0) {
-                $new_value .= ", Imagem atualizada";
+            if ($image_updated) {
+                $new_value .= ", Imagem ID: " . $image_id;
+                $success = "Propriedade e imagem atualizadas com sucesso.";
+            } else {
+                $success = "Propriedade atualizada com sucesso.";
             }
 
             $table = 'PlantsProperties';
@@ -205,7 +223,6 @@ if (isset($_POST['delete_property'])) {
         $plant_id = $current_data['plant_id'];
         $property_id = $current_data['property_id'];
         $description = $current_data['description'];
-
 
         $plant_name = get_plant_name($con, $plant_id);
         $property_name = get_property_name($con, $property_id);
@@ -234,13 +251,14 @@ if (isset($_POST['delete_property'])) {
                 throw new Exception("Erro ao excluir propriedade da planta: " . mysqli_error($con));
             }
 
-            $old_value = "Planta: $plant_name, Propriedade: $property_name, Descrição: $description";
+            // Inclui o ID e o nome da planta no valor antigo
+            $old_value = "Planta ID: $plant_id, Nome: $plant_name, Propriedade: $property_name, Descrição: $description";
             $new_value = null;
 
             $table = 'PlantsProperties';
             $action_id = 2; 
             $changed_by = $_SESSION['id'];
-            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value);
+            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 
             mysqli_commit($con);
             $success = "Propriedade da planta excluída com sucesso.";
