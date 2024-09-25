@@ -1,6 +1,9 @@
+# /public/.htaccess
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /uriplants/public/
+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L]
+    RewriteRule ^ index.php [QSA,L]
 </IfModule>

@@ -109,7 +109,7 @@ CREATE TABLE PlantsProperties (
 
 CREATE TABLE Images (
   id integer AUTO_INCREMENT,
-  imagem blob NOT NULL,
+  imagem longblob NOT NULL,
   source varchar(255),
   plants_property_id integer NOT NULL,
   deleted_at timestamp NULL,
@@ -120,7 +120,7 @@ CREATE TABLE Images (
 
 CREATE TABLE RegionMap (
   id integer AUTO_INCREMENT,
-  imagem blob NOT NULL,
+  imagem longblob NOT NULL,
   name varchar(255),
   source varchar(255),
   description varchar(255),
@@ -181,7 +181,7 @@ CREATE TABLE AuditLogs (
 -- INSERT INTO orders (name) VALUES ('Fabales');
 -- INSERT INTO families (name) VALUES ('Caesalpiniaceae (Leguminosae: Caesalpinioideae)');
 
--- RegionMap blob aqui tem que ir pelo phpmyadmin pra upar o arquivo
+-- RegionMap longblob aqui tem que ir pelo phpmyadmin pra upar o arquivo
 
 -- INSERT INTO plants (name, common_names, division_id, class_id, order_id, family_id, genus_id, species, region_id, applications, ecology)
 -- VALUES (
@@ -197,5 +197,5 @@ CREATE TABLE AuditLogs (
 
 -- INSERT INTO `plantsproperties` (`id`, `plant_id`, `property_id`, `description`, `created_at`, `deleted_at`) VALUES (NULL, '1', '1', 'Descricao curta', current_timestamp(), NULL);
 
--- Image blob  aqui tem que ir pelo phpmyadmin pra upar o arquivo
+-- Image longblob  aqui tem que ir pelo phpmyadmin pra upar o arquivo
 

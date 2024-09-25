@@ -1,13 +1,9 @@
-<?php
-?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <title>Quiz de Plantas</title>
-    <!-- Inclusão do Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Inclusão do Font Awesome CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
@@ -24,10 +20,9 @@
             max-width: 800px;
             margin: 0 auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative; /* Para posicionar o placar dentro do contêiner */
+            position: relative;
         }
         
-        /* Estilos do Placar */
         #scoreboard {
             display: flex;
             gap: 10px;
@@ -46,15 +41,15 @@
         }
 
         .score-acertos {
-            background-color: #28a745; /* Verde */
+            background-color: #28a745;
         }
 
         .score-erros {
-            background-color: #dc3545; /* Vermelho */
+            background-color: #dc3545;
         }
 
         .score-total {
-            background-color: #007bff; /* Azul */
+            background-color: #007bff;
         }
 
         #question {
@@ -127,7 +122,6 @@
                 width: 100%;
             }
 
-            /* Ajuste do placar em telas menores */
             #scoreboard {
                 flex-direction: column;
                 align-items: center;
@@ -189,8 +183,6 @@
 </head>
 <body>
     <div id="quiz-container">
-       
-        <!-- Placar -->
         <div id="scoreboard">
             <div id="acertos" class="score-block score-acertos">
                 Acertos: <span id="correct-count">0</span>
@@ -205,7 +197,6 @@
 
         <div id="quizCarousel" class="carousel slide" data-bs-interval="false">
             <div class="carousel-inner" id="carousel-inner">
-
             </div>
             <button class="custom-carousel-control-prev" type="button" data-bs-target="#quizCarousel" data-bs-slide="prev">
                 <i class="fa-solid fa-angles-left"></i>
@@ -225,23 +216,19 @@
         <button id="next-button" class="btn btn-primary">Próxima Pergunta</button>
     </div>
 
-    <!-- Inclusão do Bootstrap JS e dependências -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-
-        const QUIZ_URL = 'http://localhost/uriplants/public/quizz';
+        const QUIZ_URL = '/uriplants/public/quizz';
 
         const carouselInner = document.getElementById('carousel-inner');
         const questionEl = document.getElementById('question');
         const optionsEl = document.getElementById('options');
         const nextButton = document.getElementById('next-button');
 
-        // Elementos do Placar
         const correctCountEl = document.getElementById('correct-count');
         const incorrectCountEl = document.getElementById('incorrect-count');
         const totalCountEl = document.getElementById('total-count');
 
-        // Variáveis para armazenar a contagem de acertos, erros e total de respostas
         let correctCount = 0;
         let incorrectCount = 0;
         let totalCount = 0;
@@ -273,19 +260,15 @@
             }
         }
 
-        // Extensão do Bootstrap Carousel para obter o índice atual
         bootstrap.Carousel.prototype.getActiveIndex = function () {
             return Array.from(this._element.querySelectorAll('.carousel-item')).indexOf(this._element.querySelector('.carousel-item.active'));
         };
 
         async function fetchQuiz() {
             try {
-                
                 optionsEl.innerHTML = '';
                 nextButton.style.display = 'none';
-
                 carouselInner.innerHTML = '';
-
                 questionEl.textContent = 'Carregando pergunta...';
 
                 const response = await fetch(QUIZ_URL);
@@ -348,7 +331,6 @@
                 updateCarouselControls(quizCarousel);
 
                 quizCarouselElement.addEventListener('slide.bs.carousel', function (event) {
-
                     const totalItems = carouselInner.children.length;
                     const nextIndex = event.to;
 
@@ -381,15 +363,14 @@
         }
 
         function handleAnswer(selectedOption, button) {
-
             const allButtons = document.querySelectorAll('.option-button');
             allButtons.forEach(btn => btn.disabled = true);
 
             if (selectedOption === correctOption) {
                 button.classList.remove('btn-outline-secondary');
                 button.classList.add('correct', 'btn-success');
-                correctCount++; // Incrementa a contagem de acertos
-                correctCountEl.textContent = correctCount; // Atualiza o placar de acertos
+                correctCount++; 
+                correctCountEl.textContent = correctCount; 
             } else {
                 button.classList.remove('btn-outline-secondary');
                 button.classList.add('incorrect', 'btn-danger');
@@ -401,12 +382,12 @@
                     }
                 });
 
-                incorrectCount++; // Incrementa a contagem de erros
-                incorrectCountEl.textContent = incorrectCount; // Atualiza o placar de erros
+                incorrectCount++;
+                incorrectCountEl.textContent = incorrectCount;
             }
 
-            totalCount = correctCount + incorrectCount; // Calcula o total de respostas
-            totalCountEl.textContent = totalCount; // Atualiza o placar de total
+            totalCount = correctCount + incorrectCount;
+            totalCountEl.textContent = totalCount;
 
             nextButton.style.display = 'inline-block';
         }
