@@ -5,7 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Quiz de Plantas</title>
+    <!-- Inclusão do Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Inclusão do Font Awesome CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
@@ -22,8 +24,39 @@
             max-width: 800px;
             margin: 0 auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* Para posicionar o placar dentro do contêiner */
         }
         
+        /* Estilos do Placar */
+        #scoreboard {
+            display: flex;
+            gap: 10px;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .score-block {
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1em;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .score-acertos {
+            background-color: #28a745; /* Verde */
+        }
+
+        .score-erros {
+            background-color: #dc3545; /* Vermelho */
+        }
+
+        .score-total {
+            background-color: #007bff; /* Azul */
+        }
+
         #question {
             font-size: 1.5em;
             margin: 20px 0;
@@ -93,6 +126,17 @@
             #next-button {
                 width: 100%;
             }
+
+            /* Ajuste do placar em telas menores */
+            #scoreboard {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .score-block {
+                width: 100%;
+                max-width: 300px;
+            }
         }
 
         .carousel-item img {
@@ -146,6 +190,19 @@
 <body>
     <div id="quiz-container">
        
+        <!-- Placar -->
+        <div id="scoreboard">
+            <div id="acertos" class="score-block score-acertos">
+                Acertos: <span id="correct-count">0</span>
+            </div>
+            <div id="erros" class="score-block score-erros">
+                Erros: <span id="incorrect-count">0</span>
+            </div>
+            <div id="total" class="score-block score-total">
+                Total: <span id="total-count">0</span>
+            </div>
+        </div>
+
         <div id="quizCarousel" class="carousel slide" data-bs-interval="false">
             <div class="carousel-inner" id="carousel-inner">
 
@@ -168,6 +225,7 @@
         <button id="next-button" class="btn btn-primary">Próxima Pergunta</button>
     </div>
 
+    <!-- Inclusão do Bootstrap JS e dependências -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
 
@@ -177,6 +235,16 @@
         const questionEl = document.getElementById('question');
         const optionsEl = document.getElementById('options');
         const nextButton = document.getElementById('next-button');
+
+        // Elementos do Placar
+        const correctCountEl = document.getElementById('correct-count');
+        const incorrectCountEl = document.getElementById('incorrect-count');
+        const totalCountEl = document.getElementById('total-count');
+
+        // Variáveis para armazenar a contagem de acertos, erros e total de respostas
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let totalCount = 0;
 
         let correctOption = '';
 
@@ -205,6 +273,7 @@
             }
         }
 
+        // Extensão do Bootstrap Carousel para obter o índice atual
         bootstrap.Carousel.prototype.getActiveIndex = function () {
             return Array.from(this._element.querySelectorAll('.carousel-item')).indexOf(this._element.querySelector('.carousel-item.active'));
         };
@@ -319,6 +388,8 @@
             if (selectedOption === correctOption) {
                 button.classList.remove('btn-outline-secondary');
                 button.classList.add('correct', 'btn-success');
+                correctCount++; // Incrementa a contagem de acertos
+                correctCountEl.textContent = correctCount; // Atualiza o placar de acertos
             } else {
                 button.classList.remove('btn-outline-secondary');
                 button.classList.add('incorrect', 'btn-danger');
@@ -329,7 +400,13 @@
                         btn.classList.add('correct', 'btn-success');
                     }
                 });
+
+                incorrectCount++; // Incrementa a contagem de erros
+                incorrectCountEl.textContent = incorrectCount; // Atualiza o placar de erros
             }
+
+            totalCount = correctCount + incorrectCount; // Calcula o total de respostas
+            totalCountEl.textContent = totalCount; // Atualiza o placar de total
 
             nextButton.style.display = 'inline-block';
         }
