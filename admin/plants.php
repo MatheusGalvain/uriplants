@@ -165,6 +165,7 @@
 <html lang="en">
 
 <head>
+    
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Plantas</title>
     <style>
@@ -445,6 +446,7 @@
                                             <td><?php echo htmlspecialchars($row['name']); ?></td>
                                             <td>
                                                 <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-m" style="width: 15%;">Editar</a>
+                                                <button type="button" class="btn btn-primary btn-m" data-bs-toggle="modal" data-bs-target="#qrCodeModal" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">QR Code</button>
                                                 <button type="button" class="btn btn-danger btn-m" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">Excluir</button>
                                             </td>
                                         </tr>
@@ -486,6 +488,26 @@
         </div>
     </div>
 
+        <!-- Modal para QR Code -->
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrCodeModalLabel">QR Code da Planta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="qrCode" style="display: flex; justify-content: center;"></div>
+                    <a id="downloadLink" download="qrcode.png" class="btn btn-secondary mt-3">Baixar QR Code</a>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>                                    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Modal de Confirmação de Exclusão
@@ -546,7 +568,36 @@
                 });
             }
 
-            // Exibir o formulário de edição se estiver em modo de edição
+            // Qr Code
+            var qrCodeModal = document.getElementById('qrCodeModal');
+            qrCodeModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var plantId = button.getAttribute('data-id');
+                var plantName = button.getAttribute('data-name');
+                var qrCodeContainer = document.getElementById('qrCode');
+                var downloadLink = document.getElementById('downloadLink');
+
+               
+                qrCodeContainer.innerHTML = '';
+
+                // Modificar aqui para a url que for definida
+                var url = 'http://localhost/uriplants/public/plants/' + plantId;
+                var qrCode = new QRCode(qrCodeContainer, {
+                    text: url,
+                    width: 256,
+                    height: 256,
+                });
+
+                setTimeout(function() {
+                    var qrCodeImg = qrCodeContainer.querySelector('img');
+                    if (qrCodeImg) {
+                        var sanitizedPlantName = plantName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                        downloadLink.href = qrCodeImg.src;
+                        downloadLink.download = sanitizedPlantName + '_' + plantId + '.png';
+                    }
+                }, 500); 
+            });
+
             <?php if ($edit_plant) { ?>
                 var editForm = document.getElementById('edit-form');
                 var plantList = document.getElementById('plant-list');
