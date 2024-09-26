@@ -493,7 +493,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="qrCodeModalLabel">QR Code da Planta</h5>
+                    <h5 class="modal-title" id="qrCodeModalLabel">QR Code de Planta</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
@@ -573,14 +573,18 @@
             qrCodeModal.addEventListener('show.bs.modal', function(event) {
                 var button = event.relatedTarget;
                 var plantId = button.getAttribute('data-id');
-                var plantName = button.getAttribute('data-name');
+                var plantName = button.getAttribute('data-name'); // Pegar o nome da planta
                 var qrCodeContainer = document.getElementById('qrCode');
                 var downloadLink = document.getElementById('downloadLink');
+                var modalTitle = document.getElementById('qrCodeModalLabel'); // Título do modal
 
-               
+                // Atualizar o título do modal com o nome da planta
+                modalTitle.textContent = 'QR Code Planta ' + plantName;
+
+                // Limpar o conteúdo anterior
                 qrCodeContainer.innerHTML = '';
 
-                // Modificar aqui para a url que for definida
+                // Gerar QR code para o URL
                 var url = 'http://localhost/uriplants/public/plants/' + plantId;
                 var qrCode = new QRCode(qrCodeContainer, {
                     text: url,
@@ -588,14 +592,15 @@
                     height: 256,
                 });
 
+                // Configurar o link de download com nome da planta e ID
                 setTimeout(function() {
                     var qrCodeImg = qrCodeContainer.querySelector('img');
                     if (qrCodeImg) {
-                        var sanitizedPlantName = plantName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                        var sanitizedPlantName = plantName.replace(/[^a-z0-9]/gi, '_').toLowerCase(); // Sanitiza o nome
                         downloadLink.href = qrCodeImg.src;
-                        downloadLink.download = sanitizedPlantName + '_' + plantId + '.png';
+                        downloadLink.download = sanitizedPlantName + '_' + plantId + '.png'; // Nome do arquivo
                     }
-                }, 500); 
+                }, 500); // Aguardar o QR code ser gerado
             });
 
             <?php if ($edit_plant) { ?>
