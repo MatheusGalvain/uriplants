@@ -1,5 +1,3 @@
-<?php
-?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -22,8 +20,38 @@
             max-width: 800px;
             margin: 0 auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         
+        #scoreboard {
+            display: flex;
+            gap: 10px;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .score-block {
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1em;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .score-acertos {
+            background-color: #28a745;
+        }
+
+        .score-erros {
+            background-color: #dc3545;
+        }
+
+        .score-total {
+            background-color: #007bff;
+        }
+
         #question {
             font-size: 1.5em;
             margin: 20px 0;
@@ -93,6 +121,16 @@
             #next-button {
                 width: 100%;
             }
+
+            #scoreboard {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .score-block {
+                width: 100%;
+                max-width: 300px;
+            }
         }
 
         .carousel-item img {
@@ -145,10 +183,20 @@
 </head>
 <body>
     <div id="quiz-container">
-       
+        <div id="scoreboard">
+            <div id="acertos" class="score-block score-acertos">
+                Acertos: <span id="correct-count">0</span>
+            </div>
+            <div id="erros" class="score-block score-erros">
+                Erros: <span id="incorrect-count">0</span>
+            </div>
+            <div id="total" class="score-block score-total">
+                Total: <span id="total-count">0</span>
+            </div>
+        </div>
+
         <div id="quizCarousel" class="carousel slide" data-bs-interval="false">
             <div class="carousel-inner" id="carousel-inner">
-
             </div>
             <button class="custom-carousel-control-prev" type="button" data-bs-target="#quizCarousel" data-bs-slide="prev">
                 <i class="fa-solid fa-angles-left"></i>
@@ -170,13 +218,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-
-        const QUIZ_URL = 'http://localhost/uriplants/public/quizz';
+        const QUIZ_URL = '/uriplants/public/quizz';
 
         const carouselInner = document.getElementById('carousel-inner');
         const questionEl = document.getElementById('question');
         const optionsEl = document.getElementById('options');
         const nextButton = document.getElementById('next-button');
+
+        const correctCountEl = document.getElementById('correct-count');
+        const incorrectCountEl = document.getElementById('incorrect-count');
+        const totalCountEl = document.getElementById('total-count');
+
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let totalCount = 0;
 
         let correctOption = '';
 
@@ -211,12 +266,9 @@
 
         async function fetchQuiz() {
             try {
-                
                 optionsEl.innerHTML = '';
                 nextButton.style.display = 'none';
-
                 carouselInner.innerHTML = '';
-
                 questionEl.textContent = 'Carregando pergunta...';
 
                 const response = await fetch(QUIZ_URL);
@@ -279,7 +331,6 @@
                 updateCarouselControls(quizCarousel);
 
                 quizCarouselElement.addEventListener('slide.bs.carousel', function (event) {
-
                     const totalItems = carouselInner.children.length;
                     const nextIndex = event.to;
 
@@ -312,13 +363,14 @@
         }
 
         function handleAnswer(selectedOption, button) {
-
             const allButtons = document.querySelectorAll('.option-button');
             allButtons.forEach(btn => btn.disabled = true);
 
             if (selectedOption === correctOption) {
                 button.classList.remove('btn-outline-secondary');
                 button.classList.add('correct', 'btn-success');
+                correctCount++; 
+                correctCountEl.textContent = correctCount; 
             } else {
                 button.classList.remove('btn-outline-secondary');
                 button.classList.add('incorrect', 'btn-danger');
@@ -329,7 +381,13 @@
                         btn.classList.add('correct', 'btn-success');
                     }
                 });
+
+                incorrectCount++;
+                incorrectCountEl.textContent = incorrectCount;
             }
+
+            totalCount = correctCount + incorrectCount;
+            totalCountEl.textContent = totalCount;
 
             nextButton.style.display = 'inline-block';
         }
