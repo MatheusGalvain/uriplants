@@ -36,7 +36,6 @@
 
         .button-group {
             display: flex;
-            /* gap: 60px; */
             width: 900px;
             justify-content: space-around;
         }
@@ -44,15 +43,15 @@
         .btn {
             padding: 15px 30px;
             margin: auto;
-            background-color: white; /* Fundo branco */
+            background-color: white; 
             color: black;
-            border: 2px solid #228B22; /* Borda verde floresta */
+            border: 2px solid #228B22; 
             border-radius: 5px;
             font-size: 1.1em;
             cursor: pointer;
             transition: background-color 0.3s ease;
             text-align: center;
-            width: 90%; /* Mesma largura para todos os botões */
+            width: 90%;
             display: inline-block;
         }
 
@@ -61,7 +60,7 @@
         }
 
         button {
-            width: 90%; /* Garantindo que os botões ocupem a mesma largura */
+            width: 90%;
             background: none;
             border: none;
             padding: 0;
@@ -83,7 +82,7 @@
         .slider {
             position: relative;
             width: 100%;
-            height: 55vh; /* Ajusta o slider para ocupar toda a altura do header */
+            height: 55vh;
             overflow: hidden;
         }
 
@@ -99,7 +98,7 @@
 
         .slides {
             display: flex;
-            transition: transform 2s cubic-bezier(0.25, 0.1, 0.25, 1); /* Função personalizada com duração aumentada */
+            transition: transform 2s cubic-bezier(0.25, 0.1, 0.25, 1); 
         }
 
         .slide {
@@ -112,11 +111,11 @@
 
         .slide-text {
             position: absolute;
-            bottom: 40px; /* Ajuste para descer o texto */
-            right: 50px; /* Margem extra à direita */
+            bottom: 40px;
+            right: 50px; 
             color: white;
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
-            z-index: 3; /* Superior aos gradientes */
+            z-index: 3; 
         }
 
         .slide-text h2 {
@@ -125,7 +124,7 @@
 
         .slide-text p {
             margin: 0;
-            max-width: 200px; /* Limitar a largura do texto */
+            max-width: 200px;
         }
 
         .controls {
@@ -135,7 +134,7 @@
             transform: translateX(-50%);
             display: flex;
             gap: 10px;
-            z-index: 3; /* Superior aos gradientes */
+            z-index: 3; 
         }
 
         .controls .dot {
@@ -158,7 +157,7 @@
             top: 0;
             width: 100%;
             z-index: 999;
-            background-color: transparent; /* Torna o fundo transparente para permitir que a imagem do carrossel seja vista */
+            background-color: transparent;
         }
 
         .header {
@@ -167,14 +166,14 @@
             top: 0;
             position: absolute;
             width: 100%;
-            z-index: 1000; /* Mantém o header acima do slider */
+            z-index: 1000; 
         }
 
         .top-bar {
             display: flex;
             justify-content: space-between;
             padding: 10px 20px;
-            background-color: rgba(51, 51, 51, 0.8); /* Transparência para deixar o fundo do header visível */
+            background-color: rgba(51, 51, 51, 0.8); 
             color: white;
         }
 
@@ -199,17 +198,15 @@
             let slideInterval;
             let isTransitioning = false;
 
-            // Clone o primeiro slide e adiciona ao final para loop infinito
             const firstSlideClone = slides[0].cloneNode(true);
             slidesContainer.appendChild(firstSlideClone);
 
-            // Atualiza o número total de slides após o clone
             const updatedTotalSlides = slidesContainer.querySelectorAll('.slide').length;
 
             function updateSlide(index) {
-                if (isTransitioning) return; // Evita múltiplas transições simultâneas
+                if (isTransitioning) return; 
                 isTransitioning = true;
-                slidesContainer.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)'; // Duração aumentada
+                slidesContainer.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)'; 
                 slidesContainer.style.transform = `translateX(-${index * 100}%)`;
                 currentSlide = index;
                 updateDots();
@@ -223,14 +220,14 @@
 
             slidesContainer.addEventListener('transitionend', () => {
                 if (currentSlide === updatedTotalSlides - 1) {
-                    // Remove a transição para reposicionar sem animação
+                    
                     slidesContainer.style.transition = 'none';
                     slidesContainer.style.transform = `translateX(0)`;
                     currentSlide = 0;
                     updateDots();
-                    // Força o reflow para que a mudança de estilo seja aplicada
+                    
                     void slidesContainer.offsetWidth;
-                    // Reativa a transição
+                    
                     slidesContainer.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)';
                 }
                 isTransitioning = false;
@@ -239,14 +236,14 @@
             dots.forEach((dot, index) => {
                 dot.addEventListener('click', () => {
                     updateSlide(index);
-                    resetInterval(); // Reseta o intervalo quando o usuário clica em um dot
+                    resetInterval(); 
                 });
             });
 
             function startSlideShow() {
                 slideInterval = setInterval(() => {
                     updateSlide(currentSlide + 1);
-                }, 10000); // 10000 milissegundos = 10 segundos
+                }, 10000); 
             }
 
             function resetInterval() {
@@ -254,7 +251,6 @@
                 startSlideShow();
             }
 
-            // Inicializa os dots e o slideshow
             updateDots();
             startSlideShow();
         });
@@ -290,7 +286,7 @@
                 <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('images/bg2.jpg'); ">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
-                        <p>Leia o QRCode<br> e conheça mais sobre variadas espécies!</p>
+                        <p>Leia o QR Code<br> e conheça mais sobre variadas espécies!</p>
                     </div>
                 </div>
                 <div class="slide" style="  background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('images/bg3.jpg');">
