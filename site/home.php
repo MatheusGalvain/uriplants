@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="./css/reset.css">
     <link rel="stylesheet" href="./css/footer.css">
     <link rel="stylesheet" href="./css/main.css">
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             let currentSlide = 0;

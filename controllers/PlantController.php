@@ -66,51 +66,92 @@ class PlantController {
                 $conn->close();
                 return;
             }
+ // Tratamento para listagem com paginação
+ $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10; // Ajuste o padrão conforme necessário
+ if ($limit <= 0) $limit = 10;
 
-            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 1;
-            if ($limit <= 0) $limit = 1;
+ $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+ if ($page <= 0) $page = 1;
 
-            $sql = "SELECT 
-                        plants.name, 
-                        plants.ecology AS description, 
-                        images.imagem AS image_blob
-                    FROM plants
-                    LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-                    LEFT JOIN properties ON plantsproperties.property_id = properties.id
-                    LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                    WHERE properties.name = 'planta'
-                    GROUP BY plants.id
-                    ORDER BY plants.id ASC
-                    LIMIT ?";
+ $offset = ($page - 1) * $limit;
 
-            $stmt = $conn->prepare($sql);
-            if (!$stmt) {
-                echo json_encode(["message" => "Erro na preparação da consulta padrão", "error" => $conn->error]);
-                return;
-            }
+ // Consulta para obter o total de plantas
+ $countSql = "SELECT COUNT(DISTINCT plants.id) as total 
+              FROM plants
+              LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+              LEFT JOIN properties ON plantsproperties.property_id = properties.id
+              LEFT JOIN images ON plantsproperties.id = images.plants_property_id
+              WHERE properties.name = 'planta'";
 
-            $stmt->bind_param("i", $limit);
+ $countStmt = $conn->prepare($countSql);
+ if (!$countStmt) {
+     echo json_encode(["message" => "Erro na preparação da consulta de contagem", "error" => $conn->error]);
+     return;
+ }
 
-            if ($stmt->execute()) {
-                $result = $stmt->get_result();
-                $plants = [];
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        if (!empty($row['image_blob'])) {
-                            $row['image_blob'] = base64_encode($row['image_blob']);
-                        }
-                        $plants[] = $row;
-                    }
-                }
+ if (!$countStmt->execute()) {
+     echo json_encode(["message" => "Erro ao contar plantas", "error" => $countStmt->error]);
+     return;
+ }
 
-                echo json_encode($plants, JSON_UNESCAPED_UNICODE);
-            } else {
-                echo json_encode(["message" => "Erro ao buscar plantas", "error" => $stmt->error]);
-            }
+ $countResult = $countStmt->get_result();
+ $totalPlants = 0;
+ if ($row = $countResult->fetch_assoc()) {
+     $totalPlants = intval($row['total']);
+ }
+ $totalPages = ceil($totalPlants / $limit);
 
-            $stmt->close();
-            $conn->close();
-        }
-    }
+ $countStmt->close();
+
+ // Consulta para obter as plantas com limite e offset
+ $sql = "SELECT 
+             plants.id,
+             plants.name, 
+             plants.ecology AS description, 
+             images.imagem AS image_blob
+         FROM plants
+         LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+         LEFT JOIN properties ON plantsproperties.property_id = properties.id
+         LEFT JOIN images ON plantsproperties.id = images.plants_property_id
+         WHERE properties.name = 'planta'
+         GROUP BY plants.id
+         ORDER BY plants.id ASC
+         LIMIT ? OFFSET ?";
+
+ $stmt = $conn->prepare($sql);
+ if (!$stmt) {
+     echo json_encode(["message" => "Erro na preparação da consulta padrão", "error" => $conn->error]);
+     return;
+ }
+
+ $stmt->bind_param("ii", $limit, $offset);
+
+ if ($stmt->execute()) {
+     $result = $stmt->get_result();
+     $plants = [];
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+             if (!empty($row['image_blob'])) {
+                 $row['image_blob'] = base64_encode($row['image_blob']);
+             }
+             $plants[] = $row;
+         }
+     }
+
+     // Retorna as plantas juntamente com informações de paginação
+     echo json_encode([
+         "plants" => $plants,
+         "totalPlants" => $totalPlants,
+         "totalPages" => $totalPages,
+         "currentPage" => $page
+     ], JSON_UNESCAPED_UNICODE);
+ } else {
+     echo json_encode(["message" => "Erro ao buscar plantas", "error" => $stmt->error]);
+ }
+
+ $stmt->close();
+ $conn->close();
+}
+}
 }
 ?>
