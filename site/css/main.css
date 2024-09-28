@@ -58,9 +58,22 @@
     font-family: monospace;
   }
   
-
 .wrapper-footer {
     background-color: #00668F;
+}
+
+.background-div {
+  width: 100vw;
+  height: 500px;
+  background-image: url('../images/pexels-sohi-807598.jpg'); /* Caminho para a sua imagem */
+  background-size: cover; /* Faz a imagem cobrir a div */
+  background-position: center; /* Centraliza a imagem na div */
+  background-repeat: no-repeat; /* Impede a repetição da imagem */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7); /* Sombras no texto para melhorar a legibilidade */
 }
 
 footer {

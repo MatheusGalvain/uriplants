@@ -31,9 +31,7 @@ if (preg_match('#^/plants/(\d+)$#', $requestPath, $matches)) {
 }
 
 if ($requestPath === '/plants') {
-    if ($method === 'POST') {
-        $plantController->insert();
-    } elseif ($method === 'GET') {
+    if ($method === 'GET') {
         $plantController->get(); 
     } else {
         header("HTTP/1.1 405 Method Not Allowed");
@@ -52,9 +50,7 @@ if (preg_match('#^/quizz/(\d+)$#', $requestPath, $matches)) {
 }
 
 if ($requestPath === '/quizz') {
-    if ($method === 'POST') {
-        $quizzController->insert();
-    } elseif ($method === 'GET') {
+    if ($method === 'GET') {
         $quizzController->get(); 
     } else {
         header("HTTP/1.1 405 Method Not Allowed");
