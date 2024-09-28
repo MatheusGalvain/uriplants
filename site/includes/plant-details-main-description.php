@@ -1,19 +1,18 @@
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost/uriplants/public/plants')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('plants-container');
-            let html = '';
-            let plant = data[0];
-            
-            let plant_name_h2 = document.getElementById('plant-name');
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('http://localhost/uriplants/public/plants')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('plants-container');
+                let html = '';
+                let plant = data[0];
 
-            plant_name_h2.innerHTML = plant.name;
-        })
-        .catch(error => console.error('Erro ao buscar as plantas:', error));
-    }
-);
+                let plant_name_h2 = document.getElementById('plant-name');
+
+                plant_name_h2.innerHTML = plant.name;
+            })
+            .catch(error => console.error('Erro ao buscar as plantas:', error));
+    });
 </script>
 
 <main class="plant-details-home">
@@ -23,14 +22,16 @@ document.addEventListener('DOMContentLoaded', function() {
     <section class="plant-content">
         <section class="carousel-container">
             <div class="plant-details-carousel-imgs">
+                <img class="arrow left-arrow" src="images/img-test/left-arrow.png" alt="Seta esquerda">
                 <img src="images/img-test/little-plants.jpeg" alt="imgs-carousel-plants-details">
                 <img src="images/img-test/little-plants.jpeg" alt="imgs-carousel-plants-details">
                 <img src="images/img-test/little-plants.jpeg" alt="imgs-carousel-plants-details">
                 <img src="images/img-test/little-plants.jpeg" alt="imgs-carousel-plants-details">
+                <img class="arrow right-arrow" src="images/img-test/right-arrow.png" alt="Seta direita">
             </div>
         </section>
-        <img class="arrow left-arrow" src="images/img-test/left-arrow.png" alt="Seta esquerda">
-        <img class="arrow right-arrow" src="images/img-test/right-arrow.png" alt="Seta direita">
+
+
 
         <section class="floating-menu">
             <div class="buttons-floating-menu">

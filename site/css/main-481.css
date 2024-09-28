@@ -1,63 +1,7 @@
-/* CSS Reset básico */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+/* dispositivos móveis */
+@media (min-width: 481px) and (max-width: 768px) {
 
-  html,
-  body {
-    background-color: #f0f4f6;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-weight: normal;
-  }
-
-  ul,
-  ol {
-    list-style: none;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  button {
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  input,
-  textarea {
-    border: none;
-    font-family: inherit;
-  }
-
-
-
-  /* dispositivos móveis */
-  @media (max-width: 480px) {
-
-    /* BLUE footer */
+  /* BLUE footer */
   .wrapper-footer {
     background-color: #00668F;
   }
@@ -272,6 +216,7 @@ button.carousel-next {
   min-height: 100%;
   grid-template-rows: auto 1fr auto;
 }
+
 /* Header */
 div.header-mobile {
   width: 100%;
@@ -425,8 +370,8 @@ section.plant-content {
 }
 
 .plant-details-carousel-imgs img {
-  width: 74px;
-  height: 74px;
+  max-width: 74px;
+  max-height: 74px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -741,7 +686,7 @@ div.buttons-floating-menu a {
 .plant-food img,
 .plant-handicrafts img,
 .plant-urban-forestry img,
-.plant-landscaping img  {
+.plant-landscaping img {
   width: 74px;
   height: 74px;
   border-radius: 8px;
@@ -803,6 +748,6 @@ div.buttons-floating-menu a {
   padding: 0px 0 2px 0
 }
 
-.climatic-conditions-seasons-text h1:nth-of-type(2){
+.climatic-conditions-seasons-text h1:nth-of-type(2) {
   padding: 12px 0 2px 0;
 }

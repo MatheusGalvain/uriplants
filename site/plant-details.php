@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="css/main.css">
+
     <link rel="stylesheet" href="css/green-footer.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +17,7 @@
     <div class="wrapper">
         <?php include("includes/header-plant-details.php"); ?>
 
-        <?php include("includes/plant-details-main-taxonomy.php"); ?>
+        <?php include("includes/plant-details-main-description.php"); ?>
 
         <?php include("includes/green-footer.php"); ?>
     </div>  

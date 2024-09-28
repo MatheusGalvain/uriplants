@@ -15,13 +15,23 @@
         
 
         <section id="main-btns">
-            <div class="main-btns-container">
+            <div class="go-plants-access">
                 <div class="main-bottomtexts">
                     <h1 class="access-main">URI Plantas</h1>
                     <span class="access-text">acesse</span>
                 </div>
-                <button class="plant-btn">Plantas Cadastradas</button>
+                <a href="" class="plant-btn">Plantas Cadastradas</a>
+
             </div>
+            <div class="go-quiz-access">
+                <div class="main-bottomtexts">
+                    <h1 class="access-main">URI QUIZ</h1>
+                    <span class="access-text">acesse</span>
+                </div>
+                <a href="" class="plant-btn">QUIZ Universitário</a>
+
+            </div>
+            
         </section>
     </section>
 </main>

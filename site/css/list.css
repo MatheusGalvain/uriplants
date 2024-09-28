@@ -1,8 +1,11 @@
+/* PARA DISPOSITIVOS MOVEIS */
+
 .list-page-container{
     position: relative;
     display: flex;
     z-index: 20;
     width: 100%;
+    min-height: 600px;
 }
 
 .list-page-content {

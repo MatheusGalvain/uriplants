@@ -56,7 +56,7 @@
   }
   
   /* Ajuste para dispositivos móveis */
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     green-footer {
       flex-direction: column;
       align-items: center;
@@ -96,3 +96,5 @@
       font-weight: 400;
     }
   }
+
+  
