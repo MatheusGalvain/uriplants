@@ -1,112 +1,28 @@
-/* CSS Reset básico */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  html, body {
-    height: 100%;
-    font-family: sans-serif;
-  }
-  
-  body {
-    line-height: 1.6;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: normal;
-  }
-  
-  ul, ol {
-    list-style: none;
-  }
-  
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
-  
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  button {
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  input, textarea {
-    border: none;
-    outline: none;
-    font-family: inherit;
-  }
-  
-  blockquote {
-    margin: 0;
-  }
-  
-  code, pre {
-    font-family: monospace;
-  }
-  
-.wrapper-footer {
-    background-color: #00668F;
-}
-
-.background-div {
-  width: 100vw;
-  height: 500px;
-  background-image: url('../images/pexels-sohi-807598.jpg'); /* Caminho para a sua imagem */
-  background-size: cover; /* Faz a imagem cobrir a div */
-  background-position: center; /* Centraliza a imagem na div */
-  background-repeat: no-repeat; /* Impede a repetição da imagem */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.7); /* Sombras no texto para melhorar a legibilidade */
-}
-
 footer {
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    max-width: 926px;
-    margin: 0 auto;
+  background-color: #00668F;
 }
 
-footer .footer-left {
+
+.footer-left {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     width: 560px;
 }
 
-footer .redes-sociais, footer .telefones, footer .localizacoes {
+ .redes-sociais,  .telefones,  .localizacoes {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
+ .redes-sociais span,  .telefones span,  .localizacoes span {
     text-align: left;
     font-size: 14px;
     font-family: 'Poppins', sans-serif;
 }
 
-footer .redes-sociais a, footer .telefones a, footer .localizacoes a {
+ .redes-sociais a,  .telefones a,  .localizacoes a {
     color: white;
     text-decoration: none;
     font-size: 15px;
@@ -118,26 +34,26 @@ footer .redes-sociais a, footer .telefones a, footer .localizacoes a {
 }
 
 
-footer .redes-sociais a img {
+ .redes-sociais a img {
   width: 20px;
   height: 20px;
   vertical-align: middle;
 }
 
 
-footer .logo {
+ .logo {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-footer .logo img {
+ .logo img {
     height: 50px;
     margin-top: 10px;
 }
 
 
-footer .redes-sociais i {
+ .redes-sociais i {
     color: white;
 }
 
@@ -153,35 +69,35 @@ footer .redes-sociais i {
       padding: 10px;
   }
 
-  footer .footer-left {
+   .footer-left {
       flex-direction: column;
       justify-content: center;
       align-items: center;
       width: 100%;
   }
 
-  footer .redes-sociais, footer .telefones, footer .localizacoes {
+   .redes-sociais,  .telefones,  .localizacoes {
       align-items: center;
       width: 100%;
       margin-bottom: 20px;
   }
 
-  footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
+   .redes-sociais span,  .telefones span,  .localizacoes span {
       display: block;
       width: 100%;
       text-align: center;
   }
 
-  footer .redes-sociais .display-icons, footer .telefones a, footer .localizacoes a {
+   .redes-sociais .display-icons,  .telefones a,  .localizacoes a {
       display: block;
       text-align: center;
   }
 
-  footer .logo {
+   .logo {
       margin-top: 20px;
   }
 
-  footer .redes-sociais .display-icons {
+   .redes-sociais .display-icons {
       gap: 20px;
   }
 }
@@ -197,35 +113,36 @@ footer .redes-sociais i {
       padding: 10px;
   }
 
-  footer .footer-left {
+   .footer-left {
       flex-direction: column;
       justify-content: center;
       align-items: center;
       width: 100%;
   }
 
-  footer .redes-sociais, footer .telefones, footer .localizacoes {
+   .redes-sociais,  .telefones,  .localizacoes {
       align-items: center;
       width: 100%;
       margin-bottom: 20px;
   }
 
-  footer .redes-sociais span, footer .telefones span, footer .localizacoes span {
+   .redes-sociais span,  .telefones span,  .localizacoes span {
       display: block;
       width: 100%;
       text-align: center;
   }
 
-  footer .redes-sociais .display-icons, footer .telefones a, footer .localizacoes a {
+   .redes-sociais .display-icons,  .telefones a,  .localizacoes a {
       display: block;
       text-align: center;
   }
 
-  footer .logo {
+   .logo {
       margin-top: 20px;
   }
 
-  footer .redes-sociais .display-icons {
+   .redes-sociais .display-icons {
       gap: 20px;
   }
 }
+

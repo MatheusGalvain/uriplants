@@ -8,27 +8,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="./css/main.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
             min-height: 100vh;
             margin: 0;
             padding: 0;
             background-color: #f9f9f9;
+            overflow-x: hidden;
         }
 
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: row;
-            margin-top: 450px;
-            align-items: center;
-            justify-content: center;
-        }
-        
         h1 {
             margin-bottom: 40px;
             color: #333;
@@ -82,7 +76,7 @@
         .slider {
             position: relative;
             width: 100%;
-            height: 55vh;
+            height: 55vh; 
             overflow: hidden;
         }
 
@@ -153,7 +147,7 @@
         }
 
         .background-div {
-            position: fixed;
+            /* position: fixed; */
             top: 0;
             width: 100%;
             z-index: 999;
@@ -187,6 +181,54 @@
         .logo-slider img {
             max-height: 80px;
         }
+
+        
+        footer {
+
+            width: 100vw;
+            background-color: #00668F;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        @media (max-width: 480px) {
+                  
+            .slide {
+                border-bottom-left-radius: 60px; 
+            }
+
+            .slide-text {
+                bottom: 40px;
+                right: 25px; 
+            }
+
+            .slide-text  p, h2 {
+                text-align: end;
+            }
+                
+            .button-group {
+                margin-top: 20px;
+                flex-direction: column;
+                width: 100%;
+                max-width: 100%;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 20px; 
+
+            }
+
+            .btn:last-child {
+                margin-bottom: 40px; 
+            }
+        }
+
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -258,14 +300,13 @@
 </head>
 
 <body>
-
     <header class="background-div">
         <div class="header">
             <div class="top-bar">
                 <div class="social-icons">
-                    <a href="#"><img src="img/linkedin.png" alt="LinkedIn"></a>
-                    <a href="#"><img src="img/instagram.png" alt="Instagram"></a>
-                    <a href="#"><img src="img/facebook.png" alt="Facebook"></a>
+                    <a href="#"><img src="" alt="LinkedIn"></a>
+                    <a href="#"><img src="" alt="Instagram"></a>
+                    <a href="#"><img src="" alt="Facebook"></a>
                 </div>
                 <div class="contact-info">
                     <span>+55 (54) 3520-9000</span>
@@ -296,7 +337,7 @@
                     </div>
                 </div>
             </div>
-
+    
             <div class="controls">
                 <span class="dot active"></span>
                 <span class="dot"></span>
@@ -304,9 +345,6 @@
             </div>
         </div>
     </header>
-
-
-    <div class="container">
     <div class="button-group">
         <div style="width: 300px">
             <div class="button-title">URI Plantas</div>
@@ -321,9 +359,42 @@
             <button onclick="window.location.href='/uriplants/admin'" class="btn">Painel Administrador</button>
         </div>
     </div>
-</div>
 
-    <?php include("includes/footer.php"); ?>
+
+
+
+    <footer>
+        <div class="footer-left">
+            <div class="redes-sociais">
+                <span>Redes Sociais</span>
+                <div class="display-icons">
+                    <a href="https://www.facebook.com/uricampuserechim"><img src="images/facebook-icon.png"/></a>
+                    <a href="https://www.instagram.com/urierechim/"><img src="images/instagram-icon.png"/></a>
+                    <a href="https://twitter.com/urierechim"><img src="images/x-icon.png"/></a>
+                    <a href="https://www.youtube.com/urierechim"><img src="images/youtube-icon.png"/></a>
+                </div>
+            </div>
+            
+            
+            <div class="telefones">
+                <span>Telefones</span>
+                <a href="tel:+555435209000">+55 (54) 3520-9000</a>
+            </div>
+            
+            
+            <div class="localizacoes">
+                <span>Localizações</span>
+                <a href="https://maps.google.com/?q=Avenida+Sete+de+Setembro,+1621" target="_blank">
+                    Avenida Sete de Setembro, 1621
+                </a>
+            </div>
+        </div>
+        
+        <div class="logo">
+            <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" /></a>
+        </div>
+    </footer>
+      
 </body>
 
 </html>
