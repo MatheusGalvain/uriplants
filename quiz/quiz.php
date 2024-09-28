@@ -218,7 +218,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const QUIZ_URL = '/uriplants/public/quizz';
+        const QUIZ_URL = '/uriplants/public/quiz';
 
         const carouselInner = document.getElementById('carousel-inner');
         const questionEl = document.getElementById('question');

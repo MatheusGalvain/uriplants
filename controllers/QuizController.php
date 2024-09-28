@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../config/database.php';
 
-class QuizzController {
+class quizController {
     private $conn;
 
     public function __construct() {

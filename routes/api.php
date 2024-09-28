@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../controllers/PlantController.php';
-require_once __DIR__ . '/../controllers/QuizzController.php';
+require_once __DIR__ . '/../controllers/quizController.php';
 
 function getRequestPath() {
     $requestUri = $_SERVER['REQUEST_URI'];
@@ -19,7 +19,7 @@ $requestPath = getRequestPath();
 $method = $_SERVER['REQUEST_METHOD'];
 
 $plantController = new PlantController();
-$quizzController = new QuizzController();
+$quizController = new quizController();
 
 if (preg_match('#^/plants/(\d+)$#', $requestPath, $matches)) {
     $id = intval($matches[1]);
@@ -40,18 +40,18 @@ if ($requestPath === '/plants') {
     exit;
 }
 
-if (preg_match('#^/quizz/(\d+)$#', $requestPath, $matches)) {
+if (preg_match('#^/quiz/(\d+)$#', $requestPath, $matches)) {
     $id = intval($matches[1]);
     if ($method === 'GET') {
         $_GET['id'] = $id; 
-        $quizzController->get();
+        $quizController->get();
         exit;
     }
 }
 
-if ($requestPath === '/quizz') {
+if ($requestPath === '/quiz') {
     if ($method === 'GET') {
-        $quizzController->get(); 
+        $quizController->get(); 
     } else {
         header("HTTP/1.1 405 Method Not Allowed");
         echo json_encode(["message" => "Método não permitido"]);
