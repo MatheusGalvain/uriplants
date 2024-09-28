@@ -184,7 +184,7 @@
         
         footer {
 
-            width: 100vw;
+            width: 100%;
             background-color: #00668F;
             color: white;
             padding: 20px;
