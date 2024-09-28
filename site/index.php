@@ -147,7 +147,6 @@
         }
 
         .background-div {
-            /* position: fixed; */
             top: 0;
             width: 100%;
             z-index: 999;
@@ -364,10 +363,6 @@
             <button onclick="window.location.href='/uriplants/admin'" class="btn">Painel Administrador</button>
         </div>
     </div>
-
-
-
-
     <footer>
         <div class="footer-left">
             <div class="redes-sociais">
@@ -379,14 +374,10 @@
                     <a href="https://www.youtube.com/urierechim"><img src="images/youtube-icon.png"/></a>
                 </div>
             </div>
-            
-            
             <div class="telefones">
                 <span>Telefones</span>
                 <a href="tel:+555435209000">+55 (54) 3520-9000</a>
             </div>
-            
-            
             <div class="localizacoes">
                 <span>Localizações</span>
                 <a href="https://maps.google.com/?q=Avenida+Sete+de+Setembro,+1621" target="_blank">
@@ -394,12 +385,9 @@
                 </a>
             </div>
         </div>
-        
         <div class="logo">
             <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" /></a>
         </div>
     </footer>
-      
 </body>
-
 </html>
