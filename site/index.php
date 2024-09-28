@@ -23,13 +23,12 @@
         .container {
             flex: 1;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            margin-top: 450px;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            margin-top: 350px; /* Ajuste para compensar o header fixo */
         }
-
+        
         h1 {
             margin-bottom: 40px;
             color: #333;
@@ -37,51 +36,48 @@
 
         .button-group {
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
+            /* gap: 60px; */
+            width: 900px;
+            justify-content: space-around;
         }
 
         .btn {
             padding: 15px 30px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border: none;
+            margin: auto;
+            background-color: white; /* Fundo branco */
+            color: black;
+            border: 2px solid #228B22; /* Borda verde floresta */
             border-radius: 5px;
             font-size: 1.1em;
             cursor: pointer;
             transition: background-color 0.3s ease;
             text-align: center;
+            width: 90%; /* Mesma largura para todos os botões */
+            display: inline-block;
         }
 
         .btn:hover {
-            background-color: #0056b3;
+            background-color: #f0f0f0;
         }
 
-        .btn-admin {
-            background-color: #28a745;
+        button {
+            width: 90%; /* Garantindo que os botões ocupem a mesma largura */
+            background: none;
+            border: none;
+            padding: 0;
         }
 
-        .btn-admin:hover {
-            background-color: #1e7e34;
+        .button-title {
+            font-weight: bold;
+            font-size: 1.4em;
+            transform: translateY(8px);
+            color: black;
         }
 
-        .btn-plants {
-            background-color: #17a2b8;
-        }
-
-        .btn-plants:hover {
-            background-color: #117a8b;
-        }
-
-        .btn-quizz {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .btn-quizz:hover {
-            background-color: #e0a800;
+        .subtitle {
+            font-size: 0.9em;
+            color: gray;
+            margin-left: 5px;
         }
 
         .slider {
@@ -89,6 +85,16 @@
             width: 100%;
             height: 55vh; /* Ajusta o slider para ocupar toda a altura do header */
             overflow: hidden;
+        }
+
+        .slider::before {
+            left: 0;
+            background: linear-gradient(to right, black, rgba(0, 0, 0, 0));
+        }
+
+        .slider::after {
+            right: 0;
+            background: linear-gradient(to left, black, rgba(0, 0, 0, 0));
         }
 
         .slides {
@@ -100,7 +106,7 @@
             min-width: 100%;
             background-size: cover;
             background-position: center;
-            height: 55vh; /* Define a altura da imagem de fundo */
+            height: 55vh;
             position: relative;
         }
 
@@ -110,6 +116,7 @@
             right: 50px; /* Margem extra à direita */
             color: white;
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+            z-index: 3; /* Superior aos gradientes */
         }
 
         .slide-text h2 {
@@ -128,6 +135,7 @@
             transform: translateX(-50%);
             display: flex;
             gap: 10px;
+            z-index: 3; /* Superior aos gradientes */
         }
 
         .controls .dot {
@@ -273,25 +281,26 @@
         </div>
         <div class="slider">
             <div class="slides">
-                <div class="slide" style="background-image: url('images/bg1.jpg');">
+                <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%), url('images/bg1.jpg'); ">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
                         <p>Uri Plantas oferece uma diversidade<br> gigante sobre as plantas</p>
                     </div>
                 </div>
-                <div class="slide" style="background-image: url('images/bg2.jpg');">
+                <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('images/bg2.jpg'); ">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
                         <p>Leia o QRCode<br> e conheça mais sobre variadas espécies!</p>
                     </div>
                 </div>
-                <div class="slide" style="background-image: url('images/bg3.jpg');">
+                <div class="slide" style="  background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('images/bg3.jpg');">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
                         <p>Uma parceria dos cursos de Arquitetura,<br> Biologia e Ciência da Computação</p>
                     </div>
                 </div>
             </div>
+
             <div class="controls">
                 <span class="dot active"></span>
                 <span class="dot"></span>
@@ -302,13 +311,21 @@
 
 
     <div class="container">
-        <h1>Bem-vindo ao UriPlants</h1>
-        <div class="button-group">
-            <a href="/uriplants/admin" class="btn btn-admin">Admin</a>
-            <a href="/uriplants/plants" class="btn btn-plants">Lista de Plantas</a>
-            <a href="/uriplants/quizz" class="btn btn-quizz">Quizz</a>
+    <div class="button-group">
+        <div style="width: 300px">
+            <div class="button-title">URI Plantas</div>
+            <button onclick="window.location.href='/uriplants/plants'" class="btn">Plantas Cadastradas</button>
+        </div>
+        <div style="width: 300px">
+            <div class="button-title">URI Quiz</div>
+            <button onclick="window.location.href='/uriplants/quizz'" class="btn">Quiz Universitário</button>
+        </div>
+        <div style="width: 300px">
+            <div class="button-title">URI Admin</div>
+            <button onclick="window.location.href='/uriplants/admin'" class="btn">Painel Administrador</button>
         </div>
     </div>
+</div>
 
     <?php include("includes/footer.php"); ?>
 </body>
