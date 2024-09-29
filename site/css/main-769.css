@@ -1,25 +1,21 @@
-/* dispositivos móveis */
-@media (min-width: 481px) {
-
-  /* BLUE footer */
-  .wrapper-footer {
-    background-color: #00668F;
-  }
+@media (min-width: 769px) {
 
   footer {
-    color: white;
+
     padding: 20px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin: 0 auto;
+    margin: 0 36px;
+    flex-direction: row;
   }
 
   footer .footer-left {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 560px;
+    justify-content: left;
+    align-items: center;
+    width: 580px;
+    gap: 20px;
+    flex-direction: row;
   }
 
   footer .redes-sociais,
@@ -28,7 +24,18 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
+    align-items: center;
+    width: 100%;
+    align-items: flex-start;
+    /* Alinha à esquerda */
+    text-align: left;
+    /* Alinha o texto à esquerda */
   }
+
+  footer .localizacoes {
+    white-space: nowrap;
+  }
+
 
   footer .redes-sociais a,
   footer .telefones a,
@@ -45,40 +52,6 @@
     width: 20px;
     height: 20px;
     vertical-align: middle;
-  }
-
-  footer .logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  footer .logo img {
-    height: 50px;
-    margin-top: 10px;
-  }
-
-
-  footer {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 10px;
-  }
-
-  footer .footer-left {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    gap: 20px;
-  }
-
-  footer .redes-sociais,
-  footer .telefones,
-  footer .localizacoes {
-    align-items: center;
-    width: 100%;
   }
 
   footer .redes-sociais .display-icons,
@@ -112,15 +85,39 @@
     display: block;
   }
 
-  #main-btns {
-    margin: 40px 0 50px 0;
-    gap: 20px;
+  .sectionhome {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     width: 100%;
+  }
+
+  #main-btns {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    max-height: 100%;
+    flex-direction: row;
+  }
+
+  .go-plants-access,
+  .go-quiz-access {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
     flex-direction: column;
   }
+
+
+  .main-bottomtexts {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    flex-grow: 1;
+  }
+
 
   .main-bottomtexts h1.access-main {
     font-size: 2em;
@@ -133,12 +130,6 @@
     color: black;
     font-weight: 200;
     margin-left: 8px;
-  }
-
-  .main-bottomtexts {
-    display: flex;
-    justify-content: flex-start;
-    align-items: baseline;
   }
 
   .plant-btn {
@@ -316,8 +307,6 @@
     color: #2C483C;
     margin: 1px 0 0 0;
   }
-
-
 
   /* Página da planta específica + DESCRIPTION */
   .plant-details-home {
@@ -509,6 +498,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
+
   /* PLANT DETAILS APENAS TAXONOMY */
 
   .plant-taxonomy {
@@ -592,8 +582,6 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
-
-
 
   /* ECOLOGY */
 
@@ -679,7 +667,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
-
   /* PLANT DETAILS CLIMATIC SEASONS */
 
   .climatic-conditions,
@@ -739,21 +726,20 @@
   }
 
 
-/* SLICK CARROUSEL */
-
+  /* SLICK CARROCEL */
   .plants-carousel-content {
-    max-width: 400px;
+    max-width: 580px;
     margin: 25px auto;
   }
-  
+
   .plants-carousel-content .slick-slide {
     margin: 0 16px;
   }
-  
+
   .plants-carousel-content .slick-list {
     margin: 0 -16px;
   }
-  
+
   #plant-carousel img {
     border-radius: 5px;
   }

@@ -7,6 +7,8 @@
     <title>Document</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/list.css">
+    <link rel="stylesheet" href="css/main-481.css">
+    <link rel="stylesheet" href="css/main-769.css">
     <link rel="stylesheet" href="css/green-footer.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
