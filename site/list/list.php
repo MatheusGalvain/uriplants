@@ -27,9 +27,9 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(
-                150deg, 
-                rgba(255, 255, 255, 0.8) 0%, 
-                rgba(212, 163, 115, 0.4) 10%, 
+                150deg,
+                rgba(255, 255, 255, 0.8) 0%,
+                rgba(212, 163, 115, 0.4) 10%,
                 rgba(255, 255, 255, 0) 40%
             );
             z-index: 1; /* Assegura que a sobreposição esteja acima da imagem de fundo */
@@ -105,18 +105,21 @@
         }
 
         nav a.active {
-            border-bottom: 2px solid #00ff00;
+            border-bottom: 2px solid #006838;
         }
 
 
         .header-container {
             display: flex;
+            margin-top: 30px;
+            min-width: 1200px;
         }
 
         .icon-container {
-            background-color: #18392B;
+            background-color: #006838;
             border-radius: 8px;
             font-size: 24px;
+            cursor: pointer;
             width: 50px;
             display: flex;
             justify-content: center;
@@ -124,6 +127,10 @@
             align-items: center;
             margin-right: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .icon-container:hover {
+            background-color: #18392B;
         }
 
         .text-container {
@@ -145,6 +152,7 @@
             font-size: 16px;
             color: #6e6e6e;
         }
+
         /* Plant cards */
         .plant-container {
             padding: 20px;
@@ -155,10 +163,9 @@
         .plant-card {
             display: flex;
             justify-content: space-between;
-            background-color: white;
+            background-color: #f9f9f9; /* Cor de fundo suave */
             padding: 15px;
             margin-bottom: 15px;
-            background-color: #f9f9f9; /* Cor de fundo suave */
             position: relative;
             border-radius: 10px;
             z-index: 1;
@@ -224,25 +231,43 @@
             text-decoration: none;
             margin: 5px;
             padding: 8px 12px;
-            border: 1px solid #00ff00;
-            border-radius: 4px;
+            /* Remover a borda existente */
+            border: none;
+            /* Adicionar border-radius igual ao das listagens de plantas */
+            border-radius: 10px;
+            /* Adicionar box-shadow similar ao das listagens de plantas */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             color: black;
             cursor: pointer;
             transition: background-color 0.3s, color 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: #f9f9f9; /* Cor de fundo suave semelhante às plantas */
         }
 
         .pagination a:hover {
-            background-color: #00ff00;
+            /* Alterar para uma cor mais escura */
+            background-color: #18392B; /* Exemplo de cinza mais escuro */
             color: white;
         }
 
         .pagination a.active {
-            background-color: #00ff00;
+            background-color: #006838;
             color: white;
             cursor: default;
+        }
+
+        /* Estilização específica para setas */
+        .pagination a.arrow {
+            /* Já removemos a borda e o fundo no seletor acima */
+            /* Mantém a cor padrão */
+            color: black;
+        }
+
+        .pagination a.arrow:hover {
+            background-color: #18392B; /* Mesma cor mais escura */
+            color: white;
         }
 
         .pagination-info {
@@ -275,7 +300,6 @@
             width: 30px;
             margin: 0 10px;
         }
-
     </style>
 </head>
 
@@ -301,7 +325,7 @@
         <div>
             <div class="header-container">
                 <div class="icon-container">
-                <i class="fas fa-caret-left"></i>
+                    <i class="fas fa-angle-left"></i> <!-- Ícone atualizado -->
                 </div>
                 <div class="text-container">
                     <span>Você está em</span>
@@ -313,11 +337,11 @@
         <div>
             <!-- Plant cards -->
             <div class="plant-container">
-                
+
                 <!-- Plant cards serão inseridos aqui dinamicamente -->
                 <div id="plants"></div>
             </div>
-        
+
             <!-- Pagination (movido para aqui) -->
             <div class="pagination" id="pagination">
                 <!-- Links de paginação serão inseridos aqui dinamicamente -->
@@ -331,10 +355,10 @@
             <div class="redes-sociais">
                 <span>Redes Sociais</span>
                 <div class="display-icons">
-                    <a href="https://www.facebook.com/uricampuserechim"><img src="images/facebook-icon.png" alt="Facebook"/></a>
-                    <a href="https://www.instagram.com/urierechim/"><img src="images/instagram-icon.png" alt="Instagram"/></a>
-                    <a href="https://twitter.com/urierechim"><img src="images/x-icon.png" alt="Twitter"/></a>
-                    <a href="https://www.youtube.com/urierechim"><img src="images/youtube-icon.png" alt="YouTube"/></a>
+                    <a href="https://www.facebook.com/uricampuserechim"><img src="images/facebook-icon.png" alt="Facebook" /></a>
+                    <a href="https://www.instagram.com/urierechim/"><img src="images/instagram-icon.png" alt="Instagram" /></a>
+                    <a href="https://twitter.com/urierechim"><img src="images/x-icon.png" alt="Twitter" /></a>
+                    <a href="https://www.youtube.com/urierechim"><img src="images/youtube-icon.png" alt="YouTube" /></a>
                 </div>
             </div>
             <div class="telefones">
@@ -349,7 +373,7 @@
             </div>
         </div>
         <div class="logo">
-            <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" alt="Logo URI"/></a>
+            <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" alt="Logo URI" /></a>
         </div>
     </footer>
 
@@ -360,7 +384,7 @@
             const paginationContainer = document.getElementById('pagination');
 
             let currentPage = 1;
-            const limit = 1; // Número de itens por página
+            const limit = 10; // Número de itens por página
             let totalPages = 1;
 
             // Função para buscar plantas do endpoint
@@ -431,9 +455,10 @@
                 // Botão "Anterior" com seta para a esquerda
                 if (currentPage > 1) {
                     const prevLink = document.createElement('a');
-                    prevLink.innerHTML = '&#8592;'; // Setinha para a esquerda
+                    prevLink.innerHTML = '<i class="fas fa-angle-double-left"></i>'; // Nova seta para a esquerda
                     prevLink.href = '#';
                     prevLink.setAttribute('aria-label', 'Página Anterior');
+                    prevLink.classList.add('arrow'); // Adiciona classe para estilização
                     prevLink.addEventListener('click', (e) => {
                         e.preventDefault();
                         if (currentPage > 1) {
@@ -466,9 +491,10 @@
                 // Botão "Próximo" com seta para a direita
                 if (currentPage < totalPages) {
                     const nextLink = document.createElement('a');
-                    nextLink.innerHTML = '&#8594;'; // Setinha para a direita
+                    nextLink.innerHTML = '<i class="fas fa-angle-double-right"></i>'; // Nova seta para a direita
                     nextLink.href = '#';
                     nextLink.setAttribute('aria-label', 'Próxima Página');
+                    nextLink.classList.add('arrow'); // Adiciona classe para estilização
                     nextLink.addEventListener('click', (e) => {
                         e.preventDefault();
                         if (currentPage < totalPages) {
