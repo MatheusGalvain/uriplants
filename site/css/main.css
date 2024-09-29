@@ -429,7 +429,6 @@ section.plant-content {
 
 div.buttons-floating-menu {
   margin: 0 auto;
-  padding: 10px;
   background-color: #2C483C;
   flex-wrap: wrap;
   border-radius: 4px;
@@ -437,14 +436,36 @@ div.buttons-floating-menu {
   display: flex;
 }
 
-div.buttons-floating-menu a {
+div.buttons-floating-menu button {
   justify-content: center;
   margin: 0 auto;
   font-family: 'Poppins';
   font-weight: 400;
   color: white;
   font-size: 12px;
+  padding: 10px;
 }
+
+
+
+/* AQUIU */
+
+.tablinks.active {
+  border-bottom: 3px solid #3FFFA2;
+  /* color: #b1fde2; */
+}
+
+.tabcontent {
+  display: none;
+  animation: fadeEffect 1s; 
+}
+
+
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+/* AQUIU */
 
 .resume {
   display: flex;

@@ -25,7 +25,7 @@
     <div class="wrapper">
         <?php include("includes/header-plant-details.php"); ?>
 
-        <?php include("includes/plant-details-main-taxonomy.php"); ?>
+        <?php include("includes/plant-details-base.php"); ?>
 
         <?php include("includes/green-footer.php"); ?>
     </div>  
