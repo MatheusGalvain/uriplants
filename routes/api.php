@@ -40,15 +40,6 @@ if ($requestPath === '/plants') {
     exit;
 }
 
-if (preg_match('#^/quiz/(\d+)$#', $requestPath, $matches)) {
-    $id = intval($matches[1]);
-    if ($method === 'GET') {
-        $_GET['id'] = $id; 
-        $quizController->get();
-        exit;
-    }
-}
-
 if ($requestPath === '/quiz') {
     if ($method === 'GET') {
         $quizController->get(); 

@@ -166,6 +166,13 @@
             z-index: 1;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             align-items: center;
+            cursor: pointer; /* Adicionado para indicar que o cartão é clicável */
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .plant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .plant-card::before {
@@ -389,6 +396,9 @@
                     const plantCard = document.createElement('div');
                     plantCard.classList.add('plant-card');
 
+                    // Adiciona um atributo data-id para armazenar o ID da planta
+                    plantCard.setAttribute('data-id', plant.id);
+
                     const plantInfo = document.createElement('div');
                     plantInfo.classList.add('plant-info');
 
@@ -413,6 +423,27 @@
 
                     plantCard.appendChild(plantInfo);
                     plantCard.appendChild(plantImage);
+
+                    // Adiciona o listener de clique ao cartão da planta
+                    plantCard.addEventListener('click', async () => {
+                        const plantId = plant.id; // Obtém o ID da planta
+
+                        try {
+                            // Faz a requisição para o endpoint específico da plantahttp://localhost/uriplants/public/plants
+                            const response = await fetch(`http://localhost/uriplants/public/plants?id=${plantId}`);
+
+                            if (response.ok) {
+                                // Redireciona para a página plant.php
+                                window.location.href = '../plant/plant.php';
+                            } else {
+                                console.error('Erro na requisição para a planta específica.');
+                                alert('Não foi possível carregar os detalhes da planta.');
+                            }
+                        } catch (error) {
+                            console.error('Erro ao fazer a requisição:', error);
+                            alert('Ocorreu um erro ao tentar carregar a planta.');
+                        }
+                    });
 
                     plantsContainer.appendChild(plantCard);
                 });
