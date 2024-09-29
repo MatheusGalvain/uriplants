@@ -8,15 +8,64 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/footer.css">
     <style>
+        body {
+            background: none;
+            position: relative;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                150deg, 
+                rgba(255, 255, 255, 0.8) 0%, 
+                rgba(212, 163, 115, 0.4) 10%, 
+                rgba(255, 255, 255, 0) 40%
+            );
+            z-index: 1; /* Assegura que a sobreposição esteja acima da imagem de fundo */
+        }
+
+        /* Novo pseudo-elemento para a imagem de fundo com baixa opacidade */
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('../images/logoURIsus.png');
+            background-size: contain;
+            background-position: right;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            opacity: 0.05; /* Ajuste a opacidade conforme desejado (0.0 a 1.0) */
+            z-index: 0; /* Assegura que a imagem de fundo esteja atrás da sobreposição */
+            pointer-events: none; /* Permite que cliques passem para os elementos abaixo */
+        }
+
+        section {
+            position: relative; /* Adicionado */
+            z-index: 2; /* Adicionado para garantir que esteja acima da sobreposição */
+            display: flex;
+            flex-direction: column;
+            min-height: 700px;
+        }
 
         /* Header section */
         .header {
-            background-color: #fff;
-            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
             border-bottom: 2px solid #ccc;
+            position: relative;
         }
 
         .top-bar {
@@ -59,6 +108,43 @@
             border-bottom: 2px solid #00ff00;
         }
 
+
+        .header-container {
+            display: flex;
+        }
+
+        .icon-container {
+            background-color: #18392B;
+            border-radius: 8px;
+            font-size: 24px;
+            width: 50px;
+            display: flex;
+            justify-content: center;
+            color: white;
+            align-items: center;
+            margin-right: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 10px;
+            border-left: 2px solid black;
+        }
+
+        .text-container h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .text-container span {
+            font-size: 16px;
+            color: #6e6e6e;
+        }
         /* Plant cards */
         .plant-container {
             padding: 20px;
@@ -72,14 +158,40 @@
             background-color: white;
             padding: 15px;
             margin-bottom: 15px;
-            border: 2px solid #00ff00;
-            border-radius: 8px;
+            background-color: #f9f9f9; /* Cor de fundo suave */
+            position: relative;
+            border-radius: 10px;
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
             align-items: center;
+        }
+
+        .plant-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            border-radius: 10px;
+            padding: 2px;
+            background: linear-gradient(170deg, #19AF66 0%, #18392B 92%, #0F5332 100%);
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
         }
 
         .plant-card img {
             width: 100px;
             height: 100px;
+            min-width: 100px;
+            min-height: 100px;
             object-fit: cover;
             border-radius: 8px;
         }
@@ -117,6 +229,9 @@
             color: black;
             cursor: pointer;
             transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .pagination a:hover {
@@ -182,25 +297,33 @@
         </div>
     </header>
 
-    <!-- Navigation -->
-    <nav>
-        <a href="#">URI Quiz</a>
-        <a href="#">URI Animais</a>
-        <a href="#" class="active">URI Plantas</a>
-    </nav>
-
-    <!-- Plant cards -->
-    <div class="plant-container">
-        <h2>Você está em URI Plantas</h2>
-
-        <!-- Plant cards serão inseridos aqui dinamicamente -->
-        <div id="plants"></div>
-
-        <!-- Pagination -->
-        <div class="pagination" id="pagination">
-            <!-- Links de paginação serão inseridos aqui dinamicamente -->
+    <section>
+        <div>
+            <div class="header-container">
+                <div class="icon-container">
+                <i class="fas fa-caret-left"></i>
+                </div>
+                <div class="text-container">
+                    <span>Você está em</span>
+                    <h1>URI Plantas</h1>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div>
+            <!-- Plant cards -->
+            <div class="plant-container">
+                
+                <!-- Plant cards serão inseridos aqui dinamicamente -->
+                <div id="plants"></div>
+            </div>
+        
+            <!-- Pagination (movido para aqui) -->
+            <div class="pagination" id="pagination">
+                <!-- Links de paginação serão inseridos aqui dinamicamente -->
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer>
@@ -237,7 +360,7 @@
             const paginationContainer = document.getElementById('pagination');
 
             let currentPage = 1;
-            const limit = 1; // Ajuste conforme necessário
+            const limit = 1; // Número de itens por página
             let totalPages = 1;
 
             // Função para buscar plantas do endpoint
@@ -301,15 +424,16 @@
                 });
             }
 
-            // Função para renderizar a paginação
+            // Função para renderizar a paginação com setas e números
             function renderPagination() {
                 paginationContainer.innerHTML = ''; // Limpa a paginação anterior
 
-                // Botão "Anterior"
+                // Botão "Anterior" com seta para a esquerda
                 if (currentPage > 1) {
                     const prevLink = document.createElement('a');
-                    prevLink.textContent = 'Anterior';
+                    prevLink.innerHTML = '&#8592;'; // Setinha para a esquerda
                     prevLink.href = '#';
+                    prevLink.setAttribute('aria-label', 'Página Anterior');
                     prevLink.addEventListener('click', (e) => {
                         e.preventDefault();
                         if (currentPage > 1) {
@@ -320,17 +444,31 @@
                     paginationContainer.appendChild(prevLink);
                 }
 
-                // Exibir a informação da página atual e total de páginas
-                const infoSpan = document.createElement('span');
-                infoSpan.classList.add('pagination-info');
-                infoSpan.textContent = `Página ${currentPage} de ${totalPages}`;
-                paginationContainer.appendChild(infoSpan);
+                // Links numerados para as páginas
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageLink = document.createElement('a');
+                    pageLink.textContent = i;
+                    pageLink.href = '#';
+                    if (i === currentPage) {
+                        pageLink.classList.add('active');
+                        pageLink.setAttribute('aria-current', 'page');
+                    }
+                    pageLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (i !== currentPage) {
+                            currentPage = i;
+                            loadPlants();
+                        }
+                    });
+                    paginationContainer.appendChild(pageLink);
+                }
 
-                // Botão "Próximo"
+                // Botão "Próximo" com seta para a direita
                 if (currentPage < totalPages) {
                     const nextLink = document.createElement('a');
-                    nextLink.textContent = 'Próximo';
+                    nextLink.innerHTML = '&#8594;'; // Setinha para a direita
                     nextLink.href = '#';
+                    nextLink.setAttribute('aria-label', 'Próxima Página');
                     nextLink.addEventListener('click', (e) => {
                         e.preventDefault();
                         if (currentPage < totalPages) {
