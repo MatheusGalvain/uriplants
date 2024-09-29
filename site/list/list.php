@@ -425,24 +425,11 @@
                     plantCard.appendChild(plantImage);
 
                     // Adiciona o listener de clique ao cartão da planta
-                    plantCard.addEventListener('click', async () => {
+                    plantCard.addEventListener('click', () => {
                         const plantId = plant.id; // Obtém o ID da planta
-
-                        try {
-                            // Faz a requisição para o endpoint específico da plantahttp://localhost/uriplants/public/plants
-                            const response = await fetch(`http://localhost/uriplants/public/plants?id=${plantId}`);
-
-                            if (response.ok) {
-                                // Redireciona para a página plant.php
-                                window.location.href = '../plant/plant.php';
-                            } else {
-                                console.error('Erro na requisição para a planta específica.');
-                                alert('Não foi possível carregar os detalhes da planta.');
-                            }
-                        } catch (error) {
-                            console.error('Erro ao fazer a requisição:', error);
-                            alert('Ocorreu um erro ao tentar carregar a planta.');
-                        }
+                        
+                        // Redireciona para a página plant.php com o ID da planta na URL
+                        window.location.href = `../plant/plant.php?id=${plantId}`;
                     });
 
                     plantsContainer.appendChild(plantCard);
