@@ -139,3 +139,28 @@
     footer {flex-direction: column;}
     footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
 }
+/* Ignorar */
+@media screen and (min-width: 0px) and (max-width: 359px){
+    #header .topheader,.bottomheader{display: none;}
+    #main-menu-mobile{ display: flex; }
+    .navigatorcontainer{display: none;}
+    .box{
+        width: 320px;
+    }
+    .boximage{
+        width: 100%;
+    }
+    .articletitle{display: none;}
+    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
+    .plantinfo{width: 100%;}
+    .photocentral{width: 100%; border-radius: 0; height: 300px;}
+    .photoImg{border-radius: 0;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .navigatorref{font-size: 15px;}
+    .informationsart h2{font-size: 18px;}
+    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+    .otherplants-wrapp h1{font-size: 40px;}
+    footer {flex-direction: column;}
+    footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
+}
