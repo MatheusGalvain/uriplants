@@ -83,36 +83,91 @@ if (isset($_GET['id'])) {
     <title><?php echo !empty($plantName) ? $plantName : "Detalhes da Planta"; ?> - URI Plantas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap"
-        rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
-        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap"rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/footer.css">
     <link rel="stylesheet" href="../css/listplant.css">
+    <link rel="stylesheet" href="../css/listplant_responsive.css">
 </head>
 
-<body>
-    <header class="header">
-        <div class="top-bar">
-            <div class="social-icons">
-                <a href="#"><img src="linkedin-placeholder.png" alt="LinkedIn"></a>
-                <a href="#"><img src="instagram-placeholder.png" alt="Instagram"></a>
-                <a href="#"><img src="facebook-placeholder.png" alt="Facebook"></a>
-            </div>
-            <div class="contact-info">
-                <span>+55 (54) 3520-9000</span>
-            </div>
+<header id="header" class="header">
+    <div class="topheader">
+        <div class="boxheader">
+            <ul class="topheaderul">
+                <li><a class="reficon" href="https://www.instagram.com/urierechim/" target="_BLANK" aria-label="Acesso ao instagram"><img src="../images/instagram-icon.png" alt="instagram"></a></li>
+                <li><a class="reficon" href="https://www.youtube.com/user/urierechim/videos" target="_BLANK" aria-label="Acesso ao youtube"><img src="../images/youtube-icon.png" alt="youtube"></a></li>
+                <li><a class="reficon" href="https://www.facebook.com/uricampuserechim/?locale=pt_BR" target="_BLANK" aria-label="Acesso ao facebook"><img src="../images/facebook-icon.png" alt="facebook"></a></li>
+                <li class="lifont">+55 (54) 3520-9000</li>
+            </ul>
+            <ul class="topheaderullinks">
+                <li class="lifont">@ 2024 URI Câmpus de Erechim</li>
+                <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a politica de privacidade">Política de privacidade</a></li>
+                <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a reitoria">Reitoria</a></li>
+                <li class="lihover"><a class="acesslink" href="https://www.uricer.edu.br/site/informacao?uri=000139000000000000000000000" target="_BLANK" alt="acesso a uri sustentabilidade">URI Sustentabilidade</a></li>
+            </ul>
         </div>
-        <div class="logo-slider">
-            <img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim">
+    </div>
+    <div class="bottomheader">
+        <div class="boxheader">
+            <a href="#" alt="Logo da uri" class="logoheader"><img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim"></a>
+            <ul class="ulheader">
+                <li class="liheaderhover"><a href="#">URI Quiz</a></li>
+                <li class="liheaderhover"><a href="#">Uri Plantas</a></li>
+                <li>
+                    <form action="../list/list.php" method="GET" class="search-form">
+                        <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
+                        <button type="submit">🔍</button>
+                    </form>
+                </li>
+            </ul>
         </div>
-    </header>
+    </div>
+    <nav id="main-menu-mobile">
+        <div id="button-menu" class="button-menu">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <ul id="main-menu-mobile-items">
+            <div class="hamburguer-wrapp">
+                <h1>Fechar menu...</h1>
+                <div id="button-menu" class="button-menu">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+            <li class="item-menu">
+                <a alt="Uri Plants" href="#" class="menu-mobile-link ">URI Plants</a>
+            </li>
+             <li class="item-menu">
+                <a alt="Uri Quiz" href="#" class="menu-mobile-link">URI Quiz</a>
+            </li>
+        </ul>
+    </nav>
+</header>
 
+<body>
     <main>
-        <section id="main-section" class="plantinfo">
+        <div class="navigatorcontainer">
             <div class="box">
+                <div class="header-container">
+                    <a href="../list/list.php" class="icon-container">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                    <div class="text-container">
+                        <span>Você está em</span>
+                        <h1>URI Plantas</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section id="main-section" class="plantinfo">
+            <div class="boximage">
                 <article class="articletitle">
                     <h1><?php echo $plantName; ?></h1>
                     <h2>Conheça mais sobre a planta!</h2>
@@ -134,11 +189,10 @@ if (isset($_GET['id'])) {
                     </div>
                     <div class="otherphotos-wrapp">
                         <?php
-                        $plantImages = $plantController->getPlantImages($id);
-                        $maxPhotos = 4; // Total de fotos a serem exibidas
-                        $count = 0;
+                            $plantImages = $plantController->getPlantImages($id);
+                            $maxPhotos = 4;
+                            $count = 0;
                         ?>
-
                         <?php if (!empty($plantImages)): ?>
                             <?php foreach ($plantImages as $image): ?>
                                 <?php if ($count < $maxPhotos && $image['image_blob'] !== base64_encode($mainImageSrc)): ?>
@@ -160,10 +214,9 @@ if (isset($_GET['id'])) {
             <div class="box">
                 <div class="navigatordiv">
                     <ul class="navigatorList">
-                        <li><a class="navigatorref" href="#" onclick="showSection('conditions')">Condições</a></li>
-                        <li><a class="navigatorref" href="#" onclick="showSection('classification')">Classificações</a>
-                        </li>
-                        <li><a class="navigatorref" href="#" onclick="showSection('about')">Sobre</a></li>
+                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('conditions')">Condições</a></li>
+                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('classification')">Classificações</a></li>
+                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('about')">Sobre</a></li>
                     </ul>
                 </div>
             </div>
@@ -188,6 +241,12 @@ if (isset($_GET['id'])) {
                     <h1>Ordem</h1>
                     <h2><?php echo $orderName; ?></h2>
                 </article>
+            </div>
+        </section>
+
+        <!-- Sessão de informações da planta que está em classificação -->
+        <section id="main-section" class="classification">
+            <div class="box">
                 <article class="informationsart">
                     <h1>Classe</h1>
                     <h2><?php echo $className; ?></h2>
@@ -207,14 +266,7 @@ if (isset($_GET['id'])) {
             </div>
         </section>
 
-        <!-- Sessão de informações da planta que está em classificação -->
-        <section id="main-section" class="classification">
-            <div class="box">
-                <h1>Classificação</h1>
-            </div>
-        </section>
-
-        <!-- Sessão de informações da planta que está em classificação -->
+        <!-- Sessão de informações da planta que está em condições -->
         <section id="main-section" class="conditionals">
             <div class="box">
                 <h1>Condições</h1>
@@ -259,12 +311,10 @@ if (isset($_GET['id'])) {
             <div class="redes-sociais">
                 <span>Redes Sociais</span>
                 <div class="display-icons">
-                    <a href="https://www.facebook.com/uricampuserechim"><img src="images/facebook-icon.png"
-                            alt="Facebook" /></a>
-                    <a href="https://www.instagram.com/urierechim/"><img src="images/instagram-icon.png"
-                            alt="Instagram" /></a>
-                    <a href="https://twitter.com/urierechim"><img src="images/x-icon.png" alt="Twitter" /></a>
-                    <a href="https://www.youtube.com/urierechim"><img src="images/youtube-icon.png" alt="YouTube" /></a>
+                    <a href="https://www.facebook.com/uricampuserechim"><img src="../images/facebook-icon.png" alt="Facebook" /></a>
+                    <a href="https://www.instagram.com/urierechim/"><img src="../images/instagram-icon.png" alt="Instagram" /></a>
+                    <a href="https://twitter.com/urierechim"><img src="../images/x-icon.png" alt="Twitter" /></a>
+                    <a href="https://www.youtube.com/urierechim"><img src="../images/youtube-icon.png" alt="YouTube" /></a>
                 </div>
             </div>
             <div class="telefones">
@@ -279,11 +329,12 @@ if (isset($_GET['id'])) {
             </div>
         </div>
         <div class="logo">
-            <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" alt="Logo URI" /></a>
+            <a href="https://www.uricer.edu.br/"><img src="../images/uri-logo.png" alt="Logo URI" /></a>
         </div>
     </footer>
 
     <script>
+        
         function changeMainImage(imageSrc) {
             document.getElementById('mainImage').src = imageSrc;
         }
@@ -294,13 +345,12 @@ if (isset($_GET['id'])) {
 
         // Função que vai fazer a navegação do navigator
         function showSection(section) {
-
             // Deixa as classes com o display none
             document.querySelector('.informations').style.display = 'none';
             document.querySelector('.classification').style.display = 'none';
             document.querySelector('.conditionals').style.display = 'none';
 
-            // Se a sessão for conforme clicar a div aciona
+            // Exibe a seção correta
             if (section === 'about') {
                 document.querySelector('.informations').style.display = 'block';
             }
@@ -310,7 +360,31 @@ if (isset($_GET['id'])) {
             if (section === 'conditions') {
                 document.querySelector('.conditionals').style.display = 'block';
             }
+
+            // Atualiza a classe 'active' nos links
+            const links = document.querySelectorAll('.navigatorref');
+            links.forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Adiciona a classe 'active' ao link correspondente
+            const activeLink = document.querySelector(`.navigatorref[onclick*='${section}']`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
         }
+
+        $('.button-menu').click(function () {
+            $(this).toggleClass('button-menu-close');
+            $('#main-menu-mobile-items').toggleClass('main-menu-mobile-items-open');
+        });
+    
+        $('.item-menu').click(function () {
+            // Desativar todos os menus ativos quando clicar em um novo menu
+            $('.menu-link').removeClass('activeheader');
+            // Ativar o menu sublinhado quando for clicado
+            $(this).children().addClass('activeheader');
+        });
 
         // Chama a função showSection para exibir a seção "Sobre" ao carregar a página
         window.onload = function () {

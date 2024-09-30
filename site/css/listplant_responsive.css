@@ -1,0 +1,141 @@
+@media screen and (min-width: 1651px) and (max-width: 1850px) {
+    .boxheader{
+        width: 1600px;
+    }
+}
+@media screen and (min-width: 1451px) and (max-width: 1650px) {
+    .boxheader{
+        width: 1400px;
+    }
+}
+@media screen and (min-width: 1251px) and (max-width: 1450px) {
+    .boxheader{
+        width: 1200px;
+    }
+    .box{
+        width: 1200px;
+    }
+    .boximage{
+        width: 1200px;
+    }
+    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
+    .photocentral{width: 850px;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherplant{width: 280px;}
+}
+@media screen and (min-width: 1151px) and (max-width: 1250px) {
+    .boxheader{
+        width: 1100px;
+    }
+    .box{
+        width: 1100px;
+    }
+    .boximage{
+        width: 1100px;
+    }
+    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
+    .photocentral{width: 850px;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherplant{width: 260px;}
+}
+@media screen and (min-width: 1024px) and (max-width: 1150px) {
+    .boxheader{
+        width: 1000px;
+    }
+    .box{
+        width: 1000px;
+    }
+    .boximage{
+        width: 1000px;
+    }
+    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
+    .photocentral{width: 850px;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherplant{width: 240px;}
+}
+@media screen and (min-width: 800px) and (max-width: 1023px) {
+    #header .topheader,.bottomheader{display: none;}
+    #main-menu-mobile{ display: flex; }
+    .navigatorcontainer{display: none;}
+    .box{
+        width: 750px;
+    }
+    .boximage{
+        width: 100%;
+    }
+    .articletitle{display: none;}
+    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 50px;}
+    .plantinfo{width: 100%;}
+    .photocentral{width: 100%; border-radius: 0;}
+    .photoImg{border-radius: 0;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+	
+}
+@media screen and (min-width: 600px) and (max-width: 799px) {
+    #header .topheader,.bottomheader{display: none;}
+    #main-menu-mobile{ display: flex; }
+    .navigatorcontainer{display: none;}
+    .box{
+        width: 550px;
+    }
+    .boximage{
+        width: 100%;
+    }
+    .articletitle{display: none;}
+    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
+    .plantinfo{width: 100%;}
+    .photocentral{width: 100%; border-radius: 0; height: 500px;}
+    .photoImg{border-radius: 0;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+    footer {flex-direction: column;}
+    footer .footer-left {align-items: center;flex-direction: column;gap: 30px;}
+}
+@media screen and (min-width: 460px) and (max-width: 599px) {
+    #header .topheader,.bottomheader{display: none;}
+    #main-menu-mobile{ display: flex; }
+    .navigatorcontainer{display: none;}
+    .box{
+        width: 400px;
+    }
+    .boximage{
+        width: 100%;
+    }
+    .articletitle{display: none;}
+    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
+    .plantinfo{width: 100%;}
+    .photocentral{width: 100%; border-radius: 0; height: 350px;}
+    .photoImg{border-radius: 0;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+    footer {flex-direction: column;}
+    footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
+}
+@media screen and (min-width: 360px) and (max-width: 459px) {
+    #header .topheader,.bottomheader{display: none;}
+    #main-menu-mobile{ display: flex; }
+    .navigatorcontainer{display: none;}
+    .box{
+        width: 320px;
+    }
+    .boximage{
+        width: 100%;
+    }
+    .articletitle{display: none;}
+    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
+    .plantinfo{width: 100%;}
+    .photocentral{width: 100%; border-radius: 0; height: 300px;}
+    .photoImg{border-radius: 0;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .navigatorref{font-size: 15px;}
+    .informationsart h2{font-size: 18px;}
+    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+    .otherplants-wrapp h1{font-size: 40px;}
+    footer {flex-direction: column;}
+    footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
+}
