@@ -13,7 +13,11 @@ require_once __DIR__ . '/../../controllers/PlantController.php';
 $plantController = new PlantController();
 
 // Função para sanitizar a entrada
-function sanitize_input($data) {
+function sanitize_input($data)
+{
+    if (is_null($data)) {
+        return '';
+    }
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
 }
 
@@ -23,40 +27,49 @@ $plantDescription = "";
 $plantImage = "../images/plant-placeholder.png";
 $plantImageAlt = "";
 $errorMessage = "";
+$familyName = "";
+$orderName = "";
+$className = "";
+$speciesName = "";
+$ecologyName = "";
+$applicationsName = "";
+$propertyName = "";
+$plantPropertyDescription = "";
 
 // Verificar se o parâmetro 'id' foi passado na URL
 if (isset($_GET['id'])) {
-    // Sanitizar o ID recebido
     $id = intval($_GET['id']);
-
-    // Verificar se o ID é válido
     if ($id > 0) {
-        // Buscar os detalhes da planta com o ID fornecido
         $plant = $plantController->getSinglePlant($id);
-
-        // Verificar se a planta foi encontrada
         if (isset($plant['id'])) {
-            // Extrair os dados da planta
             $plantName = sanitize_input($plant['name']);
-            $plantDescription = sanitize_input($plant['ecology']); // Assumindo que 'ecology' é a descrição
+            $plantDescription = sanitize_input($plant['ecology']);
             if (!empty($plant['image_blob'])) {
                 $plantImage = 'data:image/jpeg;base64,' . $plant['image_blob'];
             }
             $plantImageAlt = "Imagem de " . $plantName;
+
+            // Extrair família, ordem, classe e propriedades
+            $familyName = sanitize_input($plant['family_name']);
+            $orderName = sanitize_input($plant['order_name']);
+            $className = sanitize_input($plant['class_name']);
+            $speciesName = sanitize_input($plant['species']);
+            $ecologyName = sanitize_input($plant['ecology']);
+            $applicationsName = sanitize_input($plant['applications']);
+            $propertyName = sanitize_input($plant['property_name']);
+            $plantPropertyDescription = sanitize_input($plant['plant_property_description']);
+
+            $otherPlants = $plantController->getOtherPlants($id);
         } else {
-            // Planta não encontrada ou ocorreu um erro
             $errorMessage = isset($plant['message']) ? $plant['message'] : "Erro desconhecido.";
             if (isset($plant['error'])) {
-                // Logar o erro em um arquivo de log ou sistema de logging apropriado
                 error_log("Erro ao buscar planta: " . $plant['error']);
             }
         }
     } else {
-        // ID inválido
         $errorMessage = "ID da planta inválido.";
     }
 } else {
-    // Parâmetro 'id' não foi passado
     $errorMessage = "ID da planta não especificado.";
 }
 ?>
@@ -70,14 +83,14 @@ if (isset($_GET['id'])) {
     <title><?php echo !empty($plantName) ? $plantName : "Detalhes da Planta"; ?> - URI Plantas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/footer.css">
-    <style>
-        /* Seu CSS existente */
-        /* ... (mantido inalterado) ... */
-    </style>
+    <link rel="stylesheet" href="../css/listplant.css">
 </head>
 
 <body>
@@ -95,39 +108,161 @@ if (isset($_GET['id'])) {
         <div class="logo-slider">
             <img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim">
         </div>
-        <nav>
-            <a href="../" class="active">Início</a>
-            <a href="#">Sobre</a>
-            <a href="#">Contato</a>
-        </nav>
     </header>
 
-    <section>
-        <div class="plant-details-container">
-            <?php if (!empty($errorMessage)): ?>
-                <div class="plant-details">
-                    <h1>Erro</h1>
-                    <p><?php echo sanitize_input($errorMessage); ?></p>
-                    <a href="../" class="back-link">&laquo; Voltar para URI Plantas</a>
-                </div>
-            <?php else: ?>
-                <div class="plant-details">
+    <main>
+        <section id="main-section" class="plantinfo">
+            <div class="box">
+                <article class="articletitle">
                     <h1><?php echo $plantName; ?></h1>
-                    <img src="<?php echo $plantImage; ?>" alt="<?php echo sanitize_input($plantImageAlt); ?>">
-                    <p><?php echo nl2br($plantDescription); ?></p>
-                    <a href="../" class="back-link">&laquo; Voltar para URI Plantas</a>
+                    <h2>Conheça mais sobre a planta!</h2>
+                </article>
+                <section class="photosplant">
+                    <div class="photocentral-wrapp">
+                        <div class="photocentral">
+                            <?php
+                            // Verifica se a imagem da planta está disponível
+                            if (!empty($plantImage)) {
+                                $mainImageSrc = $plantImage;
+                            } else {
+                                $mainImageSrc = '../images/notfound.png'; // Imagem padrão
+                            }
+                            ?>
+                            <img id="mainImage" class="photoImg" src="<?php echo $mainImageSrc; ?>"
+                                alt="<?php echo sanitize_input($plantImageAlt); ?>">
+                        </div>
+                    </div>
+                    <div class="otherphotos-wrapp">
+                        <?php
+                        $plantImages = $plantController->getPlantImages($id);
+                        $maxPhotos = 4; // Total de fotos a serem exibidas
+                        $count = 0;
+                        ?>
+
+                        <?php if (!empty($plantImages)): ?>
+                            <?php foreach ($plantImages as $image): ?>
+                                <?php if ($count < $maxPhotos && $image['image_blob'] !== base64_encode($mainImageSrc)): ?>
+                                    <div class="otherphotodiv"
+                                        onclick="changeMainImage('data:image/jpeg;base64,<?php echo $image['image_blob']; ?>')">
+                                        <img class="otherphoto" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
+                                            alt="<?php echo sanitize_input($plantName); ?>">
+                                    </div>
+                                    <?php $count++; ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section id="main-section" class="navigator">
+            <div class="box">
+                <div class="navigatordiv">
+                    <ul class="navigatorList">
+                        <li><a class="navigatorref" href="#" onclick="showSection('conditions')">Condições</a></li>
+                        <li><a class="navigatorref" href="#" onclick="showSection('classification')">Classificações</a>
+                        </li>
+                        <li><a class="navigatorref" href="#" onclick="showSection('about')">Sobre</a></li>
+                    </ul>
                 </div>
-            <?php endif; ?>
-        </div>
-    </section>
+            </div>
+        </section>
+
+        <!-- Sessão de informações da planta que está em sobre -->
+        <section id="main-section" class="informations">
+            <div class="box">
+                <article class="informationsart">
+                    <h1>Nome</h1>
+                    <h2><?php echo $plantName; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Descrição</h1>
+                    <h2><?php echo $plantDescription; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Família</h1>
+                    <h2><?php echo $familyName; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Ordem</h1>
+                    <h2><?php echo $orderName; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Classe</h1>
+                    <h2><?php echo $className; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Espécie</h1>
+                    <h2><?php echo $speciesName; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Aplicações</h1>
+                    <h2><?php echo $applicationsName; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Ecologia</h1>
+                    <h2><?php echo $ecologyName; ?></h2>
+                </article>
+            </div>
+        </section>
+
+        <!-- Sessão de informações da planta que está em classificação -->
+        <section id="main-section" class="classification">
+            <div class="box">
+                <h1>Classificação</h1>
+            </div>
+        </section>
+
+        <!-- Sessão de informações da planta que está em classificação -->
+        <section id="main-section" class="conditionals">
+            <div class="box">
+                <h1>Condições</h1>
+            </div>
+        </section>
+
+        <section id="main-section" class="otherplants-wrapp">
+            <div class="box">
+                <h1>Outras Plantas</h1>
+                <div class="otherplants">
+                    <?php if (!empty($otherPlants)): ?>
+                        <?php foreach ($otherPlants as $otherPlant): ?>
+                            <div class="otherplant" onclick="goToPlant(<?php echo $otherPlant['id']; ?>)">
+                                <div class="centerplant">
+                                    <div class="otherplantimg">
+                                        <?php if (!empty($otherPlant['image_blob'])): ?>
+                                            <img src="data:image/jpeg;base64,<?php echo $otherPlant['image_blob']; ?>"
+                                                alt="<?php echo sanitize_input($otherPlant['name']); ?>">
+                                        <?php else: ?>
+                                            <img src="../images/notfound.png"
+                                                alt="<?php echo sanitize_input($otherPlant['name']); ?>">
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="titleothersplants">
+                                        <h1>Nome</h1>
+                                        <h2><?php echo sanitize_input($otherPlant['name']); ?></h2>
+                                    </div>
+                                </div>
+                                <a class="btnotherplant" href="#">ACESSE</a>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>Não há outras plantas disponíveis.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <footer>
         <div class="footer-left">
             <div class="redes-sociais">
                 <span>Redes Sociais</span>
                 <div class="display-icons">
-                    <a href="https://www.facebook.com/uricampuserechim"><img src="images/facebook-icon.png" alt="Facebook" /></a>
-                    <a href="https://www.instagram.com/urierechim/"><img src="images/instagram-icon.png" alt="Instagram" /></a>
+                    <a href="https://www.facebook.com/uricampuserechim"><img src="images/facebook-icon.png"
+                            alt="Facebook" /></a>
+                    <a href="https://www.instagram.com/urierechim/"><img src="images/instagram-icon.png"
+                            alt="Instagram" /></a>
                     <a href="https://twitter.com/urierechim"><img src="images/x-icon.png" alt="Twitter" /></a>
                     <a href="https://www.youtube.com/urierechim"><img src="images/youtube-icon.png" alt="YouTube" /></a>
                 </div>
@@ -147,6 +282,42 @@ if (isset($_GET['id'])) {
             <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" alt="Logo URI" /></a>
         </div>
     </footer>
+
+    <script>
+        function changeMainImage(imageSrc) {
+            document.getElementById('mainImage').src = imageSrc;
+        }
+
+        function goToPlant(plantId) {
+            window.location.href = 'plant.php?id=' + plantId;
+        }
+
+        // Função que vai fazer a navegação do navigator
+        function showSection(section) {
+
+            // Deixa as classes com o display none
+            document.querySelector('.informations').style.display = 'none';
+            document.querySelector('.classification').style.display = 'none';
+            document.querySelector('.conditionals').style.display = 'none';
+
+            // Se a sessão for conforme clicar a div aciona
+            if (section === 'about') {
+                document.querySelector('.informations').style.display = 'block';
+            }
+            if (section === 'classification') {
+                document.querySelector('.classification').style.display = 'block';
+            }
+            if (section === 'conditions') {
+                document.querySelector('.conditionals').style.display = 'block';
+            }
+        }
+
+        // Chama a função showSection para exibir a seção "Sobre" ao carregar a página
+        window.onload = function () {
+            showSection('about');
+        };
+
+    </script>
 </body>
 
 </html>

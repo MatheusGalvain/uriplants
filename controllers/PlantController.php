@@ -187,5 +187,77 @@ class PlantController {
             echo json_encode(["message" => "Método não suportado"], JSON_UNESCAPED_UNICODE);
         }
     }
+    public function getOtherPlants($currentPlantId, $limit = 4) {
+        $conn = getConnection();
+        
+        $sql = "SELECT plants.id, plants.name, images.imagem AS image_blob
+                FROM plants
+                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+                LEFT JOIN images ON plantsproperties.id = images.plants_property_id
+                WHERE plants.id != ? 
+                ORDER BY RAND() LIMIT ?";
+        
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
+        }
+    
+        $stmt->bind_param("ii", $currentPlantId, $limit);
+    
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            $otherPlants = [];
+            while ($row = $result->fetch_assoc()) {
+                if (!empty($row['image_blob'])) {
+                    $row['image_blob'] = base64_encode($row['image_blob']);
+                }
+                $otherPlants[] = $row;
+            }
+    
+            $stmt->close();
+            $conn->close();
+            return $otherPlants;
+        } else {
+            $error = ["message" => "Erro ao buscar outras plantas", "error" => $stmt->error];
+            $stmt->close();
+            $conn->close();
+            return $error;
+        }
+    }
+    public function getPlantImages($plantId) {
+        $conn = getConnection();
+        
+        $sql = "SELECT images.imagem AS image_blob
+                FROM images
+                JOIN plantsproperties ON images.plants_property_id = plantsproperties.id
+                WHERE plantsproperties.plant_id = ?";
+        
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
+        }
+    
+        $stmt->bind_param("i", $plantId);
+    
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            $images = [];
+            while ($row = $result->fetch_assoc()) {
+                if (!empty($row['image_blob'])) {
+                    $row['image_blob'] = base64_encode($row['image_blob']);
+                }
+                $images[] = $row;
+            }
+    
+            $stmt->close();
+            $conn->close();
+            return $images;
+        } else {
+            $error = ["message" => "Erro ao buscar imagens da planta", "error" => $stmt->error];
+            $stmt->close();
+            $conn->close();
+            return $error;
+        }
+    }
 }
 ?>
