@@ -26,12 +26,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                150deg,
-                rgba(255, 255, 255, 0.8) 0%,
-                rgba(212, 163, 115, 0.4) 10%,
-                rgba(255, 255, 255, 0) 40%
-            );
+            background: linear-gradient(150deg, rgb(14 75 22 / 80%) 0%, rgba(57, 91, 65, 0.4) 10%, rgba(34, 49, 36, 0) 40%);
             z-index: 1;
         }
 
@@ -47,7 +42,7 @@
             background-position: right;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            opacity: 0.05;
+            opacity: 0.15;
             z-index: 0;
             pointer-events: none;
         }
