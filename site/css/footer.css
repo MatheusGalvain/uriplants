@@ -65,6 +65,7 @@ footer .localizacoes {
 display: flex;
 flex-direction: column;
 gap: 5px;
+text-align: left;
 }
   
 footer .redes-sociais a,
