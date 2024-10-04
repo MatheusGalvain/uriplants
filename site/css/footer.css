@@ -76,6 +76,12 @@ footer .localizacoes a {
 
 .display-icons {
   display: flex;
+  gap: 10px
+}
+
+footer .telefones a, footer .localizacoes a {
+  font-family: 'poppins';
+  font-weight: 200;
 }
 
 footer .redes-sociais a img {

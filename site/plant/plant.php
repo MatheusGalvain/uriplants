@@ -214,9 +214,10 @@ if (isset($_GET['id'])) {
             <div class="box">
                 <div class="navigatordiv">
                     <ul class="navigatorList">
-                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('conditions')">Condições</a></li>
-                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('classification')">Classificações</a></li>
-                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('about')">Sobre</a></li>
+                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('description')">Descrição</a></li>
+                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('taxonomy')">Taxonomia</a></li>
+                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('ecology')">Ecologia</a></li>
+                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('occourrence')">Occorrência</a></li>
                     </ul>
                 </div>
             </div>
@@ -245,7 +246,7 @@ if (isset($_GET['id'])) {
         </section>
 
         <!-- Sessão de informações da planta que está em classificação -->
-        <section id="main-section" class="classification">
+        <section id="main-section" class="taxonomy">
             <div class="box">
                 <article class="informationsart">
                     <h1>Classe</h1>
@@ -267,9 +268,15 @@ if (isset($_GET['id'])) {
         </section>
 
         <!-- Sessão de informações da planta que está em condições -->
-        <section id="main-section" class="conditionals">
+        <section id="main-section" class="description">
             <div class="box">
-                <h1>Condições</h1>
+                <h1>Condiçõess</h1>
+            </div>
+        </section>
+
+        <section id="main-section" class="occourrence">
+            <div class="box">
+                <h1>Ocorrênciaa</h1>
             </div>
         </section>
 
@@ -347,18 +354,22 @@ if (isset($_GET['id'])) {
         function showSection(section) {
             // Deixa as classes com o display none
             document.querySelector('.informations').style.display = 'none';
-            document.querySelector('.classification').style.display = 'none';
-            document.querySelector('.conditionals').style.display = 'none';
+            document.querySelector('.taxonomy').style.display = 'none';
+            document.querySelector('.description').style.display = 'none';
+            document.querySelector('.occourrence').style.display = 'none';
 
             // Exibe a seção correta
-            if (section === 'about') {
+            if (section === 'ecology') {
                 document.querySelector('.informations').style.display = 'block';
             }
-            if (section === 'classification') {
-                document.querySelector('.classification').style.display = 'block';
+            if (section === 'taxonomy') {
+                document.querySelector('.taxonomy').style.display = 'block';
             }
-            if (section === 'conditions') {
-                document.querySelector('.conditionals').style.display = 'block';
+            if (section === 'description') {
+                document.querySelector('.description').style.display = 'block';
+            }
+            if (section === 'occourrence') {
+                document.querySelector('.occourrence').style.display = 'block';
             }
 
             // Atualiza a classe 'active' nos links
@@ -386,9 +397,9 @@ if (isset($_GET['id'])) {
             $(this).children().addClass('activeheader');
         });
 
-        // Chama a função showSection para exibir a seção "Sobre" ao carregar a página
+        // Chama a função showSection para exibir a seção "Descrição" ao carregar a página
         window.onload = function () {
-            showSection('about');
+            showSection('description');
         };
 
     </script>

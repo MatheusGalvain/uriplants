@@ -112,7 +112,7 @@
         }
 
         .icon-container {
-            background-color: #006838;
+            background-color: #1d4535;
             border-radius: 8px;
             font-size: 24px;
             cursor: pointer;
@@ -250,7 +250,7 @@
         }
 
         .pagination a.active {
-            background-color: #006838;
+            background-color: #1d4535;
             color: white;
             cursor: default;
         }
@@ -270,10 +270,11 @@
         }
 
         footer {
-            background-color: #006838;
+            background: linear-gradient(to right, #13673f, #1d4535);
             padding: 20px;
             color: white;
             text-align: center;
+            z-index: 999;
         }
 
         footer .footer-columns div {
