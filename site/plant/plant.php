@@ -147,6 +147,11 @@ if (isset($_GET['id'])) {
                 <a alt="Uri Quiz" href="#" class="menu-mobile-link">URI Quiz</a>
             </li>
         </ul>
+        <form action="../list/list.php" method="GET" class="search-form-mobile">
+                        <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
+                        <button type="submit">🔍</button>
+                    </form>
+
     </nav>
 </header>
 
