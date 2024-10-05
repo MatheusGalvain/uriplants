@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="./css/reset.css">
     <link rel="stylesheet" href="./css/footer.css">
     <link rel="stylesheet" href="./css/main.css">
+    <!-- TODO: MUDAR LINK FONTAWESOME -->
+    <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             let currentSlide = 0;

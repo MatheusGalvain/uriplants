@@ -91,6 +91,9 @@ if (isset($_GET['id'])) {
     <link rel="stylesheet" href="../css/footer.css">
     <link rel="stylesheet" href="../css/listplant.css">
     <link rel="stylesheet" href="../css/listplant_responsive.css">
+    <!-- TODO: MUDAR LINK FONTAWESOME -->
+    <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script> 
+
 </head>
 
 <header id="header" class="header">
@@ -119,7 +122,7 @@ if (isset($_GET['id'])) {
                 <li>
                     <form action="../list/list.php" method="GET" class="search-form">
                         <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
-                        <button type="submit">🔍</button>
+                        <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
                     </form>
                 </li>
             </ul>
@@ -149,7 +152,7 @@ if (isset($_GET['id'])) {
         </ul>
         <form action="../list/list.php" method="GET" class="search-form-mobile">
                         <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
-                        <button type="submit">🔍</button>
+                        <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
                     </form>
 
     </nav>
@@ -272,7 +275,7 @@ if (isset($_GET['id'])) {
             </div>
         </section>
 
-        <!-- Sessão de informações da planta que está em condições -->
+        <!-- Sessão de informações da planta que está em descrição -->
         <section id="main-section" class="description">
             <div class="box">
                 <h1>Condiçõess</h1>
