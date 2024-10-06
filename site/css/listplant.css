@@ -597,12 +597,12 @@ main{
 .navigatorref:hover{
     text-decoration: none;
 }
-.informations, .classification, .conditionals{
+.informations, .taxonomy, .description, .occourrence{
     flex-direction: column;
     flex-wrap: wrap;
     padding-top: 50px;
 }
-.informations, .classification, .conditionals, .box{
+.informations, .taxonomy, .description, .occourrence, .box{
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
