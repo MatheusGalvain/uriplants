@@ -339,11 +339,29 @@ if (isset($_GET['id'])) {
             </div>
         </section>
 
-
         <!-- Sessão de informações da planta que está em Ocorrência-->
         <section id="main-section" class="occourrence">
             <div class="box">
-                <h1>Ocorrênciaa</h1>
+                <article class="informationsart">
+                    <h1>Condições Climáticas</h1>
+                    <h2><?php echo $plantName; ?></h2>
+                    <div class="climate-info">
+                        <article class="informationsart">
+
+                            <img src="https://picsum.photos/800/500" alt="Estação Climática">
+                            <div class="occourrence-text-container">
+
+                                <article class="informationsart">
+                                    <h1>Estação Climática</h1>
+                                    <h2>LLALALALAL</h2>
+                                    <!-- <h2><?php echo $seasonName; ?></h2> -->
+                                    <h1>Descrição</h1>
+                                    <!-- <p><?php echo $seasonDescription; ?></p> -->
+                                     <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Veritatis quo tempora suscipit quibusdam ut adipisci facere aspernatur dolor illum. Iure facilis sint exercitationem odio nobis mollitia ab tempore repellat alias!</p>
+                                </article>
+
+                        </article>
+                </article>
             </div>
         </section>
 

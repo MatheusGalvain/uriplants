@@ -607,6 +607,24 @@ main{
     flex-wrap: wrap;
     gap: 20px;
 }
+.occourrence .informationsart{
+    flex-wrap: nowrap;
+}
+.climate-info{
+    margin: 26px;
+    padding-left: 26px;
+    border-left: 2px solid #2C483C;
+}
+.climate-info .informationsart img{
+    width: 400px;
+    border-radius: 10px;
+}
+.climate-info>.informationsart{
+    flex-direction: row;
+}
+.occourrence-text-container{
+    margin-left: 18px;
+}
 .informationsart{
     display: flex;
     justify-content: flex-start;
