@@ -596,12 +596,12 @@ main{
 .navigatorref:hover{
     text-decoration: none;
 }
-.informations, .taxonomy, .description, .occourrence{
+.ecology, .taxonomy, .description, .occourrence{
     flex-direction: column;
     flex-wrap: wrap;
     padding-top: 50px;
 }
-.informations, .taxonomy, .description, .occourrence, .box{
+.ecology, .taxonomy, .description, .occourrence, .box{
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
