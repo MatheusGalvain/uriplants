@@ -91,34 +91,32 @@ if (isset($_POST['recover'])) {
 
 <body>
     <main>
-        <section id="main-admin">
-            <div class="main-admin-left">
-                <?php
-                $nomeImagem = 'loginhome.jpg';
-                $caminhoPasta = 'images/';
-                $caminhoImagem = $caminhoPasta . $nomeImagem;
-                if (file_exists($caminhoImagem)) {
-                    echo '<img class="loginImg" src="' . htmlspecialchars($caminhoImagem) . '" alt="Imagem">';
-                } else {
-                    echo 'Imagem não encontrada.';
-                }
-                ?>
-            </div>
-            <div class="main-admin-right">
-                <div class="right-content">
-                    <h1>Recuperação de Senha</h1>
-                </div>
-                <div id="content-btns">
-                    <form class="custom-form" method="post">
-                        <div class="form-group">
-                            <label class="form-label" for="inputEmail">Insira o endereço de E-mail a ser recuperado:</label>
-                            <input class="form-input" type="email" name="uemail" id="inputEmail" required />
-                        </div>
-                        <div class="form-actions">
-                            <button class="submit-btn" name="recover" type="submit">Recuperar Senha</button>
-                        </div>
-                    </form>
-                    <a class="inittext" href="index.php">Voltar</a>
+    <section id="main-admin">
+            <div class="container">
+                <article class="title-admin">
+                    <!-- Ajustar href -->
+                    <a class="returnbtn" href="index.php" alt="Link do Site"> 
+                    <i class="fas fa-angle-left"></i>
+                    Voltar para o login</a>
+                    <div class="container-return">
+                        <h2>Recuperação de Senha</h2>
+                        <h1>Perdeu a senha? Não se preocupe! Estamos prontos para ajudar. Informe seu e-mail abaixo.</h1>
+                    </div>
+                </article>
+                <form class="custom-form" method="post">
+                    <div class="form-group">
+                        <input class="form-input" placeholder="Informe seu E-mail" type="email" name="uemail" id="inputEmail" required />
+                        <!-- <label class="form-label" for="inputEmail">Endereço de E-mail:</label> -->
+                    </div>
+                    <div class="form-actions">
+                        <button class="submit-btn" name="recover" type="submit">Enviar E-mail</button>
+                    </div>
+                </form>
+                <div class="logo-wrapp">
+                    <div class="logocontainer">
+                        <!-- Ajustar href para ir pro site-->
+                        <img href="#" class="logoadmin" src="images/logouri.png" alt="Logo da URI">
+                    </div>
                 </div>
             </div>
         </section>

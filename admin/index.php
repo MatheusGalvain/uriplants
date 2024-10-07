@@ -9,6 +9,7 @@
     <meta name="author" content="" />
     <title>Admin | Lobby</title>
     <!-- Includes -->
+    <link href="css/reset.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <link href="css/index.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
@@ -18,29 +19,35 @@
 <body>
     <main>
         <section id="main-admin">
-            <div class="main-admin-left">
-                <?php
-                $nomeImagem = 'loginhome.jpg';
-                $caminhoPasta = 'images/';
-                $caminhoImagem = $caminhoPasta . $nomeImagem;
-
-                if (file_exists($caminhoImagem)) {
-                    echo '<img class="loginImg" src="' . htmlspecialchars($caminhoImagem) . '" alt="Imagem login uri">';
-                } else {
-                    echo 'Imagem não encontrada.';
-                }
-                ?>
-            </div>
-            <div class="main-admin-right">
-                <div class="right-wrapp">
-                    <div class="right-content"> 
-                        <h1>Bem-Vindo ao Painel Administrador</h1>
-                        <h2>da URI Plantas, em parceria com o curso de Biologia!</h2>
+            <div class="container">
+                <article class="title-admin">
+                    <!-- Ajustar href -->
+                    <a class="returnbtn" href="#" alt="Link do Site"> 
+                    <i class="fas fa-angle-left"></i>
+                    Voltar ao site</a>
+                    <div class="container-return">
+                        <h1>Bem Vindo de volta ao admin</h1>
+                        <h2>URI Plants | Login</h2>
                     </div>
-                    <div id="content-btns">
-                        <ul>
-                            <li><a class="button-admin-lobby" href="login.php">Faça seu login!</a></li>
-                        </ul>
+                </article>
+                <form class="custom-form" method="post">
+                    <div class="form-group">
+                        <input class="form-input" placeholder="E-mail" name="uemail" id="inputEmail" required/>
+                        <!-- <label class="form-label" for="inputEmail">Endereço de E-mail:</label> -->
+                    </div>
+                    <div class="form-group">
+                        <!-- <label class="form-label" for="inputPassword">Senha:</label> -->
+                        <input class="form-input" placeholder="Senha" name="password" type="password" id="inputPassword" required />
+                    </div>
+                    <div class="form-actions">
+                        <button class="submit-btn" name="login" type="submit">Login</button>
+                        <a class="forgot-password" href="password-recovery.php">Esqueceu a Senha?</a>
+                    </div>
+                </form>
+                <div class="logo-wrapp">
+                    <div class="logocontainer">
+                        <!-- Ajustar href para ir pro site-->
+                        <img href="#" class="logoadmin" src="images/logouri.png" alt="Logo da URI">
                     </div>
                 </div>
             </div>
