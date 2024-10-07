@@ -448,22 +448,20 @@ try {
                                                             Propriedade: <?php echo htmlspecialchars($property['property_name']); ?>
                                                         </div>
                                                         <div class="card-body">
-                                                            <p><strong>Descrição:</strong> <?php echo htmlspecialchars($property['description']); ?></p>
-                                                            <p><strong>Criado em:</strong> <?php echo date("d/m/Y H:i", strtotime($property['created_at'])); ?></p>
+                                                            
+                                                            
                                                             <?php if (!empty($property['images'])) { ?>
                                                                 <div class="row">
                                                                     <?php foreach ($property['images'] as $image) { ?>
                                                                         <div class="col-md-12">
                                                                             <img src="data:image/jpeg;base64,<?php echo base64_encode($image['imagem']); ?>" class="card-img-top" alt="Imagem" style="height: 200px; object-fit: cover;">
-                                                                            <p class="card-text"><strong>Fonte:</strong> <?php echo htmlspecialchars($image['image_source']); ?></p>
-                                                                            <p class="card-text"><strong>Adicionado em:</strong> <?php echo date("d/m/Y H:i", strtotime($property['created_at'])); ?></p>
                                                                         </div>
                                                                     <?php } ?>
                                                                 </div>
                                                             <?php } else { ?>
                                                                 <p>Sem imagens associadas.</p>
                                                             <?php } ?>
-                                                            <div class="d-flex justify-content-between">
+                                                            <div class="d-flex justify-content-between mt-1">
                                                                 <button type="button" class="btn btn-success btn-sm edit-button" 
                                                                     data-bs-toggle="modal" data-bs-target="#editPropertyModal"
                                                                     data-id="<?php echo htmlspecialchars($plants_property_id); ?>" 
