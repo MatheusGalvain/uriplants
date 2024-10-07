@@ -47,27 +47,25 @@ function get_property_name($con, $property_id) {
     return "Desconhecida";
 }
 
-
-    
 // Função para filtrar entrada
-function filter_input_data($con, $data) {
+function filter_input_data_custom($con, $data) {
     return mysqli_real_escape_string($con, trim($data));
 }
 
 // Adicionar Planta com Propriedades e Imagens
 if (isset($_POST['add_plant'])) {
     // Dados da Planta
-    $name = filter_input_data($con, $_POST['name']);
-    $common_names = filter_input_data($con, $_POST['common_names']);
+    $name = filter_input_data_custom($con, $_POST['name']);
+    $common_names = filter_input_data_custom($con, $_POST['common_names']);
     $division_id = intval($_POST['division_id']);
     $class_id = intval($_POST['class_id']);
     $order_id = intval($_POST['order_id']);
     $family_id = intval($_POST['family_id']);
     $genus_id = intval($_POST['genus_id']);
     $region_id = intval($_POST['region_id']);
-    $species = filter_input_data($con, $_POST['species']);
-    $applications = filter_input_data($con, $_POST['applications']);
-    $ecology = filter_input_data($con, $_POST['ecology']);
+    $species = filter_input_data_custom($con, $_POST['species']);
+    $applications = filter_input_data_custom($con, $_POST['applications']);
+    $ecology = filter_input_data_custom($con, $_POST['ecology']);
 
     // Propriedades e Imagens enviadas via JavaScript (JSON)
     $properties = isset($_POST['properties']) ? json_decode($_POST['properties'], true) : [];
@@ -111,8 +109,8 @@ if (isset($_POST['add_plant'])) {
             // Inserção das Propriedades e Imagens
             foreach ($properties as $property) {
                 $property_id = intval($property['property_id']);
-                $description = filter_input_data($con, $property['description']);
-                $source = filter_input_data($con, $property['source']);
+                $description = filter_input_data_custom($con, $property['description']);
+                $source = filter_input_data_custom($con, $property['source']);
                 $image = isset($property['image']) ? $property['image'] : null; // Base64 string
 
                 // Inserir na tabela PlantsProperties
@@ -167,9 +165,207 @@ if (isset($_POST['add_plant'])) {
     }
 }
 
-// Busca e exibição de plantas
-$search = isset($_POST['search']) ? filter_input_data($con, $_POST['search']) : '';
+// Excluir Planta
+if (isset($_POST['delete_plant'])) {
+    $delete_id = intval($_POST['id']);
+    if ($delete_id > 0) {
+        mysqli_begin_transaction($con);
+        try {
+            // Verifica se a planta existe e não está deletada
+            $stmt = $con->prepare("SELECT name FROM Plants WHERE id = ? AND deleted_at IS NULL");
+            if (!$stmt) {
+                throw new Exception("Erro na preparação da consulta: " . $con->error);
+            }
+            $stmt->bind_param("i", $delete_id);
+            $stmt->execute();
+            mysqli_stmt_bind_result($stmt, $plant_name);
+            if (!mysqli_stmt_fetch($stmt)) {
+                throw new Exception("Planta não encontrada ou já foi excluída.");
+            }
+            $stmt->close();
+
+            // Atualiza o campo deleted_at
+            $stmt = $con->prepare("UPDATE Plants SET deleted_at = NOW() WHERE id = ?");
+            if (!$stmt) {
+                throw new Exception("Erro na preparação da atualização: " . $con->error);
+            }
+            $stmt->bind_param("i", $delete_id);
+            if (!$stmt->execute()) {
+                throw new Exception("Erro ao excluir planta: " . $stmt->error);
+            }
+            $stmt->close();
+
+            // Auditoria para exclusão de planta
+            $table = 'Plants';
+            $action_id = 3; // Exclusão
+            $changed_by = $_SESSION['id'];
+            $old_value = "Planta: $plant_name";
+            $new_value = null;
+            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $delete_id);
+
+            mysqli_commit($con);
+            $success = "Planta excluída com sucesso.";
+        } catch (Exception $e) {
+            mysqli_rollback($con);
+            $error = $e->getMessage();
+        }
+    } else {
+        $error = "ID de planta inválido para exclusão.";
+    }
+}
+
+// Editar Planta
+if (isset($_POST['edit_plant'])) {
+    // Dados da Planta
+    $edit_id = intval($_POST['plant_id']);
+    $name = filter_input_data_custom($con, $_POST['name']);
+    $common_names = filter_input_data_custom($con, $_POST['common_names']);
+    $division_id = intval($_POST['division_id']);
+    $class_id = intval($_POST['class_id']);
+    $order_id = intval($_POST['order_id']);
+    $family_id = intval($_POST['family_id']);
+    $genus_id = intval($_POST['genus_id']);
+    $region_id = intval($_POST['region_id']);
+    $species = filter_input_data_custom($con, $_POST['species']);
+    $applications = filter_input_data_custom($con, $_POST['applications']);
+    $ecology = filter_input_data_custom($con, $_POST['ecology']);
+
+    // Propriedades adicionadas via JavaScript (JSON)
+    $new_properties = isset($_POST['properties']) ? json_decode($_POST['properties'], true) : [];
+
+    if ($edit_id > 0) {
+        mysqli_begin_transaction($con);
+        try {
+            // Verifica se a planta existe e não está deletada
+            $stmt = $con->prepare("SELECT name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology FROM Plants WHERE id = ? AND deleted_at IS NULL");
+            if (!$stmt) {
+                throw new Exception("Erro na preparação da consulta: " . $con->error);
+            }
+            $stmt->bind_param("i", $edit_id);
+            $stmt->execute();
+            $stmt->bind_result($old_name, $old_common_names, $old_division_id, $old_class_id, $old_order_id, $old_family_id, $old_genus_id, $old_region_id, $old_species, $old_applications, $old_ecology);
+            if (!mysqli_stmt_fetch($stmt)) {
+                throw new Exception("Planta não encontrada ou já foi excluída.");
+            }
+            $stmt->close();
+
+            // Atualizar os dados da planta
+            $stmt = $con->prepare("UPDATE Plants SET name = ?, common_names = ?, division_id = ?, class_id = ?, `order_id` = ?, family_id = ?, genus_id = ?, region_id = ?, species = ?, applications = ?, ecology = ? WHERE id = ?");
+            if (!$stmt) {
+                throw new Exception("Erro na preparação da atualização: " . $con->error);
+            }
+            $stmt->bind_param("ssiiiiissssi", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $edit_id);
+            if (!$stmt->execute()) {
+                throw new Exception("Erro ao atualizar planta: " . $stmt->error);
+            }
+            $stmt->close();
+
+            // Auditoria para atualização de planta
+            $table = 'Plants';
+            $action_id = 2; // Atualização
+            $changed_by = $_SESSION['id'];
+            $old_value = "Planta: $old_name, Espécie: $old_species";
+            $new_value = "Planta: $name, Espécie: $species";
+            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $edit_id);
+
+            // Inserção das Novas Propriedades (não editar existentes)
+            if (!empty($new_properties)) {
+                foreach ($new_properties as $property) {
+                    $property_id = intval($property['property_id']);
+                    $description = filter_input_data_custom($con, $property['description']);
+                    $source = filter_input_data_custom($con, $property['source']);
+                    $image = isset($property['image']) ? $property['image'] : null; // Base64 string
+
+                    // Inserir na tabela PlantsProperties
+                    $stmt = $con->prepare("INSERT INTO PlantsProperties (plant_id, property_id, description) VALUES (?, ?, ?)");
+                    if (!$stmt) {
+                        throw new Exception("Erro na preparação da consulta PlantsProperties: " . $con->error);
+                    }
+                    $stmt->bind_param("iis", $edit_id, $property_id, $description);
+                    if (!$stmt->execute()) {
+                        throw new Exception("Erro ao adicionar propriedade da planta: " . $stmt->error);
+                    }
+                    $plants_property_id = mysqli_insert_id($con);
+                    $stmt->close();
+
+                    // Auditoria para inserção de propriedade
+                    $plant_name = get_plant_name($con, $edit_id);
+                    $property_name = get_property_name($con, $property_id);
+                    $new_value = "Planta: $plant_name, Propriedade: $property_name, Descrição: $description";
+                    log_audit_action($con, 'PlantsProperties', 1, $changed_by, null, $new_value, $edit_id);
+
+                    // Inserir imagem, se existir
+                    if ($image) {
+                        // Decodifica a imagem Base64
+                        $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
+                        
+                        // Insere na tabela images
+                        $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id) VALUES (?, ?, ?)");
+                        if (!$stmt) {
+                            throw new Exception("Erro na preparação da consulta de imagem: " . $con->error);
+                        }
+                        $stmt->bind_param("ssi", $image_data, $source, $plants_property_id);
+                        if (!$stmt->execute()) {
+                            throw new Exception("Erro ao adicionar a imagem: " . $stmt->error);
+                        }
+                        $image_id = mysqli_insert_id($con);
+                        $stmt->close();
+
+                        // Auditoria para inserção de imagem
+                        $new_value = "Imagem ID: $image_id, Fonte: $source";
+                        log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $edit_id);
+                    }
+                }
+            }
+
+            mysqli_commit($con);
+            $success = "Planta atualizada com sucesso.";
+        } catch (Exception $e) {
+            mysqli_rollback($con);
+            $error = $e->getMessage();
+        }
+    } else {
+        $error = "ID de planta inválido para edição.";
+    }
+}
+
+// Configuração de Paginação
+$items_per_page = 10; // Número de plantas por página
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? intval($_GET['page']) : 1;
+if ($page < 1) $page = 1;
+
+// Captura do termo de busca
+$search = isset($_GET['search']) ? filter_input_data_custom($con, $_GET['search']) : '';
 $searchQuery = $search ? "AND (p.name LIKE '%$search%' OR p.common_names LIKE '%$search%')" : "";
+
+// Contagem total de plantas para paginação
+$count_sql = "
+    SELECT COUNT(*) as total
+    FROM Plants p
+    LEFT JOIN Divisions d ON p.division_id = d.id
+    LEFT JOIN Classes cl ON p.class_id = cl.id
+    LEFT JOIN Orders o ON p.order_id = o.id
+    LEFT JOIN Families fa ON p.family_id = fa.id
+    LEFT JOIN Genus ge ON p.genus_id = ge.id
+    LEFT JOIN RegionMap re ON p.region_id = re.id
+    WHERE p.deleted_at IS NULL $searchQuery
+";
+$count_result = mysqli_query($con, $count_sql);
+if ($count_result) {
+    $count_row = mysqli_fetch_assoc($count_result);
+    $total_items = intval($count_row['total']);
+} else {
+    $total_items = 0;
+    $error = "Erro na contagem de plantas: " . mysqli_error($con);
+}
+
+$total_pages = ceil($total_items / $items_per_page);
+if ($page > $total_pages && $total_pages > 0) {
+    $page = $total_pages;
+}
+$offset = ($page - 1) * $items_per_page;
+
+// Busca e exibição de plantas com paginação
 $plantsQuery = mysqli_query($con, "
     SELECT p.*, d.name as division_name, cl.name as class_name, o.name as order_name, fa.name as family_name, ge.name as genus_name, re.name as region_name
     FROM Plants p
@@ -181,6 +377,7 @@ $plantsQuery = mysqli_query($con, "
     LEFT JOIN RegionMap re ON p.region_id = re.id
     WHERE p.deleted_at IS NULL $searchQuery
     ORDER BY p.created_at DESC
+    LIMIT $items_per_page OFFSET $offset
 ");
 if (!$plantsQuery) {
     $error = "Erro na consulta de plantas: " . mysqli_error($con);
@@ -193,6 +390,37 @@ $orders = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Orders WHERE
 $families = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Families WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
 $genus = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Genus WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
 $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
+
+// Verificar se está no modo de edição
+$edit_mode = false;
+$edit_plant = [];
+if (isset($_GET['edit'])) {
+    $edit_id = intval($_GET['edit']);
+    if ($edit_id > 0) {
+        $stmt = $con->prepare("
+            SELECT p.*, d.name as division_name, cl.name as class_name, o.name as order_name, 
+                   fa.name as family_name, ge.name as genus_name, re.name as region_name
+            FROM Plants p
+            LEFT JOIN Divisions d ON p.division_id = d.id
+            LEFT JOIN Classes cl ON p.class_id = cl.id
+            LEFT JOIN Orders o ON p.order_id = o.id
+            LEFT JOIN Families fa ON p.family_id = fa.id
+            LEFT JOIN Genus ge ON p.genus_id = ge.id
+            LEFT JOIN RegionMap re ON p.region_id = re.id
+            WHERE p.id = ? AND p.deleted_at IS NULL
+        ");
+        if ($stmt) {
+            $stmt->bind_param("i", $edit_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                $edit_plant = $result->fetch_assoc();
+                $edit_mode = true;
+            }
+            $stmt->close();
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -276,6 +504,15 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
             height: 25px;
             cursor: pointer;
         }
+
+        /* Estilos para paginação */
+        .pagination {
+            justify-content: center;
+        }
+
+        .pagination a, .pagination span {
+            margin: 0 2px;
+        }
     </style>
 </head>
 
@@ -297,27 +534,37 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                     <?php } ?>
 
                     <!-- Botão para abrir o formulário de Adição de Planta -->
-                    <button id="toggleForm" class="btn btn-primary mb-4">Nova Planta</button>
+                    <?php if (!$edit_mode) { ?>
+                        <button id="toggleForm" class="btn btn-primary mb-4">Nova Planta</button>
+                    <?php } ?>
 
-                    <!-- Formulário de Adição de Planta -->
-                    <div id="plant-form" class="card mb-4" style="display: none;">
+                    <!-- Formulário de Adição/Editação de Planta -->
+                    <div id="plant-form" class="card mb-4" style="<?php echo ($edit_mode || false) ? 'display: block;' : 'display: none;'; ?>">
                         <div class="card-body">
-                            <h5 class="card-title">Nova Planta</h5>
+                            <h5 class="card-title"><?php echo $edit_mode ? 'Editar Planta' : 'Nova Planta'; ?></h5>
                             <form method="POST" action="" id="addPlantForm">
+                                <?php if ($edit_mode) { ?>
+                                    <input type="hidden" name="plant_id" value="<?php echo htmlspecialchars($edit_plant['id']); ?>">
+                                <?php } ?>
                                 <!-- Seção de Propriedades -->
                                 <div class="mb-3">
-                                    <button type="button" class="btn btn-primary btn-sm" id="addPropertyButton">Adicionar Imagem</button>
+                                    <button type="button" class="btn btn-primary btn-sm" id="addPropertyButton">Adicionar Propriedade</button>
                                     <div id="propertiesList" class="mt-3">
                                         <!-- Propriedades adicionadas aparecerão aqui -->
+                                        <?php
+                                        // Se estiver no modo de edição, pode listar as propriedades existentes se desejar,
+                                        // mas conforme a instrução do usuário, não é necessário mostrar nem editar as imagens já no banco.
+                                        // Apenas permitir adicionar novas propriedades.
+                                        ?>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="name" class="form-label">*Nome Científico</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <input type="text" class="form-control" id="name" name="name" required value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['name']) : ''; ?>">
                                 </div>
                                 <div class="mb-3">
                                     <label for="common_names" class="form-label">Nomes Comuns</label>
-                                    <textarea class="form-control" id="common_names" name="common_names"></textarea>
+                                    <textarea class="form-control" id="common_names" name="common_names"><?php echo $edit_mode ? htmlspecialchars($edit_plant['common_names']) : ''; ?></textarea>
                                 </div>
 
                                 <!-- Seleção da Divisão -->
@@ -326,7 +573,7 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                                     <select class="form-select" id="division_id" name="division_id" required>
                                         <option value="">Selecione a divisão</option>
                                         <?php foreach ($divisions as $division) { ?>
-                                            <option value="<?php echo htmlspecialchars($division['id']); ?>">
+                                            <option value="<?php echo htmlspecialchars($division['id']); ?>" <?php echo ($edit_mode && $edit_plant['division_id'] == $division['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($division['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -339,7 +586,7 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                                     <select class="form-select" id="class_id" name="class_id" required>
                                         <option value="">Selecione a classe</option>
                                         <?php foreach ($classes as $class) { ?>
-                                            <option value="<?php echo htmlspecialchars($class['id']); ?>">
+                                            <option value="<?php echo htmlspecialchars($class['id']); ?>" <?php echo ($edit_mode && $edit_plant['class_id'] == $class['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($class['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -352,7 +599,7 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                                     <select class="form-select" id="order_id" name="order_id" required>
                                         <option value="">Selecione a ordem</option>
                                         <?php foreach ($orders as $order) { ?>
-                                            <option value="<?php echo htmlspecialchars($order['id']); ?>">
+                                            <option value="<?php echo htmlspecialchars($order['id']); ?>" <?php echo ($edit_mode && $edit_plant['order_id'] == $order['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($order['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -365,7 +612,7 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                                     <select class="form-select" id="family_id" name="family_id" required>
                                         <option value="">Selecione a família</option>
                                         <?php foreach ($families as $family) { ?>
-                                            <option value="<?php echo htmlspecialchars($family['id']); ?>">
+                                            <option value="<?php echo htmlspecialchars($family['id']); ?>" <?php echo ($edit_mode && $edit_plant['family_id'] == $family['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($family['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -378,7 +625,7 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                                     <select class="form-select" id="genus_id" name="genus_id">
                                         <option value="">Selecione o gênero</option>
                                         <?php foreach ($genus as $genusItem) { ?>
-                                            <option value="<?php echo htmlspecialchars($genusItem['id']); ?>">
+                                            <option value="<?php echo htmlspecialchars($genusItem['id']); ?>" <?php echo ($edit_mode && $edit_plant['genus_id'] == $genusItem['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($genusItem['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -391,7 +638,7 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                                     <select class="form-select" id="region_id" name="region_id">
                                         <option value="">Selecione a região</option>
                                         <?php foreach ($regionMap as $region) { ?>
-                                            <option value="<?php echo htmlspecialchars($region['id']); ?>">
+                                            <option value="<?php echo htmlspecialchars($region['id']); ?>" <?php echo ($edit_mode && $edit_plant['region_id'] == $region['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($region['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -401,31 +648,34 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                                 <!-- Outros campos opcionais -->
                                 <div class="mb-3">
                                     <label for="species" class="form-label">Espécie</label>
-                                    <input type="text" class="form-control" id="species" name="species">
+                                    <input type="text" class="form-control" id="species" name="species" value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['species']) : ''; ?>">
                                 </div>
                                 <div class="mb-3">
                                     <label for="applications" class="form-label">Aplicações</label>
-                                    <textarea class="form-control" id="applications" name="applications"></textarea>
+                                    <textarea class="form-control" id="applications" name="applications"><?php echo $edit_mode ? htmlspecialchars($edit_plant['applications']) : ''; ?></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="ecology" class="form-label">Ecologia</label>
-                                    <textarea class="form-control" id="ecology" name="ecology"></textarea>
+                                    <textarea class="form-control" id="ecology" name="ecology"><?php echo $edit_mode ? htmlspecialchars($edit_plant['ecology']) : ''; ?></textarea>
                                 </div>
 
-
-
-                                <button type="submit" name="add_plant" class="btn btn-primary">Adicionar Planta</button>
-                                <button type="button" id="cancelAddPlant" class="btn btn-secondary">Cancelar</button>
+                                <?php if ($edit_mode) { ?>
+                                    <button type="submit" name="edit_plant" class="btn btn-success">Atualizar Planta</button>
+                                    <a href="plants.php" class="btn btn-secondary">Cancelar</a>
+                                <?php } else { ?>
+                                    <button type="submit" name="add_plant" class="btn btn-primary">Adicionar Planta</button>
+                                    <button type="button" id="cancelAddPlant" class="btn btn-secondary">Cancelar</button>
+                                <?php } ?>
                             </form>
                         </div>
                     </div>
 
                     <!-- Lista de Plantas Cadastradas -->
-                    <div id="plant-list" class="card mb-4">
+                    <div id="plant-list" class="card mb-4" style="<?php echo ($edit_mode) ? 'display: none;' : 'display: block;'; ?>">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="card-title mb-0">Plantas Cadastradas</h5>
-                                <form method="POST" action="" class="d-flex">
+                                <form method="GET" action="" class="d-flex">
                                     <input type="text" class="form-control me-2" name="search" placeholder="Buscar plantas" value="<?php echo htmlspecialchars($search); ?>">
                                     <button class="btn btn-primary" type="submit">Buscar</button>
                                     <?php if ($search) { ?>
@@ -462,11 +712,45 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                                     <?php } ?>
                                     <?php if ($plantCount === 0) { ?>
                                         <tr>
-                                            <td colspan="10" class="text-center">Nenhuma planta encontrada.</td>
+                                            <td colspan="4" class="text-center">Nenhuma planta encontrada.</td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>
                             </table>
+
+                            <!-- Paginação -->
+                            <?php if ($total_pages > 1) { ?>
+                                <nav>
+                                    <ul class="pagination">
+                                        <!-- Página Anterior -->
+                                        <li class="page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
+                                            <a class="page-link" href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>" aria-label="Anterior">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+
+                                        <!-- Páginas -->
+                                        <?php
+                                        // Definir intervalo de páginas a exibir
+                                        $range = 2;
+                                        for ($i = max(1, $page - $range); $i <= min($page + $range, $total_pages); $i++) {
+                                            if ($i == $page) {
+                                                echo '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
+                                            } else {
+                                                echo '<li class="page-item"><a class="page-link" href="?'. http_build_query(array_merge($_GET, ['page' => $i])) .'">' . $i . '</a></li>';
+                                            }
+                                        }
+                                        ?>
+
+                                        <!-- Próxima Página -->
+                                        <li class="page-item <?php echo ($page >= $total_pages) ? 'disabled' : ''; ?>">
+                                            <a class="page-link" href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>" aria-label="Próximo">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -554,17 +838,21 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
             var plantList = document.getElementById('plant-list');
             var cancelAddPlant = document.getElementById('cancelAddPlant');
 
-            toggleFormButton.addEventListener('click', function() {
-                plantForm.style.display = 'block';
-                plantList.style.display = 'none';
-                toggleFormButton.style.display = 'none';
-            });
+            if (toggleFormButton) {
+                toggleFormButton.addEventListener('click', function() {
+                    plantForm.style.display = 'block';
+                    plantList.style.display = 'none';
+                    toggleFormButton.style.display = 'none';
+                });
+            }
 
-            cancelAddPlant.addEventListener('click', function() {
-                plantForm.style.display = 'none';
-                plantList.style.display = 'block';
-                toggleFormButton.style.display = 'block';
-            });
+            if (cancelAddPlant) {
+                cancelAddPlant.addEventListener('click', function() {
+                    plantForm.style.display = 'none';
+                    plantList.style.display = 'block';
+                    toggleFormButton.style.display = 'block';
+                });
+            }
 
             // Gerenciar Adição de Propriedades
             var addPropertyButton = document.getElementById('addPropertyButton');
@@ -683,7 +971,7 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
                 }
             });
 
-            // Manipulação do Formulário de Adição de Planta para incluir propriedades
+            // Manipulação do Formulário de Adição/Atualização de Planta para incluir propriedades
             var addPlantFormElement = document.getElementById('addPlantForm');
             addPlantFormElement.addEventListener('submit', function(e) {
                 // Adiciona as propriedades ao campo oculto como JSON
