@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 body {
     background: none;
-    position: relative;
     min-height: 100vh;
     font-family: 'Poppins', sans-serif;
 }
@@ -460,7 +459,7 @@ main{
     bottom: -5px; 
     width: 100%;
     height: 3px;
-    background-color: #479670;
+    background-color: #3FFFA2;
     box-shadow: 0 0 10px rgba(71, 150, 112, 0.7), 0 0 20px rgba(71, 150, 112, 0.5);
     display: none; 
     transition: box-shadow 0.3s ease;
@@ -597,16 +596,34 @@ main{
 .navigatorref:hover{
     text-decoration: none;
 }
-.informations, .classification, .conditionals{
+.ecology, .taxonomy, .description, .occourrence{
     flex-direction: column;
     flex-wrap: wrap;
     padding-top: 50px;
 }
-.informations, .classification, .conditionals, .box{
+.ecology, .taxonomy, .description, .occourrence, .box{
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     gap: 20px;
+}
+.occourrence .informationsart{
+    flex-wrap: nowrap;
+}
+.climate-info{
+    margin: 26px;
+    padding-left: 26px;
+    border-left: 2px solid #2C483C;
+}
+.climate-info .informationsart img{
+    width: 400px;
+    border-radius: 10px;
+}
+.climate-info>.informationsart{
+    flex-direction: row;
+}
+.occourrence-text-container{
+    margin-left: 18px;
 }
 .informationsart{
     display: flex;

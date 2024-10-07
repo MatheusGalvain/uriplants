@@ -84,7 +84,7 @@ if (isset($_GET['id'])) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap"rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/main.css">
@@ -92,7 +92,7 @@ if (isset($_GET['id'])) {
     <link rel="stylesheet" href="../css/listplant.css">
     <link rel="stylesheet" href="../css/listplant_responsive.css">
     <!-- TODO: MUDAR LINK FONTAWESOME -->
-    <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script> 
+    <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
 
 </head>
 
@@ -146,14 +146,14 @@ if (isset($_GET['id'])) {
             <li class="item-menu">
                 <a alt="Uri Plants" href="#" class="menu-mobile-link ">URI Plants</a>
             </li>
-             <li class="item-menu">
+            <li class="item-menu">
                 <a alt="Uri Quiz" href="#" class="menu-mobile-link">URI Quiz</a>
             </li>
         </ul>
         <form action="../list/list.php" method="GET" class="search-form-mobile">
-                        <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
-                        <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
-                    </form>
+            <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
+            <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
+        </form>
 
     </nav>
 </header>
@@ -197,9 +197,9 @@ if (isset($_GET['id'])) {
                     </div>
                     <div class="otherphotos-wrapp">
                         <?php
-                            $plantImages = $plantController->getPlantImages($id);
-                            $maxPhotos = 4;
-                            $count = 0;
+                        $plantImages = $plantController->getPlantImages($id);
+                        $maxPhotos = 4;
+                        $count = 0;
                         ?>
                         <?php if (!empty($plantImages)): ?>
                             <?php foreach ($plantImages as $image): ?>
@@ -231,60 +231,137 @@ if (isset($_GET['id'])) {
             </div>
         </section>
 
-        <!-- Sessão de informações da planta que está em sobre -->
-        <section id="main-section" class="informations">
+        <!-- Sessão de informações da planta que está em Ecologia -->
+        <section id="main-section" class="ecology">
             <div class="box">
                 <article class="informationsart">
-                    <h1>Nome</h1>
-                    <h2><?php echo $plantName; ?></h2>
+                    <h1>Medicinais</h1>
+                    <h2><?php echo $medicinalUses; ?></h2>
                 </article>
                 <article class="informationsart">
-                    <h1>Descrição</h1>
-                    <h2><?php echo $plantDescription; ?></h2>
+                    <h1>Madereiros</h1>
+                    <h2><?php echo $timberUses; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Alimentação</h1>
+                    <h2><?php echo $foodUses; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Artesanato</h1>
+                    <h2><?php echo $handicraftUses; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Arborização Urbana</h1>
+                    <h2><?php echo $urbanGreening; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Sombreamento e Paisagismo</h1>
+                    <h2><?php echo $landscapeUses; ?></h2>
+                </article>
+            </div>
+        </section>
+
+
+        <!-- Sessão de informações da planta que está em Taxonomia -->
+        <section id="main-section" class="taxonomy">
+            <div class="box">
+                <article class="informationsart">
+                    <h1>Divisão</h1>
+                    <h2><?php echo $divisionName; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Classe</h1>
+                    <h2><?php echo $className; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Ordem</h1>
+                    <h2><?php echo $orderName; ?></h2>
                 </article>
                 <article class="informationsart">
                     <h1>Família</h1>
                     <h2><?php echo $familyName; ?></h2>
                 </article>
                 <article class="informationsart">
-                    <h1>Ordem</h1>
-                    <h2><?php echo $orderName; ?></h2>
-                </article>
-            </div>
-        </section>
-
-        <!-- Sessão de informações da planta que está em classificação -->
-        <section id="main-section" class="taxonomy">
-            <div class="box">
-                <article class="informationsart">
-                    <h1>Classe</h1>
-                    <h2><?php echo $className; ?></h2>
+                    <h1>Gênero</h1>
+                    <h2><?php echo $genusName; ?></h2>
                 </article>
                 <article class="informationsart">
                     <h1>Espécie</h1>
                     <h2><?php echo $speciesName; ?></h2>
                 </article>
-                <article class="informationsart">
-                    <h1>Aplicações</h1>
-                    <h2><?php echo $applicationsName; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Ecologia</h1>
-                    <h2><?php echo $ecologyName; ?></h2>
-                </article>
             </div>
         </section>
 
-        <!-- Sessão de informações da planta que está em descrição -->
+
+        <!-- Sessão de informações da planta que está em Descrição-->
         <section id="main-section" class="description">
             <div class="box">
-                <h1>Condiçõess</h1>
+                <article class="informationsart">
+                    <h1>Nome</h1>
+                    <h2><?php echo $plantName; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Nome Científico</h1>
+                    <h2><?php echo $scientificName; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Descrição</h1>
+                    <h2><?php echo $plantDescription; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Forma Biológica</h1>
+                    <h2><?php echo $biologicalForm; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Tronco</h1>
+                    <h2><?php echo $trunkDescription; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Casca</h1>
+                    <h2><?php echo $barkDescription; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Folhas</h1>
+                    <h2><?php echo $leavesDescription; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Flores</h1>
+                    <h2><?php echo $flowersDescription; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Frutos</h1>
+                    <h2><?php echo $fruitsDescription; ?></h2>
+                </article>
+                <article class="informationsart">
+                    <h1>Sementes</h1>
+                    <h2><?php echo $seedsDescription; ?></h2>
+                </article>
             </div>
         </section>
 
+        <!-- Sessão de informações da planta que está em Ocorrência-->
         <section id="main-section" class="occourrence">
             <div class="box">
-                <h1>Ocorrênciaa</h1>
+                <article class="informationsart">
+                    <h1>Condições Climáticas</h1>
+                    <h2><?php echo $plantName; ?></h2>
+                    <div class="climate-info">
+                        <article class="informationsart">
+
+                            <img src="https://picsum.photos/800/500" alt="Estação Climática">
+                            <div class="occourrence-text-container">
+
+                                <article class="informationsart">
+                                    <h1>Estação Climática</h1>
+                                    <h2>LLALALALAL</h2>
+                                    <!-- <h2><?php echo $seasonName; ?></h2> -->
+                                    <h1>Descrição</h1>
+                                    <!-- <p><?php echo $seasonDescription; ?></p> -->
+                                     <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Veritatis quo tempora suscipit quibusdam ut adipisci facere aspernatur dolor illum. Iure facilis sint exercitationem odio nobis mollitia ab tempore repellat alias!</p>
+                                </article>
+
+                        </article>
+                </article>
             </div>
         </section>
 
@@ -349,7 +426,6 @@ if (isset($_GET['id'])) {
     </footer>
 
     <script>
-        
         function changeMainImage(imageSrc) {
             document.getElementById('mainImage').src = imageSrc;
         }
@@ -361,14 +437,14 @@ if (isset($_GET['id'])) {
         // Função que vai fazer a navegação do navigator
         function showSection(section) {
             // Deixa as classes com o display none
-            document.querySelector('.informations').style.display = 'none';
+            document.querySelector('.ecology').style.display = 'none';
             document.querySelector('.taxonomy').style.display = 'none';
             document.querySelector('.description').style.display = 'none';
             document.querySelector('.occourrence').style.display = 'none';
 
             // Exibe a seção correta
             if (section === 'ecology') {
-                document.querySelector('.informations').style.display = 'block';
+                document.querySelector('.ecology').style.display = 'block';
             }
             if (section === 'taxonomy') {
                 document.querySelector('.taxonomy').style.display = 'block';
@@ -393,12 +469,12 @@ if (isset($_GET['id'])) {
             }
         }
 
-        $('.button-menu').click(function () {
+        $('.button-menu').click(function() {
             $(this).toggleClass('button-menu-close');
             $('#main-menu-mobile-items').toggleClass('main-menu-mobile-items-open');
         });
-    
-        $('.item-menu').click(function () {
+
+        $('.item-menu').click(function() {
             // Desativar todos os menus ativos quando clicar em um novo menu
             $('.menu-link').removeClass('activeheader');
             // Ativar o menu sublinhado quando for clicado
@@ -406,10 +482,9 @@ if (isset($_GET['id'])) {
         });
 
         // Chama a função showSection para exibir a seção "Descrição" ao carregar a página
-        window.onload = function () {
+        window.onload = function() {
             showSection('description');
         };
-
     </script>
 </body>
 
