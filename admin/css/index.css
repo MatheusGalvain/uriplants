@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 body {
     margin: 0;
     padding: 0;
+    background-color: #141414;
+    font-family: 'Poppins', sans-serif;
 }
 
 .bodyrestrict{
@@ -17,206 +20,171 @@ body {
     width: 100%;
     height: 100vh;
     background-color: #ffffff; 
-}
-.main-admin-left{
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    width: 50%;
-}
-.loginImg{
-    max-width: 50%;
-    max-height: 50%;
-}
-.d-flex-end {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
-#plant-form,
-#edit-form {
-    display: none;
-}
-.main-admin-right{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    width: 50%;
-    background-color: #00668f;
-    min-height: 100vh;
+    background-image: url('../images/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
     box-sizing: border-box;
+    padding: 20px;
 }
-.restrict-area{
+.container {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: center;
+    width: 480px;
+    height: 590px;
+    padding: 50px;
+    box-sizing: border-box;
+    background: rgba(39, 39, 39, 0.2);
+    border-radius: 10px;
+    border: 1px solid rgba(46, 46, 46, 0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    gap: 60px;
+}
+.title-admin{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 20px;
+}
+.container-return{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: center;
+    gap: 10px;
+}
+.returnbtn{
+    font-size: 13px;
+    color: #ffffff;
+    font-weight: 200;
+    text-decoration: none;
+    cursor: pointer;
+}
+.returnbtn:hover{
+    transition: transform 0.20s;
+    transform: scale(1.02);
+    color: #11a0d8;
+}
+.title-admin h1{
+    font-size: 15px;
+    color: #ffffff;
+    font-weight: 300;
+    margin: 0;
+}
+.title-admin h2{
+    font-size: 30px;
+    color: #ffffff;
+    font-weight: 600;
+    margin: 0;
+}
+.custom-form{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    align-content: flex-start;
+    gap: 20px;
+}
+.form-group{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+    width: 100%;
+}
+.form-input{
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+    background-color: transparent;
+    border: 1px solid #FFF;
+    color: #FFF;
+    font-weight: 300;
+    width: 100%;
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+.form-input:focus-visible{
+    outline: none;
+}
+.form-actions{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
     justify-content: flex-end;
     align-items: flex-end;
     align-content: flex-end;
-    width: 80%;
-}
-.tagrestric{
-    color: white;
-    text-decoration: none;
-    font-size: 15px;
-    box-sizing: border-box;
-    pad: 15px;
-}
-.tagrestric:hover{color: red;}
-.right-wrapp{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    flex-direction: column;
-    flex-wrap: wrap;
-    height: 80vh;
-}
-.right-content{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    flex-direction: column;
-    flex-wrap: wrap;
-    height: auto;
-}
-.right-content h1{
-    font-size: 35px;
-    font-weight: 600;
-    color: white;
-}
-.right-content h2{
-    text-align: center;
-    font-size: 22px;
-    font-weight: 200;
-    color: white;
-}
-#content-btns{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-}
-#content-btns ul{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    height: auto;
-    padding: 0;
-    gap: 20px;
-}
-#content-btns ul li{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-}
-.button-admin-lobby{
-    margin-top: 50px;
-    width: 250px;
-    height: 40px;
-    border-radius: 15px;
-    border: 1px solid white !important;
-    color: white;
-    font-size: 20px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    text-decoration: none;
-    align-items: center;
-}
-.button-admin-lobby:hover{background-color: #34aedf; color: #ffffff; text-decoration: none;}
-.custom-form {
-    width: 500px;
-    margin: 50px auto;
-    padding: 50px 20px 50px 20px;
-    box-sizing: border-box;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-.form-group {
-    position: relative;
-    margin-bottom: 1.5rem;
-}
-.form-input {
     width: 100%;
-    padding: 12px 15px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #f9f9f9;
-    box-sizing: border-box;
-    transition: border-color 0.3s;
+    gap: 20px;
 }
-.form-input:focus {
-    border-color: #007bff;
-    outline: none;
-    background: #fff;
-}
-.form-label {
-    font-size: 16px;
-    color: #666;
-    pointer-events: none;
-    transition: all 0.2s;
-    background-color: none;
-    background: #ffffff;
-    padding: 0 5px;
-    width: 90%;
-}
-.form-input:focus ~ .form-label,
-.form-input:not(:placeholder-shown) ~ .form-label {
-    top: -10px;
-    left: 10px;
-    font-size: 12px;
-    color: #007bff;
-}
-
-.form-actions {
+.submit-btn{
     display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.forgot-password {
-    font-size: 14px;
-    color: #007bff;
-    text-decoration: none;
-}
-
-.forgot-password:hover {
-    text-decoration: underline;
-}
-
-.submit-btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.submit-btn:hover {
-    background-color: #0056b3;
-}
-.inittext{
+    align-content: center;
+    width: 100%;
+    height: 50px;
+    background: rgb(56,46,120);
+    background: linear-gradient(90deg, rgba(56,46,120,1) 0%, rgba(59,110,135,1) 55%, rgba(0,102,143,1) 100%);
     font-size: 20px;
-    color: white;
-    font-weight: 300;
-    text-decoration: none;
+    color: #FFF;
+    border: none;
+    border-radius: 8px;
+    transition: transform 0.15s;
 }
-.inittext:hover{text-decoration: none; color: white;}
+.submit-btn:hover{
+    border: 0.5px solid #11a0d8;
+    transform: scale(1.01);
+}
+.forgot-password{
+    font-size: 16px;
+    color: #ffffff;
+    font-weight: 200;
+    margin: 0;
+    text-decoration: none;
+    transition: transform 0.20s;
+}
+.forgot-password:hover{
+    transition: transform 0.20s;
+    transform: scale(1.02);
+    color: #11a0d8;
+}
+.logo-wrapp{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    width: 100%;
+}
+.logocontainer{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    width: 200px;
+    height: 50px;
+}
+.logoadmin{
+    max-width: 100%;
+    cursor: pointer;
+}

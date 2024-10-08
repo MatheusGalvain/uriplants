@@ -3,215 +3,143 @@ require_once __DIR__ . '/../config/database.php';
 
 class PlantController {
 
-    public function insert() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    /**
+     * Obtém uma única planta pelo ID.
+     *
+     * @param int $id
+     * @return array|null
+     */
+    public function getSinglePlant($id) {
+        if ($id <= 0) {
+            return ["message" => "Parâmetro 'id' inválido"];
+        }
 
-            $data = json_decode(file_get_contents("php://input"), true);
-            
-            if (!isset($data['name'])) {
-                echo json_encode(["message" => "Nome da planta é obrigatório"]);
-                return;
-            }
+        $conn = getConnection();
 
-            $requiredFields = ['division_id', 'class_id', 'order_id', 'family_id', 'genus_id', 'species', 'biological_form', 'region_id', 'applications'];
-            foreach ($requiredFields as $field) {
-                if (!isset($data[$field])) {
-                    echo json_encode(["message" => "Todos os campos são obrigatórios"]);
-                    return;
+        $sql = "SELECT plants.id, plants.name, plants.common_names, 
+                plants.species, plants.applications, plants.ecology, plants.created_at, 
+                plants.deleted_at, families.name AS family_name, orders.name AS order_name,
+                divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
+                regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
+                regionmap.description AS region_map_description, regionmap.imagem AS region_map_image,
+                properties.name AS property_name, plantsproperties.description AS plant_property_description,
+                images.id AS image_id, images.imagem AS image_blob, images.source AS image_source
+                FROM plants
+                LEFT JOIN families ON plants.family_id = families.id
+                LEFT JOIN orders ON plants.order_id = orders.id
+                LEFT JOIN divisions ON plants.division_id = divisions.id
+                LEFT JOIN classes ON plants.class_id = classes.id
+                LEFT JOIN genus ON plants.genus_id = genus.id
+                LEFT JOIN regionmap ON plants.region_id = regionmap.id
+                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+                LEFT JOIN properties ON plantsproperties.property_id = properties.id
+                LEFT JOIN images ON plantsproperties.id = images.plants_property_id
+                WHERE plants.id = ?";
+
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
+        }
+
+        $stmt->bind_param("i", $id);
+
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                $plant = $result->fetch_assoc();
+                
+                if (!empty($plant['region_map_image'])) {
+                    $plant['region_map_image'] = base64_encode($plant['region_map_image']);
                 }
-            }
+                if (!empty($plant['image_blob'])) {
+                    $plant['image_blob'] = base64_encode($plant['image_blob']);
+                }
 
-            $conn = getConnection();
-
-            $stmt = $conn->prepare("INSERT INTO plants (name, division_id, class_id, order_id, family_id, genus_id, species, biological_form, region_id, applications, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-            $stmt->bind_param("siiiiissis", 
-                $data['name'], 
-                $data['division_id'], 
-                $data['class_id'], 
-                $data['order_id'], 
-                $data['family_id'], 
-                $data['genus_id'], 
-                $data['species'], 
-                $data['biological_form'], 
-                $data['region_id'], 
-                $data['applications']
-            );
-
-            if ($stmt->execute()) {
-                echo json_encode(["message" => "Planta inserida com sucesso", "plant_id" => $stmt->insert_id]);
+                $stmt->close();
+                $conn->close();
+                return $plant;
             } else {
-                echo json_encode(["message" => "Erro ao inserir planta", "error" => $stmt->error]);
+                $stmt->close();
+                $conn->close();
+                return ["message" => "Planta não encontrada"];
             }
-
+        } else {
+            $error = ["message" => "Erro ao buscar planta", "error" => $stmt->error];
             $stmt->close();
             $conn->close();
+            return $error;
         }
     }
 
-    public function get() {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $conn = getConnection();
+    /**
+     * Obtém uma lista de plantas com paginação.
+     *
+     * @param int $limit
+     * @param int $page
+     * @return array
+     */
+    public function getPlants($limit = 10, $page = 1) {
+        if ($limit <= 0) $limit = 10;
+        if ($page <= 0) $page = 1;
 
-            if (isset($_GET['id'])) {
-                $id = intval($_GET['id']);
-                if ($id <= 0) {
-                    echo json_encode(["message" => "Parâmetro 'id' inválido"]);
-                    return;
-                }
+        $offset = ($page - 1) * $limit;
 
-                $sql = "SELECT plants.id, plants.name, plants.common_names, 
-                plants.species, plants.applications, plants.ecology, plants.created_at, 
-                plants.deleted_at, families.name AS family_name, orders.name AS order_name,
-                divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
-                regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
-                regionmap.description AS region_map_description, regionmap.imagem AS region_map_image,
-                properties.name AS property_name, plantsproperties.description AS plant_property_description,
-                images.id AS image_id, images.imagem AS image_blob, images.source AS image_source
-                    FROM plants
-                    LEFT JOIN families ON plants.family_id = families.id
-                    LEFT JOIN orders ON plants.order_id = orders.id
-                    LEFT JOIN divisions ON plants.division_id = divisions.id
-                    LEFT JOIN classes ON plants.class_id = classes.id
-                    LEFT JOIN genus ON plants.genus_id = genus.id
-                    LEFT JOIN regionmap ON plants.region_id = regionmap.id
-                    LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-                    LEFT JOIN properties ON plantsproperties.property_id = properties.id
-                    LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                    WHERE plants.id = ?";
+        $conn = getConnection();
 
-                $stmt = $conn->prepare($sql);
-                if (!$stmt) {
-                    echo json_encode(["message" => "Erro na preparação da consulta", "error" => $conn->error]);
-                    return;
-                }
+        // Consulta para obter o total de plantas
+        $countSql = "SELECT COUNT(DISTINCT plants.id) as total 
+                     FROM plants
+                     LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+                     LEFT JOIN properties ON plantsproperties.property_id = properties.id
+                     LEFT JOIN images ON plantsproperties.id = images.plants_property_id
+                     WHERE properties.name = 'planta'";
 
-                $stmt->bind_param("i", $id);
+        $countStmt = $conn->prepare($countSql);
+        if (!$countStmt) {
+            return ["message" => "Erro na preparação da consulta de contagem", "error" => $conn->error];
+        }
 
-                if ($stmt->execute()) {
-                    $result = $stmt->get_result();
-                    if ($result->num_rows > 0) {
-                        $plant = $result->fetch_assoc();
-                        
-                        if (!empty($plant['region_map_image'])) {
-                            $plant['region_map_image'] = base64_encode($plant['region_map_image']);
-                        }
-                        if (!empty($plant['image_blob'])) {
-                            $plant['image_blob'] = base64_encode($plant['image_blob']);
-                        }
+        if (!$countStmt->execute()) {
+            $error = ["message" => "Erro ao contar plantas", "error" => $countStmt->error];
+            $countStmt->close();
+            $conn->close();
+            return $error;
+        }
 
-                        echo json_encode($plant, JSON_UNESCAPED_UNICODE);
-                    } else {
-                        echo json_encode(["message" => "Planta não encontrada"]);
-                    }
-                } else {
-                    echo json_encode(["message" => "Erro ao buscar planta", "error" => $stmt->error]);
-                }
+        $countResult = $countStmt->get_result();
+        $totalPlants = 0;
+        if ($row = $countResult->fetch_assoc()) {
+            $totalPlants = intval($row['total']);
+        }
+        $totalPages = ceil($totalPlants / $limit);
 
-                $stmt->close();
-                $conn->close();
-                return;
-            }
+        $countStmt->close();
 
-            $page = isset($_GET['page']) ? intval($_GET['page']) : null;
-            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : null;
+        // Consulta para obter as plantas com limite e offset
+        $sql = "SELECT 
+                    plants.id,
+                    plants.name, 
+                    plants.ecology AS description, 
+                    images.imagem AS image_blob
+                FROM plants
+                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+                LEFT JOIN properties ON plantsproperties.property_id = properties.id
+                LEFT JOIN images ON plantsproperties.id = images.plants_property_id
+                WHERE properties.name = 'planta'
+                GROUP BY plants.id
+                ORDER BY plants.id ASC
+                LIMIT ? OFFSET ?";
 
-            if ($page !== null && $limit !== null) {
-                if ($page <= 0) $page = 1;
-                if ($limit <= 0) $limit = 10;
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            $conn->close();
+            return ["message" => "Erro na preparação da consulta padrão", "error" => $conn->error];
+        }
 
-                $offset = ($page - 1) * $limit;
+        $stmt->bind_param("ii", $limit, $offset);
 
-                $sql = "SELECT plants.id, plants.name, plants.common_names, 
-                plants.species, plants.applications, plants.ecology, plants.created_at, 
-                plants.deleted_at, families.name AS family_name, orders.name AS order_name,
-                divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
-                regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
-                regionmap.description AS region_map_description, regionmap.imagem AS region_map_image,
-                properties.name AS property_name, plantsproperties.description AS plant_property_description,
-                images.id AS image_id, images.imagem AS image_blob, images.source AS image_source
-                    FROM plants
-                    LEFT JOIN families ON plants.family_id = families.id
-                    LEFT JOIN orders ON plants.order_id = orders.id
-                    LEFT JOIN divisions ON plants.division_id = divisions.id
-                    LEFT JOIN classes ON plants.class_id = classes.id
-                    LEFT JOIN genus ON plants.genus_id = genus.id
-                    LEFT JOIN regionmap ON plants.region_id = regionmap.id
-                    LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-                    LEFT JOIN properties ON plantsproperties.property_id = properties.id
-                    LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                    LIMIT ? OFFSET ?";
-
-                $stmt = $conn->prepare($sql);
-                if (!$stmt) {
-                    echo json_encode(["message" => "Erro na preparação da consulta de paginação", "error" => $conn->error]);
-                    return;
-                }
-
-                $stmt->bind_param("ii", $limit, $offset);
-
-                if ($stmt->execute()) {
-                    $result = $stmt->get_result();
-                    $plants = [];
-                    if ($result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
-                            if (!empty($row['region_map_image'])) {
-                                $row['region_map_image'] = base64_encode($row['region_map_image']);
-                            }
-                            if (!empty($row['image_blob'])) {
-                                $row['image_blob'] = base64_encode($row['image_blob']);
-                            }
-                            $plants[] = $row;
-                        }
-                    }
-
-                    $countSql = "SELECT COUNT(*) as total FROM plants";
-                    $countResult = $conn->query($countSql);
-                    $total = $countResult->fetch_assoc()['total'];
-                    $totalPages = ceil($total / $limit);
-
-                    echo json_encode([
-                        "page" => $page,
-                        "limit" => $limit,
-                        "total_pages" => $totalPages,
-                        "total_items" => $total,
-                        "plants" => $plants
-                    ], JSON_UNESCAPED_UNICODE);
-                } else {
-                    echo json_encode(["message" => "Erro ao buscar plantas com paginação", "error" => $stmt->error]);
-                }
-
-                $stmt->close();
-                $conn->close();
-                return;
-            }
-
-            $sql = "SELECT 
-                        plants.name, 
-                        plants.ecology AS description, 
-                        images.imagem AS image_blob
-                    FROM plants
-                    LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-                    LEFT JOIN properties ON plantsproperties.property_id = properties.id
-                    LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                    WHERE properties.name = 'planta'
-                    GROUP BY plants.id
-                    ORDER BY plants.id ASC
-                    LIMIT 1";
-
-            $sql = "SELECT 
-                        plants.name, 
-                        plants.ecology AS description,
-                        (
-                            SELECT images.imagem 
-                            FROM images
-                            JOIN plantsproperties ON images.plants_property_id = plantsproperties.id
-                            JOIN properties ON plantsproperties.property_id = properties.id
-                            WHERE plantsproperties.plant_id = plants.id AND properties.name = 'planta'
-                            LIMIT 1
-                        ) AS image_blob
-                    FROM plants";
-
-            $result = $conn->query($sql);
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
             $plants = [];
             if ($result->num_rows > 0) {
                 while($row = $result->fetch_assoc()) {
@@ -222,9 +150,113 @@ class PlantController {
                 }
             }
 
-            echo json_encode($plants, JSON_UNESCAPED_UNICODE);
-
+            $stmt->close();
             $conn->close();
+
+            return [
+                "plants" => $plants,
+                "totalPlants" => $totalPlants,
+                "totalPages" => $totalPages,
+                "currentPage" => $page
+            ];
+        } else {
+            $error = ["message" => "Erro ao buscar plantas", "error" => $stmt->error];
+            $stmt->close();
+            $conn->close();
+            return $error;
+        }
+    }
+
+    public function get() {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            if (isset($_GET['id'])) {
+                $id = intval($_GET['id']);
+                $plant = $this->getSinglePlant($id);
+                echo json_encode($plant, JSON_UNESCAPED_UNICODE);
+                return;
+            }
+
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+            $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+
+            $plantsData = $this->getPlants($limit, $page);
+            echo json_encode($plantsData, JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(["message" => "Método não suportado"], JSON_UNESCAPED_UNICODE);
+        }
+    }
+    public function getOtherPlants($currentPlantId, $limit = 4) {
+        $conn = getConnection();
+        
+        $sql = "SELECT plants.id, plants.name, images.imagem AS image_blob
+                FROM plants
+                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+                LEFT JOIN images ON plantsproperties.id = images.plants_property_id
+                WHERE plants.id != ? 
+                ORDER BY RAND() LIMIT ?";
+        
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
+        }
+    
+        $stmt->bind_param("ii", $currentPlantId, $limit);
+    
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            $otherPlants = [];
+            while ($row = $result->fetch_assoc()) {
+                if (!empty($row['image_blob'])) {
+                    $row['image_blob'] = base64_encode($row['image_blob']);
+                }
+                $otherPlants[] = $row;
+            }
+    
+            $stmt->close();
+            $conn->close();
+            return $otherPlants;
+        } else {
+            $error = ["message" => "Erro ao buscar outras plantas", "error" => $stmt->error];
+            $stmt->close();
+            $conn->close();
+            return $error;
+        }
+    }
+    public function getPlantImages($plantId) {
+        $conn = getConnection();
+        
+        $sql = "SELECT images.imagem AS image_blob
+                FROM images
+                JOIN plantsproperties ON images.plants_property_id = plantsproperties.id
+                WHERE plantsproperties.plant_id = ?";
+        
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
+        }
+    
+        $stmt->bind_param("i", $plantId);
+    
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            $images = [];
+            while ($row = $result->fetch_assoc()) {
+                if (!empty($row['image_blob'])) {
+                    $row['image_blob'] = base64_encode($row['image_blob']);
+                }
+                $images[] = $row;
+            }
+    
+            $stmt->close();
+            $conn->close();
+            return $images;
+        } else {
+            $error = ["message" => "Erro ao buscar imagens da planta", "error" => $stmt->error];
+            $stmt->close();
+            $conn->close();
+            return $error;
         }
     }
 }
