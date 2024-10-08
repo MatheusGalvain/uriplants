@@ -100,7 +100,6 @@ if (isset($_POST['add_plant'])) {
     $fruit_description = filter_input_data_custom($con, $_POST['fruit_description']);
     $seed_description = filter_input_data_custom($con, $_POST['seed_description']);
     $biology = filter_input_data_custom($con, $_POST['biology']);
-    $created_by = filter_input_data_custom($con, $_POST['created_by']);
 
     // Propriedades e Imagens enviadas via JavaScript (JSON)
     $properties = isset($_POST['properties']) ? json_decode($_POST['properties'], true) : [];
@@ -122,12 +121,12 @@ if (isset($_POST['add_plant'])) {
             $stmt->close();
 
             // **Atualizar a Consulta de Inserção para Incluir os Novos Campos**
-            $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description, biology, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description, biology) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da inserção: " . $con->error);
             }
             $stmt->bind_param(
-                "ssiiiiisssssssssss",
+                "ssiiiiissssssssss",
                 $name,
                 $common_names,
                 $division_id,
@@ -146,7 +145,6 @@ if (isset($_POST['add_plant'])) {
                 $fruit_description,
                 $seed_description,
                 $biology,
-                $created_by
             );
             if (!$stmt->execute()) {
                 throw new Exception("Erro ao adicionar planta: " . $stmt->error);

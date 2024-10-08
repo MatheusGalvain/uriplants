@@ -62,7 +62,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="dropdown-item text-white ps-5" href="qrcode.php">
-                                    QRCode URL
+                                    QR Code URL
                                 </a>
                             </li>
                         </ul>
