@@ -16,13 +16,13 @@ class PlantController {
 
         $conn = getConnection();
 
-        $sql = "SELECT plants.id, plants.name, plants.common_names, 
+        $sql = "SELECT plants.id, plants.name, plants.common_names, plants.bark_description , plants.trunk_description, plants.leaf_description, plants.flower_description , plants.fruit_description, plants.seed_description , plants.biology, 
                 plants.species, plants.applications, plants.ecology, plants.created_at, 
                 plants.deleted_at, families.name AS family_name, orders.name AS order_name,
                 divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
                 regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
                 regionmap.description AS region_map_description, regionmap.imagem AS region_map_image,
-                properties.name AS property_name, plantsproperties.description AS plant_property_description,
+                properties.name AS property_name,
                 images.id AS image_id, images.imagem AS image_blob, images.source AS image_source
                 FROM plants
                 LEFT JOIN families ON plants.family_id = families.id
