@@ -28,13 +28,15 @@ $plantImage = "../images/plant-placeholder.png";
 $plantImageAlt = "";
 $errorMessage = "";
 $familyName = "";
+$commonName = "";
 $orderName = "";
+$divisionName = "";
 $className = "";
+$genusName = "";
 $speciesName = "";
 $ecologyName = "";
 $applicationsName = "";
 $propertyName = "";
-$plantPropertyDescription = "";
 
 // Verificar se o parâmetro 'id' foi passado na URL
 if (isset($_GET['id'])) {
@@ -51,13 +53,15 @@ if (isset($_GET['id'])) {
 
             // Extrair família, ordem, classe e propriedades
             $familyName = sanitize_input($plant['family_name']);
+            $divisionName = sanitize_input($plant['division_name']);
             $orderName = sanitize_input($plant['order_name']);
             $className = sanitize_input($plant['class_name']);
+            $genusName = sanitize_input($plant['genus_name']);
             $speciesName = sanitize_input($plant['species']);
+            $commonName= sanitize_input($plant['common_names']);
             $ecologyName = sanitize_input($plant['ecology']);
             $applicationsName = sanitize_input($plant['applications']);
             $propertyName = sanitize_input($plant['property_name']);
-            $plantPropertyDescription = sanitize_input($plant['plant_property_description']);
 
             $otherPlants = $plantController->getOtherPlants($id);
         } else {
@@ -235,36 +239,19 @@ if (isset($_GET['id'])) {
         <section id="main-section" class="ecology">
             <div class="box">
                 <article class="informationsart">
-                    <h1>Medicinais</h1>
-                    <h2><?php echo $medicinalUses; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Madereiros</h1>
-                    <h2><?php echo $timberUses; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Alimentação</h1>
-                    <h2><?php echo $foodUses; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Artesanato</h1>
-                    <h2><?php echo $handicraftUses; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Arborização Urbana</h1>
-                    <h2><?php echo $urbanGreening; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Sombreamento e Paisagismo</h1>
-                    <h2><?php echo $landscapeUses; ?></h2>
+                    <h1>Produtos e Usos</h1>
+                    <h2><?php echo $applicationsName; ?></h2>
                 </article>
             </div>
         </section>
 
-
         <!-- Sessão de informações da planta que está em Taxonomia -->
         <section id="main-section" class="taxonomy">
             <div class="box">
+                <article class="informationsart">
+                    <h1>Nome</h1>
+                    <h2><?php echo $plantName; ?></h2>
+                </article>
                 <article class="informationsart">
                     <h1>Divisão</h1>
                     <h2><?php echo $divisionName; ?></h2>
@@ -301,8 +288,8 @@ if (isset($_GET['id'])) {
                     <h2><?php echo $plantName; ?></h2>
                 </article>
                 <article class="informationsart">
-                    <h1>Nome Científico</h1>
-                    <h2><?php echo $scientificName; ?></h2>
+                    <h1>Nome's Poulares</h1>
+                    <h2><?php echo $commonName; ?></h2>
                 </article>
                 <article class="informationsart">
                     <h1>Descrição</h1>
@@ -310,11 +297,18 @@ if (isset($_GET['id'])) {
                 </article>
                 <article class="informationsart">
                     <h1>Forma Biológica</h1>
-                    <h2><?php echo $biologicalForm; ?></h2>
+                    <h2>A fazer</h2>
+                    <div class="containerimgs-wrapp">
+                        <div class="otherphotodiv"
+                        onclick="changeMainImage('data:image/jpeg;base64,<?php echo $image['image_blob']; ?>')">
+                        <img class="otherphoto" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
+                        alt="<?php echo sanitize_input($plantName); ?>">
+                        </div>
+                    </div>
                 </article>
                 <article class="informationsart">
                     <h1>Tronco</h1>
-                    <h2><?php echo $trunkDescription; ?></h2>
+                    <h2><?php echo $plantPropertyDescription; ?></h2>
                 </article>
                 <article class="informationsart">
                     <h1>Casca</h1>

@@ -259,6 +259,5 @@ class PlantController {
             return $error;
         }
     }
-    
 }
 ?>
