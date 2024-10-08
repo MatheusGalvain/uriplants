@@ -314,7 +314,6 @@ if (isset($_GET['id'])) {
             </div>
         </section>
 
-
         <!-- Sessão de informações da planta que está em Descrição-->
         <section id="main-section" class="description">
             <div class="box">
