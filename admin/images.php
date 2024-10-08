@@ -73,9 +73,9 @@ function fetch_all_plants_properties_images($con, $search = '') {
     }
 
     $sql = "
-        SELECT pp.id, pp.plant_id, pp.property_id, pp.description, pp.created_at,
+        SELECT pp.id, pp.plant_id, pp.property_id, pp.created_at,
                p.name as plant_name, pr.name as property_name,
-               i.id as image_id, i.imagem, i.source as image_source
+               i.id as image_id, i.imagem, i.source as image_source, i.sort_order as sort_order
         FROM PlantsProperties pp
         LEFT JOIN plants p ON pp.plant_id = p.id
         LEFT JOIN properties pr ON pp.property_id = pr.id
@@ -112,7 +112,6 @@ function fetch_all_plants_properties_images($con, $search = '') {
         if (!isset($data[$plant_id]['properties'][$plants_property_id])) {
             $data[$plant_id]['properties'][$plants_property_id] = [
                 'property_name' => $row['property_name'],
-                'description' => $row['description'],
                 'created_at' => $row['created_at'],
                 'images' => []
             ];
@@ -122,7 +121,8 @@ function fetch_all_plants_properties_images($con, $search = '') {
             $data[$plant_id]['properties'][$plants_property_id]['images'][] = [
                 'image_id' => $row['image_id'],
                 'imagem' => $row['imagem'],
-                'image_source' => $row['image_source']
+                'image_source' => $row['image_source'],
+                'sort_order' => $row['sort_order']
             ];
         }
     }
@@ -138,18 +138,17 @@ try {
         if (isset($_POST['add_property'])) {
             $plant_id = intval($_POST['plant_id']);
             $property_id = intval($_POST['property_id']);
-            $description = mysqli_real_escape_string($con, $_POST['description']);
             $source = mysqli_real_escape_string($con, $_POST['source']);
 
             mysqli_begin_transaction($con);
 
             try {
-                $sql = "INSERT INTO PlantsProperties (plant_id, property_id, description, created_at) VALUES (?, ?, ?, NOW())";
+                $sql = "INSERT INTO PlantsProperties (plant_id, property_id, created_at) VALUES (?, ?, NOW())";
                 $stmt = mysqli_prepare($con, $sql);
                 if (!$stmt) {
                     throw new Exception("Erro na preparação da consulta: " . mysqli_error($con));
                 }
-                mysqli_stmt_bind_param($stmt, 'iis', $plant_id, $property_id, $description);
+                mysqli_stmt_bind_param($stmt, 'ii', $plant_id, $property_id);
                 if (!mysqli_stmt_execute($stmt)) {
                     throw new Exception("Erro ao adicionar propriedade da planta: " . mysqli_error($con));
                 }
@@ -176,7 +175,7 @@ try {
                 // Registro de auditoria
                 $plant_name = get_plant_name($con, $plant_id);
                 $property_name = get_property_name($con, $property_id);
-                $new_value = "Planta: $plant_name, Propriedade: $property_name, Descrição: $description";
+                $new_value = "Planta: $plant_name, Propriedade: $property_name";
                 log_audit_action($con, 'PlantsProperties', 1, $_SESSION['id'], null, $new_value, $plant_id);
 
                 mysqli_commit($con);
@@ -191,17 +190,16 @@ try {
             $id = intval($_POST['id']);
             $plant_id = intval($_POST['plant_id']);
             $property_id = intval($_POST['property_id']);
-            $description = mysqli_real_escape_string($con, $_POST['description']);
             $source = mysqli_real_escape_string($con, $_POST['source']);
 
             // Verificar existência da propriedade
-            $current_query = mysqli_prepare($con, "SELECT plant_id, property_id, description FROM PlantsProperties WHERE id = ?");
+            $current_query = mysqli_prepare($con, "SELECT plant_id, property_id FROM PlantsProperties WHERE id = ?");
             if (!$current_query) {
                 throw new Exception("Erro na preparação da consulta: " . mysqli_error($con));
             }
             mysqli_stmt_bind_param($current_query, 'i', $id);
             mysqli_stmt_execute($current_query);
-            mysqli_stmt_bind_result($current_query, $old_plant_id, $old_property_id, $old_description);
+            mysqli_stmt_bind_result($current_query, $old_plant_id, $old_property_id);
             if (!mysqli_stmt_fetch($current_query)) {
                 mysqli_stmt_close($current_query);
                 throw new Exception("Propriedade não encontrada.");
@@ -212,12 +210,12 @@ try {
 
             try {
                 // Atualizar PlantsProperties
-                $update_sql = "UPDATE PlantsProperties SET plant_id = ?, property_id = ?, description = ? WHERE id = ?";
+                $update_sql = "UPDATE PlantsProperties SET plant_id = ?, property_id = ? WHERE id = ?";
                 $update_stmt = mysqli_prepare($con, $update_sql);
                 if (!$update_stmt) {
                     throw new Exception("Erro na preparação da consulta de atualização: " . mysqli_error($con));
                 }
-                mysqli_stmt_bind_param($update_stmt, 'iisi', $plant_id, $property_id, $description, $id);
+                mysqli_stmt_bind_param($update_stmt, 'iii', $plant_id, $property_id, $id);
                 if (!mysqli_stmt_execute($update_stmt)) {
                     throw new Exception("Erro ao atualizar propriedade da planta: " . mysqli_error($con));
                 }
@@ -267,8 +265,8 @@ try {
                 $new_plant_name = get_plant_name($con, $plant_id);
                 $new_property_name = get_property_name($con, $property_id);
 
-                $old_value = "Planta: $old_plant_name, Propriedade: $old_property_name, Descrição: $old_description";
-                $new_value = "Planta: $new_plant_name, Propriedade: $new_property_name, Descrição: $description";
+                $old_value = "Planta: $old_plant_name, Propriedade: $old_property_name";
+                $new_value = "Planta: $new_plant_name, Propriedade: $new_property_name";
                 if ($image_updated) {
                     $new_value .= ", Imagem ID: " . $image_id;
                 }
@@ -287,13 +285,13 @@ try {
             $id = intval($_POST['id']);
 
             // Obter dados atuais
-            $current_query = mysqli_prepare($con, "SELECT plant_id, property_id, description FROM PlantsProperties WHERE id = ?");
+            $current_query = mysqli_prepare($con, "SELECT plant_id, property_id FROM PlantsProperties WHERE id = ?");
             if (!$current_query) {
                 throw new Exception("Erro na preparação da consulta: " . mysqli_error($con));
             }
             mysqli_stmt_bind_param($current_query, 'i', $id);
             mysqli_stmt_execute($current_query);
-            mysqli_stmt_bind_result($current_query, $plant_id, $property_id, $description);
+            mysqli_stmt_bind_result($current_query, $plant_id, $property_id);
             if (!mysqli_stmt_fetch($current_query)) {
                 mysqli_stmt_close($current_query);
                 throw new Exception("Propriedade não encontrada.");
@@ -328,7 +326,7 @@ try {
                 // Registro de auditoria
                 $plant_name = get_plant_name($con, $plant_id);
                 $property_name = get_property_name($con, $property_id);
-                $old_value = "Planta ID: $plant_id, Nome: $plant_name, Propriedade: $property_name, Descrição: $description";
+                $old_value = "Planta ID: $plant_id, Nome: $plant_name, Propriedade: $property_name";
                 $new_value = null;
 
                 log_audit_action($con, 'PlantsProperties', 2, $_SESSION['id'], $old_value, $new_value, $plant_id);
@@ -407,10 +405,6 @@ try {
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="description" class="form-label">Descrição</label>
-                                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-                                </div>
-                                <div class="mb-3">
                                     <label for="source" class="form-label">Fonte da Imagem</label>
                                     <input type="text" class="form-control" id="source" name="source" required>
                                 </div>
@@ -467,7 +461,7 @@ try {
                                                                     data-id="<?php echo htmlspecialchars($plants_property_id); ?>" 
                                                                     data-plant_id="<?php echo htmlspecialchars($plant_id); ?>"
                                                                     data-property_id="<?php echo htmlspecialchars($property_id); ?>"
-                                                                    data-description="<?php echo htmlspecialchars($property['description']); ?>"
+                                                                    data-sort="<?php echo htmlspecialchars($image['sort_order']); ?>"
                                                                     data-source="<?php echo htmlspecialchars($image['image_source']); ?>">
                                                                     Editar
                                                                 </button>
@@ -556,12 +550,12 @@ try {
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="editDescription" class="form-label">Descrição</label>
-                            <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
                             <label for="editSource" class="form-label">Fonte da Imagem</label>
                             <input type="text" class="form-control" id="editSource" name="source" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSort" class="form-label">Ordenação</label>
+                            <input type="text" class="form-control" id="editSort" name="sort" required>
                         </div>
                         <div class="mb-3">
                             <label for="editImage" class="form-label">Imagem (deixe em branco para não alterar)</label>
@@ -596,22 +590,22 @@ try {
         var editPropertyIdInput = document.getElementById('editPropertyId');
         var editPlantIdSelect = document.getElementById('editPlantId');
         var editPropertyIdSelect = document.getElementById('editPropertyIdSelect');
-        var editDescriptionTextarea = document.getElementById('editDescription');
         var editSourceInput = document.getElementById('editSource');
+        var editSortInput = document.getElementById('editSort');
 
         editButtons.forEach(function(button) {
             button.addEventListener('click', function() {
                 var id = this.getAttribute('data-id');
                 var plant_id = this.getAttribute('data-plant_id');
                 var property_id = this.getAttribute('data-property_id');
-                var description = this.getAttribute('data-description');
                 var source = this.getAttribute('data-source');
+                var sort = this.getAttribute('data-sort');
 
                 editPropertyIdInput.value = id;
                 editPlantIdSelect.value = plant_id;
                 editPropertyIdSelect.value = property_id;
-                editDescriptionTextarea.value = description;
                 editSourceInput.value = source;
+                editSortInput.value = sort;
             });
         });
         });
