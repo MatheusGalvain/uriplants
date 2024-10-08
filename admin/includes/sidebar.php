@@ -60,6 +60,11 @@
                                     Imagens
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item text-white ps-5" href="qrcode.php">
+                                    QRCode URL
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

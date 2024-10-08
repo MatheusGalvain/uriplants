@@ -47,6 +47,36 @@ function filter_input_data_custom($con, $data) {
     return mysqli_real_escape_string($con, trim($data));
 }
 
+// Pega o url para gerar o qrcode dinamico
+function get_qrcode_url($con) {
+    $sql = "SELECT url FROM qrcode_url LIMIT 1";
+    
+    if ($stmt = $con->prepare($sql)) {
+        // Executa a consulta
+        if ($stmt->execute()) {
+            // Obtém o resultado
+            $stmt->bind_result($url);
+            if ($stmt->fetch()) {
+                $stmt->close();
+                return $url;
+            } else {
+                // Nenhum registro encontrado
+                $stmt->close();
+                return false;
+            }
+        } else {
+            // Erro na execução da consulta
+            error_log("Erro na execução da consulta: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+    } else {
+        // Erro na preparação da consulta
+        error_log("Erro na preparação da consulta: " . $con->error);
+        return false;
+    }
+}
+
 // Adicionar Planta com Propriedades e Imagens
 if (isset($_POST['add_plant'])) {
     // Dados da Planta
@@ -145,7 +175,6 @@ if (isset($_POST['add_plant'])) {
         $error = "Por favor, adicione pelo menos uma propriedade à planta.";
     }
 }
-
 
 // Excluir Planta
 if (isset($_POST['delete_plant'])) {
@@ -298,7 +327,6 @@ if (isset($_POST['edit_plant'])) {
     }
 }
 
-
 // Configuração de Paginação
 $items_per_page = 10; // Número de plantas por página
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? intval($_GET['page']) : 1;
@@ -391,6 +419,9 @@ if (isset($_GET['edit'])) {
         }
     }
 }
+
+$qrcode_base_url = get_qrcode_url($con);
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -673,11 +704,11 @@ if (isset($_GET['edit'])) {
                                             <td><?php echo htmlspecialchars($row['name']); ?></td>
                                             <td><?php echo htmlspecialchars($row['division_name']); ?></td>
                                             <td><?php echo htmlspecialchars($row['class_name']); ?></td>
-
                                             <td>
-                                                <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-sm">Editar</a>
-                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">Excluir</button>
-                                            </td>
+                                            <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-sm">Editar</a>
+                                            <button type="button" class="btn btn-primary btn-sm qrcode-button" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">QR Code</button>
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">Excluir</button>
+                                        </td>
                                         </tr>
                                     <?php } ?>
                                     <?php if ($plantCount === 0) { ?>
@@ -728,6 +759,34 @@ if (isset($_GET['edit'])) {
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
+
+    <!-- Modal para QRCode -->
+    <div class="modal fade" id="qrcodeModal" tabindex="-1" aria-labelledby="qrcodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">QR Code da Planta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Nome da Planta:</strong> <span id="plantName"></span></p>
+                    <p><strong>ID da Planta:</strong> <span id="plantId"></span></p>
+                    <div class="mb-3">
+                        <label for="currentQrcodeUrl" class="form-label">URL atual:</label>
+                        <input type="text" class="form-control" id="currentQrcodeUrl" readonly>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <img id="qrcodeImage" src="" alt="QR Code" class="img-fluid mb-3">
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <a id="downloadQrcode" href="#" class="btn btn-primary me-2" download="qrcode.png">Baixar QR Code</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Modal para Adicionar Propriedade -->
     <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel" aria-hidden="true">
@@ -798,6 +857,47 @@ if (isset($_GET['edit'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+                // Variável PHP passada para JavaScript
+                var qrcodeBaseUrl = "<?php echo htmlspecialchars($qrcode_base_url); ?>";
+
+                // Inicializa o modal do QR Code
+                var qrcodeModal = new bootstrap.Modal(document.getElementById('qrcodeModal'));
+                var qrcodeImage = document.getElementById('qrcodeImage');
+                var downloadQrcode = document.getElementById('downloadQrcode');
+
+                // Elementos da Modal
+                var plantNameSpan = document.getElementById('plantName');
+                var plantIdSpan = document.getElementById('plantId');
+                var currentQrcodeUrlInput = document.getElementById('currentQrcodeUrl');
+
+                // Adiciona evento de clique para todos os botões "QRCode"
+                document.querySelectorAll('.qrcode-button').forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var plantId = this.getAttribute('data-id');
+                        var plantName = this.getAttribute('data-name');
+
+                        // Determina se a URL já possui parâmetros
+                        var separator = qrcodeBaseUrl.includes('?') ? '&' : '?';
+
+                        // Constrói a URL completa para o QR Code
+                        var qrContent = qrcodeBaseUrl + separator + "id=" + encodeURIComponent(plantId);
+
+                        // Utiliza uma API externa para gerar o QR Code
+                        var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(qrContent);
+
+                        // Preenche os campos da modal
+                        plantNameSpan.textContent = plantName;
+                        plantIdSpan.textContent = plantId;
+                        currentQrcodeUrlInput.value = qrContent;
+                        qrcodeImage.src = qrCodeUrl;
+                        downloadQrcode.href = qrCodeUrl;
+
+                        // Exibe o modal
+                        qrcodeModal.show();
+                    });
+                });
+
+
             // Mostrar/Esconder Formulário de Adição de Planta
             var toggleFormButton = document.getElementById('toggleForm');
             var plantForm = document.getElementById('plant-form');
