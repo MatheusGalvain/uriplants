@@ -695,7 +695,7 @@ main{
     padding: 5px 5px 5px 0;
     font-weight: 300;
     white-space: nowrap;
-    width: 20em;
+    width: 13em;
     overflow: hidden;
     text-overflow: ellipsis;
 }
