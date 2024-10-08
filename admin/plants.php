@@ -100,6 +100,7 @@ if (isset($_POST['add_plant'])) {
     $fruit_description = filter_input_data_custom($con, $_POST['fruit_description']);
     $seed_description = filter_input_data_custom($con, $_POST['seed_description']);
     $biology = filter_input_data_custom($con, $_POST['biology']);
+    $created_by = filter_input_data_custom($con, $_POST['created_by']);
 
     // Propriedades e Imagens enviadas via JavaScript (JSON)
     $properties = isset($_POST['properties']) ? json_decode($_POST['properties'], true) : [];
@@ -121,12 +122,12 @@ if (isset($_POST['add_plant'])) {
             $stmt->close();
 
             // **Atualizar a Consulta de Inserção para Incluir os Novos Campos**
-            $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description, biology) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description, biology, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da inserção: " . $con->error);
             }
             $stmt->bind_param(
-                "ssiiiiissssssssss",
+                "ssiiiiisssssssssss",
                 $name,
                 $common_names,
                 $division_id,
@@ -144,7 +145,8 @@ if (isset($_POST['add_plant'])) {
                 $flower_description,
                 $fruit_description,
                 $seed_description,
-                $biology
+                $biology,
+                $created_by
             );
             if (!$stmt->execute()) {
                 throw new Exception("Erro ao adicionar planta: " . $stmt->error);
@@ -154,11 +156,11 @@ if (isset($_POST['add_plant'])) {
 
             // Auditoria para inserção de planta
             $table = 'Plants';
-            $action_id = 1; // Adição
+            $action_id = 1;
             $changed_by = $_SESSION['id'];
             $old_value = null;
             $new_value = "Planta: $name, Espécie: $species";
-            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value);
 
             // Inserção das Propriedades e Imagens
             foreach ($properties as $property) {
@@ -654,6 +656,36 @@ $qrcode_base_url = get_qrcode_url($con);
                                 <div class="mb-3">
                                     <label for="applications" class="form-label">Aplicações</label>
                                     <textarea class="form-control" id="applications" name="applications"><?php echo $edit_mode ? htmlspecialchars($edit_plant['applications']) : ''; ?></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="biology" class="form-label">Forma Biológica</label>
+                                    <textarea class="form-control" id="biology" name="biology"><?php echo $edit_mode ? htmlspecialchars($edit_plant['biology']) : ''; ?></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="trunk" class="form-label">Tronco</label>
+                                    <textarea class="form-control" id="trunk" name="trunk_description"><?php echo $edit_mode ? htmlspecialchars($edit_plant['trunk_description']) : ''; ?></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="bark" class="form-label">Casca</label>
+                                    <textarea class="form-control" id="bark" name="bark_description"><?php echo $edit_mode ? htmlspecialchars($edit_plant['bark_description']) : ''; ?></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="leaf" class="form-label">Folha</label>
+                                    <textarea class="form-control" id="leaf" name="leaf_description"><?php echo $edit_mode ? htmlspecialchars($edit_plant['leaf_description']) : ''; ?></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="flower" class="form-label">Flor</label>
+                                    <textarea class="form-control" id="flower" name="flower_description"><?php echo $edit_mode ? htmlspecialchars($edit_plant['flower_description']) : ''; ?></textarea>
+                                </div>                 
+                                <div class="mb-3">
+                                    <label for="fruit" class="form-label">Fruta</label>
+                                    <textarea class="form-control" id="fruit" name="fruit_description"><?php echo $edit_mode ? htmlspecialchars($edit_plant['fruit_description']) : ''; ?></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="seed" class="form-label">Semente</label>
+                                    <textarea class="form-control" id="seed" name="seed_description"><?php echo $edit_mode ? htmlspecialchars($edit_plant['seed_description']) : ''; ?></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="ecology" class="form-label">Ecologia</label>
