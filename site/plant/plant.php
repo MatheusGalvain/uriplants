@@ -30,6 +30,13 @@ $errorMessage = "";
 $familyName = "";
 $commonName = "";
 $orderName = "";
+$barkDescription = "";
+$trunkDescription = "";
+$leafDescription = "";
+$flowerDescription = "";
+$fruitDescription = "";
+$seedDescription = "";
+$biologyName = "";
 $divisionName = "";
 $className = "";
 $genusName = "";
@@ -61,7 +68,13 @@ if (isset($_GET['id'])) {
             $commonName= sanitize_input($plant['common_names']);
             $ecologyName = sanitize_input($plant['ecology']);
             $applicationsName = sanitize_input($plant['applications']);
-            $propertyName = sanitize_input($plant['property_name']);
+            $barkDescription = sanitize_input($plant['bark_description']);
+            $trunkDescription = sanitize_input($plant['trunk_description']);
+            $leafDescription = sanitize_input($plant['leaf_description']);
+            $flowerDescription = sanitize_input($plant['flower_description']);
+            $fruitDescription = sanitize_input($plant['fruit_description']);
+            $seedDescription = sanitize_input($plant['seed_description']);
+            $biologyName = sanitize_input($plant['biology']);
 
             $otherPlants = $plantController->getOtherPlants($id);
         } else {
@@ -238,44 +251,66 @@ if (isset($_GET['id'])) {
         <!-- Sessão de informações da planta que está em Ecologia -->
         <section id="main-section" class="ecology">
             <div class="box">
+                <?php if (!empty($applicationsName)): ?>
                 <article class="informationsart">
                     <h1>Produtos e Usos</h1>
                     <h2><?php echo $applicationsName; ?></h2>
                 </article>
+                <?php endif; ?>
             </div>
         </section>
 
         <!-- Sessão de informações da planta que está em Taxonomia -->
         <section id="main-section" class="taxonomy">
             <div class="box">
+                <?php if (!empty($plantName)): ?>
                 <article class="informationsart">
                     <h1>Nome</h1>
                     <h2><?php echo $plantName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($divisionName)): ?>
                 <article class="informationsart">
                     <h1>Divisão</h1>
                     <h2><?php echo $divisionName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($className)): ?>
                 <article class="informationsart">
                     <h1>Classe</h1>
                     <h2><?php echo $className; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($orderName)): ?>
                 <article class="informationsart">
                     <h1>Ordem</h1>
                     <h2><?php echo $orderName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($familyName)): ?>
                 <article class="informationsart">
                     <h1>Família</h1>
                     <h2><?php echo $familyName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($genusName)): ?>
                 <article class="informationsart">
                     <h1>Gênero</h1>
                     <h2><?php echo $genusName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($speciesName)): ?>
                 <article class="informationsart">
                     <h1>Espécie</h1>
                     <h2><?php echo $speciesName; ?></h2>
                 </article>
+                <?php endif; ?>
             </div>
         </section>
 
@@ -283,53 +318,75 @@ if (isset($_GET['id'])) {
         <!-- Sessão de informações da planta que está em Descrição-->
         <section id="main-section" class="description">
             <div class="box">
-                <article class="informationsart">
-                    <h1>Nome</h1>
-                    <h2><?php echo $plantName; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Nome's Poulares</h1>
-                    <h2><?php echo $commonName; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Descrição</h1>
-                    <h2><?php echo $plantDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Forma Biológica</h1>
-                    <h2>A fazer</h2>
-                    <div class="containerimgs-wrapp">
-                        <div class="otherphotodiv"
-                        onclick="changeMainImage('data:image/jpeg;base64,<?php echo $image['image_blob']; ?>')">
-                        <img class="otherphoto" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
-                        alt="<?php echo sanitize_input($plantName); ?>">
-                        </div>
-                    </div>
-                </article>
-                <article class="informationsart">
-                    <h1>Tronco</h1>
-                    <h2><?php echo $plantPropertyDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Casca</h1>
-                    <h2><?php echo $barkDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Folhas</h1>
-                    <h2><?php echo $leavesDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Flores</h1>
-                    <h2><?php echo $flowersDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Frutos</h1>
-                    <h2><?php echo $fruitsDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Sementes</h1>
-                    <h2><?php echo $seedsDescription; ?></h2>
-                </article>
+            <?php if (!empty($plantName)): ?>
+            <article class="informationsart">
+                <h1>Nome</h1>
+                <h2><?php echo $plantName; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($commonName)): ?>
+            <article class="informationsart">
+                <h1>Nome's Poulares</h1>
+                <h2><?php echo $commonName; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($plantDescription)): ?>
+            <article class="informationsart">
+                <h1>Descrição</h1>
+                <h2><?php echo $plantDescription; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($biologyName)): ?>
+            <article class="informationsart">
+                <h1>Forma Biológica</h1>
+                <h2><?php echo $biologyName; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($trunkDescription)): ?>
+            <article class="informationsart">
+                <h1>Tronco</h1>
+                <h2><?php echo $trunkDescription; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($barkDescription)): ?>
+            <article class="informationsart">
+                <h1>Casca</h1>
+                <h2><?php echo $barkDescription; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($leafDescription)): ?>
+            <article class="informationsart">
+                <h1>Folhas</h1>
+                <h2><?php echo $leafDescription; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($flowerDescription)): ?>
+            <article class="informationsart">
+                <h1>Flores</h1>
+                <h2><?php echo $flowerDescription; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($fruitDescription)): ?>
+            <article class="informationsart">
+                <h1>Frutos</h1>
+                <h2><?php echo $fruitDescription; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($seedDescription)): ?>
+            <article class="informationsart">
+                <h1>Sementes</h1>
+                <h2><?php echo $seedDescription; ?></h2>
+            </article>
+            <?php endif; ?>
             </div>
         </section>
 
