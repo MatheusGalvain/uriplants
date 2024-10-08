@@ -398,6 +398,7 @@ main{
     align-content: flex-start;
     flex-direction: column;
     flex-wrap: wrap;
+    width: 100%;
     gap: 15px;
 }
 .otherphotodiv{
@@ -640,6 +641,8 @@ main{
     align-content: flex-start;
     flex-direction: column;
     flex-wrap: wrap;
+    width: 100%;
+    overflow: hidden;
 }
 .informationsart h1{
     font-size: 20px;
@@ -651,6 +654,57 @@ main{
     font-size: 25px;
     color: #141414;
     font-weight: 200;
+}
+.photos-wrapp{
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+    white-space: nowrap;
+    overflow-x: auto;
+    gap: 15px;
+}
+.photoproperty-wrapp{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    width: 170px;
+    height: 150px!important;
+    border-radius: 8px;
+    cursor: pointer;
+    scroll-snap-align: start;
+    margin-right: 10px;
+    overflow: hidden;
+    color: #FFF;
+}
+.lightbox-title {
+    position: absolute;
+    top: -25px;
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    font-weight: 400;
+    padding: 5px 5px 5px 2px;
+    box-sizing: border-box;
+}
+.lightbox-source{
+    position: absolute;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 5px 5px 0;
+    font-weight: 300;
+    white-space: nowrap;
+    width: 20em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.photopropertyImg{
+    max-width: 100%;
+    min-height: 100%;
+    -webkit-box-shadow: 10px 4px 69px -25px rgba(0,0,0,0.75);
+    -moz-box-shadow: 10px 4px 69px -25px rgba(0,0,0,0.75);
+    box-shadow: 10px 4px 69px -25px rgba(0,0,0,0.75);
 }
 .otherplants-wrapp{
     flex-direction: row;

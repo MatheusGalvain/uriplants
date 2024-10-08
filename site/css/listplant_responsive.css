@@ -117,7 +117,9 @@
     .navigatorList{flex-direction: column;
         flex-wrap: wrap;
         width: 70%;
-        gap: 20px;}
+        gap: 20px;
+        padding: 20px;
+    }
     .navigatordiv {flex-wrap: wrap; height: auto; flex-wrap: wrap;}
     .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
     footer {flex-direction: column;}
@@ -148,6 +150,7 @@
     .navigatorList{flex-direction: column;
         flex-wrap: wrap;
         width: 70%;
+        padding: 20px;
         gap: 20px;}
     .navigatordiv {flex-wrap: wrap; height: auto; flex-wrap: wrap;}
     footer {flex-direction: column;}
@@ -180,6 +183,7 @@
     .navigatorList{flex-direction: column;
         flex-wrap: wrap;
         width: 70%;
+        padding: 20px;
         gap: 20px;}
     .navigatordiv {flex-wrap: wrap; height: auto; flex-wrap: wrap;}
     footer {flex-direction: column;}

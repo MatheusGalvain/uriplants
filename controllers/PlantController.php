@@ -224,20 +224,21 @@ class PlantController {
             return $error;
         }
     }
-    public function getPlantImages($plantId) {
+    public function getPlantImages($plantId, $propertyId) {
         $conn = getConnection();
         
-        $sql = "SELECT images.imagem AS image_blob
+        $sql = "SELECT images.imagem AS image_blob, images.source AS image_source, properties.name AS property_name
                 FROM images
                 JOIN plantsproperties ON images.plants_property_id = plantsproperties.id
-                WHERE plantsproperties.plant_id = ?";
+                JOIN properties ON plantsproperties.property_id = properties.id
+                WHERE plantsproperties.plant_id = ? AND plantsproperties.property_id = ?";
         
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
         }
     
-        $stmt->bind_param("i", $plantId);
+        $stmt->bind_param("ii", $plantId, $propertyId);
     
         if ($stmt->execute()) {
             $result = $stmt->get_result();
@@ -259,5 +260,7 @@ class PlantController {
             return $error;
         }
     }
+    
+    
 }
 ?>
