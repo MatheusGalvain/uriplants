@@ -11,6 +11,28 @@ function display_value($value) {
     return isset($value) ? htmlspecialchars($value) : 'N/A';
 }
 
+// Definir o número de registros por página
+$limit = 20;
+
+// Obter a página atual a partir dos parâmetros GET, padrão é 1
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+
+// Calcular o OFFSET para a consulta SQL
+$offset = ($page - 1) * $limit;
+
+// Consulta para obter o total de logs
+$count_query = "
+    SELECT COUNT(*) AS total
+    FROM auditlogs AS al
+    WHERE al.deleted_at IS NULL
+";
+$count_result = mysqli_query($con, $count_query);
+$total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
+
+// Calcular o número total de páginas
+$total_pages = ceil($total_logs / $limit);
+
+// Modificar a consulta principal para ordenar do mais novo para o mais velho e adicionar LIMIT e OFFSET
 $query = "
     SELECT 
         al.id, 
@@ -30,7 +52,8 @@ $query = "
     INNER JOIN users AS u ON al.changed_by = u.id
     LEFT JOIN plants AS p ON al.plant_id = p.id
     WHERE al.deleted_at IS NULL
-    ORDER BY id
+    ORDER BY al.change_time DESC
+    LIMIT $limit OFFSET $offset
 ";
 
 $result = mysqli_query($con, $query);
@@ -43,6 +66,34 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Gerenciamento de Logs</title>
+    <!-- Adicionar estilos para a paginação -->
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a, .pagination span {
+            margin: 0 5px;
+            padding: 8px 12px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            color: #007bff;
+        }
+        .pagination a:hover {
+            background-color: #f1f1f1;
+        }
+        .pagination .active {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+        }
+        .pagination .disabled {
+            color: #ccc;
+            pointer-events: none;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body class="sb-nav-fixed">
     <?php include_once('includes/navbar.php'); ?>
@@ -53,7 +104,13 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4 mb-4 h1">Histórico de Logs</h1>
+                    <!-- Adicionar o Botão "Baixar Relatório" -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h1 class="mt-4 mb-4 h1">Histórico de Logs</h1>
+                        <a href="download_logs.php" class="btn btn-success">
+                            <i class="fas fa-download"></i> Baixar Relatório
+                        </a>
+                    </div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <table id="logsTable" class="table table-bordered">
@@ -106,6 +163,40 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <?php endif; ?>
                                 </tbody>
                             </table>
+                            
+                            <!-- Paginação -->
+                            <?php if ($total_pages > 1): ?>
+                                <div class="pagination">
+                                    <!-- Link para a página anterior -->
+                                    <?php if ($page > 1): ?>
+                                        <a href="?page=<?php echo $page - 1; ?>">&laquo; Anterior</a>
+                                    <?php else: ?>
+                                        <span class="disabled">&laquo; Anterior</span>
+                                    <?php endif; ?>
+
+                                    <!-- Links para páginas individuais -->
+                                    <?php
+                                    // Definir o intervalo de páginas a serem exibidas
+                                    $range = 2;
+                                    for ($i = max(1, $page - $range); $i <= min($page + $range, $total_pages); $i++):
+                                        if ($i == $page):
+                                    ?>
+                                            <span class="active"><?php echo $i; ?></span>
+                                        <?php else: ?>
+                                            <a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
+
+                                    <!-- Link para a próxima página -->
+                                    <?php if ($page < $total_pages): ?>
+                                        <a href="?page=<?php echo $page + 1; ?>">Próxima &raquo;</a>
+                                    <?php else: ?>
+                                        <span class="disabled">Próxima &raquo;</span>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                            <!-- Fim da Paginação -->
+
                         </div>
                     </div>
                 </div>
