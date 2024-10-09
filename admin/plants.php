@@ -887,6 +887,8 @@ $qrcode_base_url = get_qrcode_url($con);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            var addPlantFormElement = document.getElementById('addPlantForm');
+            var submitButton = addPlantFormElement.querySelector('button[type="submit"]');
                 // Variável PHP passada para JavaScript
                 var qrcodeBaseUrl = "<?php echo htmlspecialchars($qrcode_base_url); ?>";
 
@@ -960,6 +962,16 @@ $qrcode_base_url = get_qrcode_url($con);
             var propertiesArray = [];
             var propertyCounter = 0; // Contador para IDs únicos
 
+            function updateSubmitButtonState() {
+                if (propertiesArray.length === 0) {
+                    submitButton.disabled = true;
+                } else {
+                    submitButton.disabled = false;
+                }
+            }
+
+            updateSubmitButtonState();
+
             addPropertyButton.addEventListener('click', function() {
                 propertyForm.reset();
                 addPropertyModal.show();
@@ -1003,6 +1015,7 @@ $qrcode_base_url = get_qrcode_url($con);
                 } else {
                     alert('Por favor, preencha todos os campos.');
                 }
+                updateSubmitButtonState();
             });
 
             // Atualiza a visualização das propriedades
@@ -1042,6 +1055,7 @@ $qrcode_base_url = get_qrcode_url($con);
                     div.appendChild(img);
                     propertiesList.appendChild(div);
                 });
+                updateSubmitButtonState();
             }
 
             // Inicializa o Sortable.js para permitir reordenação via drag-and-drop
@@ -1065,7 +1079,7 @@ $qrcode_base_url = get_qrcode_url($con);
             });
 
             // Manipulação do Formulário de Adição/Atualização de Planta para incluir propriedades
-            var addPlantFormElement = document.getElementById('addPlantForm');
+            
             addPlantFormElement.addEventListener('submit', function(e) {
                 // Adiciona as propriedades ao campo oculto como JSON
                 var propertiesInput = document.createElement('input');
