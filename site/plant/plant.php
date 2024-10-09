@@ -30,6 +30,13 @@ $errorMessage = "";
 $familyName = "";
 $commonName = "";
 $orderName = "";
+$barkDescription = "";
+$trunkDescription = "";
+$leafDescription = "";
+$flowerDescription = "";
+$fruitDescription = "";
+$seedDescription = "";
+$biologyName = "";
 $divisionName = "";
 $className = "";
 $genusName = "";
@@ -61,8 +68,14 @@ if (isset($_GET['id'])) {
             $commonName= sanitize_input($plant['common_names']);
             $ecologyName = sanitize_input($plant['ecology']);
             $applicationsName = sanitize_input($plant['applications']);
+            $barkDescription = sanitize_input($plant['bark_description']);
+            $trunkDescription = sanitize_input($plant['trunk_description']);
+            $leafDescription = sanitize_input($plant['leaf_description']);
+            $flowerDescription = sanitize_input($plant['flower_description']);
+            $fruitDescription = sanitize_input($plant['fruit_description']);
+            $seedDescription = sanitize_input($plant['seed_description']);
+            $biologyName = sanitize_input($plant['biology']);
             $propertyName = sanitize_input($plant['property_name']);
-
             $otherPlants = $plantController->getOtherPlants($id);
         } else {
             $errorMessage = isset($plant['message']) ? $plant['message'] : "Erro desconhecido.";
@@ -81,7 +94,7 @@ if (isset($_GET['id'])) {
 <!DOCTYPE html>
 <html lang="pt-BR">
 
-<head>
+<script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo !empty($plantName) ? $plantName : "Detalhes da Planta"; ?> - URI Plantas</title>
@@ -92,12 +105,14 @@ if (isset($_GET['id'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/lightbox.css">
     <link rel="stylesheet" href="../css/footer.css">
     <link rel="stylesheet" href="../css/listplant.css">
     <link rel="stylesheet" href="../css/listplant_responsive.css">
-    <!-- TODO: MUDAR LINK FONTAWESOME -->
-    <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
+    <script src="../js/lightbox.js"></script>
 </head>
 
 <header id="header" class="header">
@@ -201,9 +216,10 @@ if (isset($_GET['id'])) {
                     </div>
                     <div class="otherphotos-wrapp">
                         <?php
-                        $plantImages = $plantController->getPlantImages($id);
-                        $maxPhotos = 4;
-                        $count = 0;
+                            $propertyId = 1;
+                            $plantImages = $plantController->getPlantImages($id, $propertyId);
+                            $maxPhotos = 4;
+                            $count = 0;
                         ?>
                         <?php if (!empty($plantImages)): ?>
                             <?php foreach ($plantImages as $image): ?>
@@ -238,16 +254,26 @@ if (isset($_GET['id'])) {
         <!-- Sessão de informações da planta que está em Ecologia -->
         <section id="main-section" class="ecology">
             <div class="box">
+                <?php if (!empty($applicationsName)): ?>
                 <article class="informationsart">
                     <h1>Produtos e Usos</h1>
                     <h2><?php echo $applicationsName; ?></h2>
                 </article>
+                <?php endif; ?>
             </div>
         </section>
 
         <!-- Sessão de informações da planta que está em Taxonomia -->
         <section id="main-section" class="taxonomy">
             <div class="box">
+                <?php if (!empty($plantName)): ?>
+                <article class="informationsart">
+                    <h1>Nome</h1>
+                    <h2><?php echo $plantName; ?></h2>
+                </article>
+                <?php endif; ?>
+
+                <?php if (!empty($divisionName)): ?>
                 <article class="informationsart">
                     <h1>Nome</h1>
                     <h2><?php echo $plantName; ?></h2>
@@ -256,33 +282,243 @@ if (isset($_GET['id'])) {
                     <h1>Divisão</h1>
                     <h2><?php echo $divisionName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($className)): ?>
                 <article class="informationsart">
                     <h1>Classe</h1>
                     <h2><?php echo $className; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($orderName)): ?>
                 <article class="informationsart">
                     <h1>Ordem</h1>
                     <h2><?php echo $orderName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($familyName)): ?>
                 <article class="informationsart">
                     <h1>Família</h1>
                     <h2><?php echo $familyName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($genusName)): ?>
                 <article class="informationsart">
                     <h1>Gênero</h1>
                     <h2><?php echo $genusName; ?></h2>
                 </article>
+                <?php endif; ?>
+
+                <?php if (!empty($speciesName)): ?>
                 <article class="informationsart">
                     <h1>Espécie</h1>
                     <h2><?php echo $speciesName; ?></h2>
                 </article>
+                <?php endif; ?>
             </div>
         </section>
-
 
         <!-- Sessão de informações da planta que está em Descrição-->
         <section id="main-section" class="description">
             <div class="box">
+            <?php if (!empty($plantName)): ?>
+            <article class="informationsart">
+                <h1>Nome</h1>
+                <h2><?php echo $plantName; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($commonName)): ?>
+            <article class="informationsart">
+                <h1>Nome's Poulares</h1>
+                <h2><?php echo $commonName; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($plantDescription)): ?>
+            <article class="informationsart">
+                <h1>Descrição</h1>
+                <h2><?php echo $plantDescription; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($biologyName)): ?>
+            <article class="informationsart">
+                <h1>Forma Biológica</h1>
+                <h2><?php echo $biologyName; ?></h2>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($trunkDescription)): ?>
+            <article class="informationsart">
+                <h1>Tronco</h1>
+                <h2><?php echo $trunkDescription; ?></h2>
+                <div class="photos-wrapp"> 
+                    <?php
+                        $propertyId = 2;
+                        $plantImages = $plantController->getPlantImages($id, $propertyId);
+                    ?>
+                    <?php if (!empty($plantImages)): ?>
+                        <?php foreach ($plantImages as $image): ?>
+                            <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
+                                <a 
+                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    class="photoproperty-wrapp" 
+                                    href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
+                                    data-lightbox="<?php echo sanitize_input($plantName); ?>">
+                                    <img class="photopropertyImg" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" alt="<?php echo sanitize_input($plantName); ?>">
+                                </a>
+                                <?php $count++; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    </div>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($barkDescription)): ?>
+            <article class="informationsart">
+                <h1>Casca</h1>
+                <h2><?php echo $barkDescription; ?></h2>
+                <div class="photos-wrapp"> 
+                    <?php
+                        $propertyId = 3;
+                        $plantImages = $plantController->getPlantImages($id, $propertyId);
+                    ?>
+                    <?php if (!empty($plantImages)): ?>
+                        <?php foreach ($plantImages as $image): ?>
+                            <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
+                                <a 
+                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    class="photoproperty-wrapp" 
+                                    href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
+                                    data-lightbox="<?php echo sanitize_input($plantName); ?>">
+                                    <img class="photopropertyImg" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" alt="<?php echo sanitize_input($plantName); ?>">
+                                </a>
+                                <?php $count++; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($leafDescription)): ?>
+            <article class="informationsart">
+                <h1>Folhas</h1>
+                <h2><?php echo $leafDescription; ?></h2>
+                <div class="photos-wrapp"> 
+                    <?php
+                        $propertyId = 4;
+                        $plantImages = $plantController->getPlantImages($id, $propertyId);
+                    ?>
+                    <?php if (!empty($plantImages)): ?>
+                        <?php foreach ($plantImages as $image): ?>
+                            <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
+                                <a 
+                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    class="photoproperty-wrapp" 
+                                    href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
+                                    data-lightbox="<?php echo sanitize_input($plantName); ?>">
+                                    <img class="photopropertyImg" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" alt="<?php echo sanitize_input($plantName); ?>">
+                                </a>
+                                <?php $count++; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($flowerDescription)): ?>
+            <article class="informationsart">
+                <h1>Flores</h1>
+                <h2><?php echo $flowerDescription; ?></h2>
+                <div class="photos-wrapp"> 
+                    <?php
+                        $propertyId = 5;
+                        $plantImages = $plantController->getPlantImages($id, $propertyId);
+                    ?>
+                    <?php if (!empty($plantImages)): ?>
+                        <?php foreach ($plantImages as $image): ?>
+                            <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
+                                <a 
+                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    class="photoproperty-wrapp" 
+                                    href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
+                                    data-lightbox="<?php echo sanitize_input($plantName); ?>">
+                                    <img class="photopropertyImg" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" alt="<?php echo sanitize_input($plantName); ?>">
+                                </a>
+                                <?php $count++; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($fruitDescription)): ?>
+            <article class="informationsart">
+                <h1>Frutos</h1>
+                <h2><?php echo $fruitDescription; ?></h2>
+                <div class="photos-wrapp"> 
+                    <?php
+                        $propertyId = 6;
+                        $plantImages = $plantController->getPlantImages($id, $propertyId);
+                    ?>
+                    <?php if (!empty($plantImages)): ?>
+                        <?php foreach ($plantImages as $image): ?>
+                            <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
+                                <a 
+                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    class="photoproperty-wrapp" 
+                                    href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
+                                    data-lightbox="<?php echo sanitize_input($plantName); ?>">
+                                    <img class="photopropertyImg" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" alt="<?php echo sanitize_input($plantName); ?>">
+                                </a>
+                                <?php $count++; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </article>
+            <?php endif; ?>
+
+            <?php if (!empty($seedDescription)): ?>
+            <article class="informationsart">
+                <h1>Sementes</h1>
+                <h2><?php echo $seedDescription; ?></h2>
+                <div class="photos-wrapp"> 
+                    <?php
+                        $propertyId = 7;
+                        $plantImages = $plantController->getPlantImages($id, $propertyId);
+                    ?>
+                    <?php if (!empty($plantImages)): ?>
+                        <?php foreach ($plantImages as $image): ?>
+                            <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
+                                <a 
+                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    class="photoproperty-wrapp" 
+                                    href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
+                                    data-lightbox="<?php echo sanitize_input($plantName); ?>">
+                                    <img class="photopropertyImg" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" alt="<?php echo sanitize_input($plantName); ?>">
+                                </a>
+                                <?php $count++; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </article>
+            <?php endif; ?>
                 <article class="informationsart">
                     <h1>Nome</h1>
                     <h2><?php echo $plantName; ?></h2>
@@ -420,6 +656,19 @@ if (isset($_GET['id'])) {
     </footer>
 
     <script>
+        lightbox.option({
+            'resizeDuration': 500,
+            'wrapAround': true,
+            'alwaysShowNavOnTouchDevices': true,
+            'wrapAround': false
+        });
+        document.addEventListener('keydown', function(event) {
+        if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            const lightbox = document.querySelector('.lightbox');
+            if (lightbox) {}
+            }
+        });
         function changeMainImage(imageSrc) {
             document.getElementById('mainImage').src = imageSrc;
         }
