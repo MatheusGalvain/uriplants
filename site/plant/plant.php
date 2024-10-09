@@ -75,7 +75,7 @@ if (isset($_GET['id'])) {
             $fruitDescription = sanitize_input($plant['fruit_description']);
             $seedDescription = sanitize_input($plant['seed_description']);
             $biologyName = sanitize_input($plant['biology']);
-            $propertyName = sanitize_input($plant['property_name']);
+
             $otherPlants = $plantController->getOtherPlants($id);
         } else {
             $errorMessage = isset($plant['message']) ? $plant['message'] : "Erro desconhecido.";
@@ -274,10 +274,6 @@ if (isset($_GET['id'])) {
                 <?php endif; ?>
 
                 <?php if (!empty($divisionName)): ?>
-                <article class="informationsart">
-                    <h1>Nome</h1>
-                    <h2><?php echo $plantName; ?></h2>
-                </article>
                 <article class="informationsart">
                     <h1>Divisão</h1>
                     <h2><?php echo $divisionName; ?></h2>
@@ -519,53 +515,6 @@ if (isset($_GET['id'])) {
                 </div>
             </article>
             <?php endif; ?>
-                <article class="informationsart">
-                    <h1>Nome</h1>
-                    <h2><?php echo $plantName; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Nome's Poulares</h1>
-                    <h2><?php echo $commonName; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Descrição</h1>
-                    <h2><?php echo $plantDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Forma Biológica</h1>
-                    <h2>A fazer</h2>
-                    <div class="containerimgs-wrapp">
-                        <div class="otherphotodiv"
-                        onclick="changeMainImage('data:image/jpeg;base64,<?php echo $image['image_blob']; ?>')">
-                        <img class="otherphoto" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
-                        alt="<?php echo sanitize_input($plantName); ?>">
-                        </div>
-                    </div>
-                </article>
-                <article class="informationsart">
-                    <h1>Tronco</h1>
-                    <h2><?php echo $plantPropertyDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Casca</h1>
-                    <h2><?php echo $barkDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Folhas</h1>
-                    <h2><?php echo $leavesDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Flores</h1>
-                    <h2><?php echo $flowersDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Frutos</h1>
-                    <h2><?php echo $fruitsDescription; ?></h2>
-                </article>
-                <article class="informationsart">
-                    <h1>Sementes</h1>
-                    <h2><?php echo $seedsDescription; ?></h2>
-                </article>
             </div>
         </section>
 
