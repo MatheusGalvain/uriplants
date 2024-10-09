@@ -21,7 +21,7 @@ function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $ne
 }
 
 function get_plant_name($con, $plant_id) {
-    $sql = "SELECT name FROM plants WHERE id = ?";
+    $sql = "SELECT name FROM plants WHERE id = ? AND deleted_at IS NULL";
     $stmt = mysqli_prepare($con, $sql);
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, 'i', $plant_id);
@@ -74,15 +74,19 @@ function fetch_all_plants_properties_images($con, $search = '') {
 
     $sql = "
         SELECT pp.id, pp.plant_id, pp.property_id, pp.created_at,
-               p.name as plant_name, pr.name as property_name,
-               i.id as image_id, i.imagem, i.source as image_source, i.sort_order as sort_order
+            p.name as plant_name, pr.name as property_name,
+            i.id as image_id, i.imagem, i.source as image_source, i.sort_order as sort_order
         FROM PlantsProperties pp
         LEFT JOIN plants p ON pp.plant_id = p.id
         LEFT JOIN properties pr ON pp.property_id = pr.id
         LEFT JOIN images i ON pp.id = i.plants_property_id
-        WHERE pp.deleted_at IS NULL $searchQuery
+        WHERE pp.deleted_at IS NULL 
+        AND p.deleted_at IS NULL 
+        $searchQuery
         ORDER BY p.name ASC, pr.name ASC, pp.created_at DESC
     ";
+
+
 
     $stmt = mysqli_prepare($con, $sql);
     if (!$stmt) {
@@ -385,12 +389,13 @@ try {
                                     <select class="form-select" id="plant_id" name="plant_id" required>
                                         <option value="">Selecione uma planta</option>
                                         <?php
-                                        $plants = mysqli_query($con, "SELECT id, name FROM plants ORDER BY name ASC");
+                                        $plants = mysqli_query($con, "SELECT id, name FROM plants WHERE deleted_at IS NULL ORDER BY name ASC");
                                         while ($plant = mysqli_fetch_assoc($plants)) {
                                             echo "<option value=\"" . htmlspecialchars($plant['id']) . "\">" . htmlspecialchars($plant['name']) . "</option>";
                                         }
                                         ?>
                                     </select>
+
                                 </div>
                                 <div class="mb-3">
                                     <label for="property_id" class="form-label">Propriedade</label>

@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include_once('includes/config.php');
@@ -6,6 +7,10 @@ require_once('includes/audit.php');
 if (strlen($_SESSION['id']) == 0) {
     header('location:logout.php');
     exit();
+}
+
+function display_value($value) {
+    return isset($value) ? htmlspecialchars($value) : 'N/A';
 }
 
 if (isset($_POST['add_region'])) {
@@ -157,43 +162,79 @@ if (isset($_POST['edit_region'])) {
     }
 }
 
+// Manipulação de Exclusão de Região (Soft Delete)
 if (isset($_POST['delete_region'])) {
     $id = intval($_POST['id']);
 
-    $old_query = mysqli_query($con, "SELECT name, source, description FROM RegionMap WHERE id = $id");
-    $old_row = mysqli_fetch_assoc($old_query);
-    $old_name = $old_row['name'];
-    $old_source = $old_row['source'];
-    $old_description = $old_row['description'];
-
-    $sql = "DELETE FROM RegionMap WHERE id = ?";
-    $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, 'i', $id);
-
-    if (mysqli_stmt_execute($stmt)) {
-        $success = "Região excluída com sucesso.";
-
-        $table = 'RegionMap';
-        $action_id = 2; 
-        $changed_by = $_SESSION['id'];
-        $old_value = "Nome: $old_name, Fonte: $old_source, Descrição: $old_description, Imagem deletada";
-        $new_value = null;
-        $plant_id = null;
-
-        log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
+    // Buscar dados antigos para log de auditoria
+    $old_query = mysqli_query($con, "SELECT name, source, description FROM RegionMap WHERE id = $id AND deleted_at IS NULL");
+    if (mysqli_num_rows($old_query) == 0) {
+        $error = "Região não encontrada.";
     } else {
-        $error = "Erro ao excluir região: " . mysqli_error($con);
+        $old_row = mysqli_fetch_assoc($old_query);
+        $old_name = $old_row['name'];
+        $old_source = $old_row['source'];
+        $old_description = $old_row['description'];
+
+        // Atualizar a coluna deleted_at em vez de deletar fisicamente
+        $sql = "UPDATE RegionMap SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL";
+        $stmt = mysqli_prepare($con, $sql);
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, 'i', $id);
+
+            if (mysqli_stmt_execute($stmt)) {
+                $success = "Região marcada como excluída com sucesso.";
+
+                // Registrar no log de auditoria
+                $table = 'RegionMap';
+                $action_id = 2; // Supondo que 2 representa "Excluir"
+                $changed_by = $_SESSION['id'];
+                $old_value = "Nome: $old_name, Fonte: $old_source, Descrição: $old_description, Imagem deletada";
+                $new_value = null;
+                $plant_id = null;
+
+                log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
+            } else {
+                $error = "Erro ao excluir região: " . mysqli_stmt_error($stmt);
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            $error = "Erro na preparação da consulta: " . mysqli_error($con);
+        }
     }
-    mysqli_stmt_close($stmt);
 }
 
 
+// Manipulação de Pesquisa
 $search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
 
+// Construção dinâmica da consulta com prepared statements
+$query = "SELECT * FROM RegionMap WHERE deleted_at IS NULL";
+$params = [];
+$types = "";
 
-$searchQuery = $search ? "AND source LIKE '%$search%'" : "";
-$regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQuery");
+// Adicionar condição de busca se $search não estiver vazio
+if (!empty($search)) {
+    $query .= " AND source LIKE ?";
+    $params[] = '%' . $search . '%';
+    $types .= "s";
+}
+
+$stmt = mysqli_prepare($con, $query);
+
+if ($stmt) {
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+    
+    mysqli_stmt_execute($stmt);
+    $regionsQuery = mysqli_stmt_get_result($stmt);
+} else {
+    // Tratamento de erro
+    error_log("Erro na preparação da consulta: " . mysqli_error($con));
+    die("Erro ao buscar regiões. Por favor, tente novamente mais tarde.");
+}
 ?>
 
 <!DOCTYPE html>
@@ -212,6 +253,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
                 <div class="container-fluid px-4">
                     <h1 class="mt-4 mb-4">Gerenciar Regiões</h1>
 
+                    <!-- Exibição de Mensagens de Sucesso ou Erro -->
                     <?php if (isset($success)) { ?>
                         <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
                     <?php } ?>
@@ -220,6 +262,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
                         <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                     <?php } ?>
 
+                    <!-- Formulário de Adição de Nova Região -->
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Adicionar uma Nova Região</h5>
@@ -245,6 +288,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
                         </div>
                     </div>
                     
+                    <!-- Listagem de Regiões Cadastradas -->
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -258,6 +302,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
                                 </form>
                             </div>
 
+                            <!-- Tabela de Regiões -->
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -283,6 +328,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
                                                 </td>
                                                 <td><?php echo htmlspecialchars($row['source']); ?></td>
                                                 <td>
+                                                    <!-- Botão para Abrir Modal de Edição -->
                                                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editRegionModal"
                                                         data-id="<?php echo htmlspecialchars($row['id']); ?>"
                                                         data-name="<?php echo htmlspecialchars($row['name']); ?>"
@@ -291,6 +337,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
                                                         Editar
                                                     </button>
 
+                                                    <!-- Botão para Abrir Modal de Exclusão -->
                                                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
                                                         data-id="<?php echo htmlspecialchars($row['id']); ?>">
                                                         Excluir
@@ -313,6 +360,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
         </div>
     </div>
 
+    <!-- Modal de Confirmação de Exclusão -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -334,6 +382,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
         </div>
     </div>
 
+    <!-- Modal de Edição de Região -->
     <div class="modal fade" id="editRegionModal" tabindex="-1" aria-labelledby="editRegionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -370,8 +419,9 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
         </div>
     </div>
 
+    <!-- Scripts JavaScript para Manipulação de Modais -->
     <script>
-
+        // Manipulação do Modal de Exclusão
         document.addEventListener('DOMContentLoaded', function() {
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
             var deleteIdInput = document.getElementById('deleteId');
@@ -384,6 +434,7 @@ $regionsQuery = mysqli_query($con, "SELECT * FROM RegionMap WHERE 1=1 $searchQue
             });
         });
 
+        // Manipulação do Modal de Edição
         document.addEventListener('DOMContentLoaded', function() {
             var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editRegionModal"]');
             var editRegionIdInput = document.getElementById('editRegionId');

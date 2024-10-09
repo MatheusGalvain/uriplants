@@ -126,7 +126,7 @@ if (isset($_POST['add_plant'])) {
                 throw new Exception("Erro na preparação da inserção: " . $con->error);
             }
             $stmt->bind_param(
-                "ssiiiiissssssssss",
+                "ssiiiiiissssssssss",
                 $name,
                 $common_names,
                 $division_id,
