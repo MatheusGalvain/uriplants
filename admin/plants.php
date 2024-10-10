@@ -66,75 +66,86 @@ if (isset($_POST['add_plant'])) {
     $species = filter_input_data_custom($con, $_POST['species']);
     $applications = filter_input_data_custom($con, $_POST['applications']);
     $ecology = filter_input_data_custom($con, $_POST['ecology']);
+    $biology = filter_input_data_custom($con, $_POST['biology']);
 
-    // Propriedades e Imagens enviadas via JavaScript (JSON)
-    $properties = isset($_POST['properties']) ? json_decode($_POST['properties'], true) : [];
+    // Novos campos de descrição
+$bark_description = filter_input_data_custom($con, $_POST['casca_description'] ?? '');
+$trunk_description = filter_input_data_custom($con, $_POST['tronco_description'] ?? '');
+$leaf_description = filter_input_data_custom($con, $_POST['folha_description'] ?? '');
+$flower_description = filter_input_data_custom($con, $_POST['flor_description'] ?? '');
+$fruit_description = filter_input_data_custom($con, $_POST['fruta_description'] ?? '');
+$seed_description = filter_input_data_custom($con, $_POST['semente_description'] ?? '');
 
-    if (!empty($properties)) {
-        mysqli_begin_transaction($con);
-        try {
-            // Verifica se a planta já existe
-            $stmt = $con->prepare("SELECT id FROM Plants WHERE name = ?");
+
+    // Coleta de dados das propriedades
+    $properties_data = isset($_POST['properties_data']) ? json_decode($_POST['properties_data'], true) : [];
+
+    mysqli_begin_transaction($con);
+    try {
+        // Verifica se a planta já existe
+        $stmt = $con->prepare("SELECT id FROM Plants WHERE name = ?");
+        if (!$stmt) {
+            throw new Exception("Erro na preparação da consulta: " . $con->error);
+        }
+        $stmt->bind_param("s", $name);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            throw new Exception("Uma planta com esse nome já existe.");
+        }
+        $stmt->close();
+
+        // Inserir nova planta
+        $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, biology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        if (!$stmt) {
+            throw new Exception("Erro na preparação da inserção: " . $con->error);
+        }
+        $stmt->bind_param("ssiiiiisssssssssss", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description);
+        if (!$stmt->execute()) {
+            throw new Exception("Erro ao adicionar planta: " . $stmt->error);
+        }
+        $plant_id = mysqli_insert_id($con);
+        $stmt->close();
+
+        // Auditoria para inserção de planta
+        $table = 'Plants';
+        $action_id = 1; // Adição
+        $changed_by = $_SESSION['id'];
+        $old_value = null;
+        $new_value = "Planta: $name, Espécie: $species";
+        log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
+        // Processar propriedades e imagens
+        foreach ($properties_data as $property_id => $images) {
+            $property_id = intval($property_id);
+
+            // Inserir na tabela PlantsProperties
+            $stmt = $con->prepare("INSERT INTO PlantsProperties (plant_id, property_id) VALUES (?, ?)");
             if (!$stmt) {
-                throw new Exception("Erro na preparação da consulta: " . $con->error);
+                throw new Exception("Erro na preparação da consulta PlantsProperties: " . $con->error);
             }
-            $stmt->bind_param("s", $name);
-            $stmt->execute();
-            $stmt->store_result();
-            if ($stmt->num_rows > 0) {
-                throw new Exception("Uma planta com esse nome já existe.");
-            }
-            $stmt->close();
-
-            // Inserir nova planta
-            $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            if (!$stmt) {
-                throw new Exception("Erro na preparação da inserção: " . $con->error);
-            }
-            $stmt->bind_param("ssiiiiissss", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology);
+            $stmt->bind_param("ii", $plant_id, $property_id);
             if (!$stmt->execute()) {
-                throw new Exception("Erro ao adicionar planta: " . $stmt->error);
+                throw new Exception("Erro ao adicionar propriedade da planta: " . $stmt->error);
             }
-            $plant_id = mysqli_insert_id($con);
+            $plants_property_id = mysqli_insert_id($con);
             $stmt->close();
 
-            // Auditoria para inserção de planta
-            $table = 'Plants';
-            $action_id = 1; // Adição
-            $changed_by = $_SESSION['id'];
-            $old_value = null;
-            $new_value = "Planta: $name, Espécie: $species";
-            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+            // Auditoria para inserção de propriedade
+            $plant_name = get_plant_name($con, $plant_id);
+            $property_name = get_property_name($con, $property_id);
+            $new_value = "Planta: $plant_name, Propriedade: $property_name";
+            log_audit_action($con, 'PlantsProperties', 1, $changed_by, null, $new_value, $plant_id);
 
-            // Inserção das Propriedades e Imagens
-            foreach ($properties as $property) {
-                $property_id = intval($property['property_id']);
-                $source = filter_input_data_custom($con, $property['source']);
-                $image = isset($property['image']) ? $property['image'] : null; // Base64 string
+            // Inserir imagens para esta propriedade
+            if (!empty($images)) {
+                foreach ($images as $imageData) {
+                    $source = filter_input_data_custom($con, $imageData['source']);
+                    $image = $imageData['image']; // Base64 string
 
-                // Inserir na tabela PlantsProperties
-                $stmt = $con->prepare("INSERT INTO PlantsProperties (plant_id, property_id) VALUES (?, ?)");
-                if (!$stmt) {
-                    throw new Exception("Erro na preparação da consulta PlantsProperties: " . $con->error);
-                }
-                $stmt->bind_param("ii", $plant_id, $property_id);
-                if (!$stmt->execute()) {
-                    throw new Exception("Erro ao adicionar propriedade da planta: " . $stmt->error);
-                }
-                $plants_property_id = mysqli_insert_id($con);
-                $stmt->close();
-
-                // Auditoria para inserção de propriedade
-                $plant_name = get_plant_name($con, $plant_id);
-                $property_name = get_property_name($con, $property_id);
-                $new_value = "Planta: $plant_name, Propriedade: $property_name";
-                log_audit_action($con, 'PlantsProperties', 1, $changed_by, null, $new_value, $plant_id);
-
-                // Inserir imagem, se existir
-                if ($image) {
                     // Decodifica a imagem Base64
                     $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
-                    
+
                     // Insere na tabela images
                     $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id) VALUES (?, ?, ?)");
                     if (!$stmt) {
@@ -152,15 +163,13 @@ if (isset($_POST['add_plant'])) {
                     log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $plant_id);
                 }
             }
-
-            mysqli_commit($con);
-            $success = "Planta e propriedades com imagens adicionadas com sucesso.";
-        } catch (Exception $e) {
-            mysqli_rollback($con);
-            $error = $e->getMessage();
         }
-    } else {
-        $error = "Por favor, adicione pelo menos uma propriedade à planta.";
+
+        mysqli_commit($con);
+        $success = "Planta e propriedades com imagens adicionadas com sucesso.";
+    } catch (Exception $e) {
+        mysqli_rollback($con);
+        $error = $e->getMessage();
     }
 }
 
@@ -228,32 +237,42 @@ if (isset($_POST['edit_plant'])) {
     $species = filter_input_data_custom($con, $_POST['species']);
     $applications = filter_input_data_custom($con, $_POST['applications']);
     $ecology = filter_input_data_custom($con, $_POST['ecology']);
+    $biology = filter_input_data_custom($con, $_POST['biology']);
 
-    // Propriedades adicionadas via JavaScript (JSON)
-    $new_properties = isset($_POST['properties']) ? json_decode($_POST['properties'], true) : [];
+
+$bark_description = filter_input_data_custom($con, $_POST['casca_description'] ?? '');
+$trunk_description = filter_input_data_custom($con, $_POST['tronco_description'] ?? '');
+$leaf_description = filter_input_data_custom($con, $_POST['folha_description'] ?? '');
+$flower_description = filter_input_data_custom($con, $_POST['flor_description'] ?? '');
+$fruit_description = filter_input_data_custom($con, $_POST['fruta_description'] ?? '');
+$seed_description = filter_input_data_custom($con, $_POST['semente_description'] ?? '');
+
+
+    // Coleta de dados das propriedades
+    $properties_data = isset($_POST['properties_data']) ? json_decode($_POST['properties_data'], true) : [];
 
     if ($edit_id > 0) {
         mysqli_begin_transaction($con);
         try {
             // Verifica se a planta existe e não está deletada
-            $stmt = $con->prepare("SELECT name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology FROM Plants WHERE id = ? AND deleted_at IS NULL");
+            $stmt = $con->prepare("SELECT name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, biology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description FROM Plants WHERE id = ? AND deleted_at IS NULL");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da consulta: " . $con->error);
             }
             $stmt->bind_param("i", $edit_id);
             $stmt->execute();
-            $stmt->bind_result($old_name, $old_common_names, $old_division_id, $old_class_id, $old_order_id, $old_family_id, $old_genus_id, $old_region_id, $old_species, $old_applications, $old_ecology);
-            if (!mysqli_stmt_fetch($stmt)) {
+            $stmt->bind_result($old_name, $old_common_names, $old_division_id, $old_class_id, $old_order_id, $old_family_id, $old_genus_id, $old_region_id, $old_species, $old_applications, $old_ecology, $old_biology, $old_bark_description, $old_trunk_description, $old_leaf_description, $old_flower_description, $old_fruit_description, $old_seed_description);
+            if (!$stmt->fetch()) {
                 throw new Exception("Planta não encontrada ou já foi excluída.");
             }
             $stmt->close();
 
             // Atualizar os dados da planta
-            $stmt = $con->prepare("UPDATE Plants SET name = ?, common_names = ?, division_id = ?, class_id = ?, `order_id` = ?, family_id = ?, genus_id = ?, region_id = ?, species = ?, applications = ?, ecology = ? WHERE id = ?");
+            $stmt = $con->prepare("UPDATE Plants SET name = ?, common_names = ?, division_id = ?, class_id = ?, `order_id` = ?, family_id = ?, genus_id = ?, region_id = ?, species = ?, applications = ?, ecology = ?, biology = ?, bark_description = ?, trunk_description = ?, leaf_description = ?, flower_description = ?, fruit_description = ?, seed_description = ? WHERE id = ?");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da atualização: " . $con->error);
             }
-            $stmt->bind_param("ssiiiiissssi", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $edit_id);
+            $stmt->bind_param("ssiiiiissssssssssi", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description, $edit_id);
             if (!$stmt->execute()) {
                 throw new Exception("Erro ao atualizar planta: " . $stmt->error);
             }
@@ -267,14 +286,28 @@ if (isset($_POST['edit_plant'])) {
             $new_value = "Planta: $name, Espécie: $species";
             log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $edit_id);
 
-            // Inserção das Novas Propriedades (não editar existentes)
-            if (!empty($new_properties)) {
-                foreach ($new_properties as $property) {
-                    $property_id = intval($property['property_id']);
-                    $source = filter_input_data_custom($con, $property['source']);
-                    $image = isset($property['image']) ? $property['image'] : null; // Base64 string
+            // Obter propriedades existentes
+            $stmt = $con->prepare("SELECT property_id, id FROM PlantsProperties WHERE plant_id = ?");
+            if (!$stmt) {
+                throw new Exception("Erro na preparação da consulta PlantsProperties: " . $con->error);
+            }
+            $stmt->bind_param("i", $edit_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $existing_properties = [];
+            while ($row = $result->fetch_assoc()) {
+                $existing_properties[$row['property_id']] = $row['id'];
+            }
+            $stmt->close();
 
-                    // Inserir na tabela PlantsProperties
+            // Processar propriedades
+            foreach ($properties_data as $property_id => $images) {
+                $property_id = intval($property_id);
+
+                if (isset($existing_properties[$property_id])) {
+                    $plants_property_id = $existing_properties[$property_id];
+                } else {
+                    // Inserir nova propriedade
                     $stmt = $con->prepare("INSERT INTO PlantsProperties (plant_id, property_id) VALUES (?, ?)");
                     if (!$stmt) {
                         throw new Exception("Erro na preparação da consulta PlantsProperties: " . $con->error);
@@ -291,12 +324,17 @@ if (isset($_POST['edit_plant'])) {
                     $property_name = get_property_name($con, $property_id);
                     $new_value = "Planta: $plant_name, Propriedade: $property_name";
                     log_audit_action($con, 'PlantsProperties', 1, $changed_by, null, $new_value, $edit_id);
+                }
 
-                    // Inserir imagem, se existir
-                    if ($image) {
+                // Inserir imagens para esta propriedade
+                if (!empty($images)) {
+                    foreach ($images as $imageData) {
+                        $source = filter_input_data_custom($con, $imageData['source']);
+                        $image = $imageData['image']; // Base64 string
+
                         // Decodifica a imagem Base64
                         $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
-                        
+
                         // Insere na tabela images
                         $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id) VALUES (?, ?, ?)");
                         if (!$stmt) {
@@ -389,6 +427,17 @@ $families = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Families W
 $genus = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Genus WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
 $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
 
+// Lista de propriedades
+$properties_list = [
+    ['id' => 1, 'name' => 'Planta'],
+    ['id' => 2, 'name' => 'Tronco'],
+    ['id' => 3, 'name' => 'Casca'],
+    ['id' => 4, 'name' => 'Folha'],
+    ['id' => 5, 'name' => 'Flor'],
+    ['id' => 6, 'name' => 'Fruta'],
+    ['id' => 7, 'name' => 'Semente']
+];
+
 // Verificar se está no modo de edição
 $edit_mode = false;
 $edit_plant = [];
@@ -459,56 +508,13 @@ if (isset($_GET['edit'])) {
             cursor: pointer;
         }
 
-        /* Estilos para propriedades */
-        #propertiesList {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px; /* Espaçamento entre as propriedades */
-            cursor: grab; /* Indicador visual de arrasto */
-        }
-
-        .property-item {
-            border: 1px solid #ccc;
-            padding: 15px;
-            position: relative;
-            flex: 1 1 calc(33.333% - 30px); /* Três itens por linha com espaçamento */
-            box-sizing: border-box;
-            max-width: 230px;
-            background-color: #f9f9f9; /* Opcional */
-        }
-
-        /* Responsividade */
-        @media (max-width: 992px) {
-            .property-item {
-                flex: 1 1 calc(50% - 30px); /* Dois itens por linha */
-            }
-        }
-
-        @media (max-width: 576px) {
-            .property-item {
-                flex: 1 1 100%; /* Um item por linha */
-            }
-        }
-
-        .remove-property {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 0, 0, 0.7);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-        }
-
         /* Estilos para paginação */
         .pagination {
             justify-content: center;
         }
 
-        .pagination a, .pagination span {
+        .pagination a,
+        .pagination span {
             margin: 0 2px;
         }
     </style>
@@ -544,18 +550,8 @@ if (isset($_GET['edit'])) {
                                 <?php if ($edit_mode) { ?>
                                     <input type="hidden" name="plant_id" value="<?php echo htmlspecialchars($edit_plant['id']); ?>">
                                 <?php } ?>
-                                <!-- Seção de Propriedades -->
-                                <div class="mb-3">
-                                    <button type="button" class="btn btn-primary btn-sm" id="addPropertyButton">Adicionar Propriedade</button>
-                                    <div id="propertiesList" class="mt-3">
-                                        <!-- Propriedades adicionadas aparecerão aqui -->
-                                        <?php
-                                        // Se estiver no modo de edição, pode listar as propriedades existentes se desejar,
-                                        // mas conforme a instrução do usuário, não é necessário mostrar nem editar as imagens já no banco.
-                                        // Apenas permitir adicionar novas propriedades.
-                                        ?>
-                                    </div>
-                                </div>
+
+                                <!-- Dados da Planta -->
                                 <div class="mb-3">
                                     <label for="name" class="form-label">*Nome Científico</label>
                                     <input type="text" class="form-control" id="name" name="name" required value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['name']) : ''; ?>">
@@ -656,6 +652,28 @@ if (isset($_GET['edit'])) {
                                     <label for="ecology" class="form-label">Ecologia</label>
                                     <textarea class="form-control" id="ecology" name="ecology"><?php echo $edit_mode ? htmlspecialchars($edit_plant['ecology']) : ''; ?></textarea>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="biology" class="form-label">Biologia</label>
+                                    <textarea class="form-control" id="biology" name="biology"><?php echo $edit_mode ? htmlspecialchars($edit_plant['biology']) : ''; ?></textarea>
+                                </div>
+
+                                <!-- Seção de Propriedades -->
+                                <?php foreach ($properties_list as $property_item): ?>
+                                    <div class="property-section mb-4" data-property-id="<?php echo $property_item['id']; ?>">
+                                        <h4><?php echo htmlspecialchars($property_item['name']); ?></h4>
+                                        <div class="mb-3">
+                                            <label for="description_<?php echo $property_item['id']; ?>" class="form-label">Descrição</label>
+                                            <?php
+                                            // Determina o nome do campo de descrição com base na propriedade
+                                            $description_field = strtolower($property_item['name']) . '_description';
+                                            ?>
+                                            <textarea class="form-control" id="<?php echo $description_field; ?>" name="<?php echo $description_field; ?>"><?php echo $edit_mode ? htmlspecialchars($edit_plant[$description_field]) : ''; ?></textarea>
+                                                     
+                                        </div>
+                                        <button type="button" class="btn btn-primary btn-sm add-image-button" data-property-id="<?php echo $property_item['id']; ?>">Adicionar Imagem</button>
+                                        <div class="images-list image-preview mt-3" id="images_list_<?php echo $property_item['id']; ?>"></div>
+                                    </div>
+                                <?php endforeach; ?>
 
                                 <?php if ($edit_mode) { ?>
                                     <button type="submit" name="edit_plant" class="btn btn-success">Atualizar Planta</button>
@@ -757,28 +775,16 @@ if (isset($_GET['edit'])) {
         </div>
     </div>
 
-    <!-- Modal para Adicionar Propriedade -->
+    <!-- Modal para Adicionar Imagem -->
     <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <form id="propertyForm">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Adicionar Propriedade</h5>
+                        <h5 class="modal-title">Adicionar Imagem</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="property_id" class="form-label">Propriedade</label>
-                            <select class="form-select" id="property_id" required>
-                                <option value="">Selecione uma propriedade</option>
-                                <?php
-                                $properties = mysqli_query($con, "SELECT id, name FROM properties ORDER BY name ASC");
-                                while ($property = mysqli_fetch_assoc($properties)) {
-                                    echo "<option value=\"" . htmlspecialchars($property['id']) . "\">" . htmlspecialchars($property['name']) . "</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
                         <div class="mb-3">
                             <label for="source" class="form-label">Fonte da Imagem</label>
                             <input type="text" class="form-control" id="source" required>
@@ -790,7 +796,7 @@ if (isset($_GET['edit'])) {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Adicionar Propriedade</button>
+                        <button type="submit" class="btn btn-primary">Adicionar Imagem</button>
                     </div>
                 </div>
             </form>
@@ -826,6 +832,11 @@ if (isset($_GET['edit'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Variáveis para armazenar dados
+            var propertiesData = {}; // Objeto para armazenar dados por propriedade
+            var propertyCounter = 0; // Contador para IDs únicos
+            var currentPropertyId = null; // ID da propriedade atual
+
             // Mostrar/Esconder Formulário de Adição de Planta
             var toggleFormButton = document.getElementById('toggleForm');
             var plantForm = document.getElementById('plant-form');
@@ -848,29 +859,29 @@ if (isset($_GET['edit'])) {
                 });
             }
 
-            // Gerenciar Adição de Propriedades
-            var addPropertyButton = document.getElementById('addPropertyButton');
-            var addPropertyModal = new bootstrap.Modal(document.getElementById('addPropertyModal'));
-            var propertyForm = document.getElementById('propertyForm');
-            var propertiesList = document.getElementById('propertiesList');
-
-            // Array para armazenar propriedades adicionadas
-            var propertiesArray = [];
-            var propertyCounter = 0; // Contador para IDs únicos
-
-            addPropertyButton.addEventListener('click', function() {
-                propertyForm.reset();
-                addPropertyModal.show();
+            // Event listener para botões 'Adicionar Imagem'
+            document.querySelectorAll('.add-image-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var propertyId = this.getAttribute('data-property-id');
+                    currentPropertyId = propertyId; // Armazena o ID da propriedade atual
+                    // Abre a modal
+                    propertyForm.reset();
+                    addPropertyModal.show();
+                });
             });
 
+            var addPropertyModal = new bootstrap.Modal(document.getElementById('addPropertyModal'));
+            var propertyForm = document.getElementById('propertyForm');
+            var addPlantFormElement = document.getElementById('addPlantForm');
+
+            // 'propertyForm' submit handler
             propertyForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                var property_id = document.getElementById('property_id').value;
                 var source = document.getElementById('source').value.trim();
                 var imageInput = document.getElementById('imageFile');
                 var file = imageInput.files[0];
 
-                if (property_id && source && file) {
+                if (currentPropertyId && source && file) {
                     // Verifica o tipo de arquivo
                     var allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
                     if (!allowedTypes.includes(file.type)) {
@@ -883,16 +894,20 @@ if (isset($_GET['edit'])) {
                     reader.onload = function(event) {
                         var imageUrl = event.target.result;
 
-                        // Adiciona a propriedade ao array com um ID único
-                        propertiesArray.push({
+                        // Inicializa o array para a propriedade atual se não existir
+                        if (!propertiesData[currentPropertyId]) {
+                            propertiesData[currentPropertyId] = [];
+                        }
+
+                        // Adiciona a imagem ao array da propriedade atual
+                        propertiesData[currentPropertyId].push({
                             id: propertyCounter++, // ID único
-                            property_id: property_id,
                             source: source,
                             image: imageUrl // Armazena a URL Base64
                         });
 
-                        // Atualiza a visualização das propriedades
-                        updatePropertiesList();
+                        // Atualiza a visualização das imagens
+                        updateImagesList(currentPropertyId);
 
                         // Fecha a modal
                         addPropertyModal.hide();
@@ -903,73 +918,57 @@ if (isset($_GET['edit'])) {
                 }
             });
 
-            // Atualiza a visualização das propriedades
-            function updatePropertiesList() {
-                propertiesList.innerHTML = '';
-                propertiesArray.forEach(function(property, index) {
+            // Função para atualizar a lista de imagens de uma propriedade
+            function updateImagesList(propertyId) {
+                var imagesList = document.getElementById('images_list_' + propertyId);
+                imagesList.innerHTML = '';
+                var imagesArray = propertiesData[propertyId] || [];
+                imagesArray.forEach(function(imageData, index) {
                     var div = document.createElement('div');
-                    div.classList.add('property-item');
-                    div.setAttribute('data-id', property.id); // Atribui o ID único
+                    div.classList.add('image-item');
+                    div.setAttribute('data-id', imageData.id);
 
                     var removeBtn = document.createElement('button');
                     removeBtn.type = 'button';
-                    removeBtn.classList.add('remove-property');
+                    removeBtn.classList.add('remove-image');
                     removeBtn.innerHTML = '&times;';
                     removeBtn.onclick = function() {
-                        propertiesArray.splice(index, 1);
-                        updatePropertiesList();
+                        imagesArray.splice(index, 1);
+                        updateImagesList(propertyId);
                     };
 
-                    // Obtém o texto da opção selecionada
-                    var selectedOption = document.querySelector('#property_id option[value="' + property.property_id + '"]');
-                    var propertyName = selectedOption ? selectedOption.textContent : 'Propriedade Desconhecida';
-
-                    var propertyInfo = document.createElement('div');
-                    propertyInfo.innerHTML = `<strong>Propriedade:</strong> ${propertyName}<br>
-                                              <strong>Fonte:</strong> ${property.source}`;
-
                     var img = document.createElement('img');
-                    img.src = property.image;
-                    img.alt = 'Imagem da Propriedade';
-                    img.style.width = '100px';
-                    img.style.height = 'auto';
-                    img.classList.add('mt-2');
+                    img.src = imageData.image;
+                    img.alt = 'Imagem';
 
                     div.appendChild(removeBtn);
-                    div.appendChild(propertyInfo);
                     div.appendChild(img);
-                    propertiesList.appendChild(div);
+                    imagesList.appendChild(div);
+                });
+
+                // Inicializa o Sortable.js para permitir reordenação via drag-and-drop
+                Sortable.create(imagesList, {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    onEnd: function(evt) {
+                        // Reordena o array com base na nova ordem
+                        var orderedIds = Array.from(imagesList.children).map(function(child) {
+                            return parseInt(child.getAttribute('data-id'));
+                        });
+                        propertiesData[propertyId].sort(function(a, b) {
+                            return orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id);
+                        });
+                    }
                 });
             }
 
-            // Inicializa o Sortable.js para permitir reordenação via drag-and-drop
-            var sortable = Sortable.create(propertiesList, {
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                onEnd: function (evt) {
-                    // Obtém a nova ordem dos elementos
-                    var orderedIds = Array.from(propertiesList.children).map(function(child) {
-                        return parseInt(child.getAttribute('data-id'));
-                    });
-
-                    // Reordena o propertiesArray com base na nova ordem dos IDs
-                    propertiesArray.sort(function(a, b) {
-                        return orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id);
-                    });
-
-                    // Atualiza a visualização para refletir a nova ordem
-                    updatePropertiesList();
-                }
-            });
-
-            // Manipulação do Formulário de Adição/Atualização de Planta para incluir propriedades
-            var addPlantFormElement = document.getElementById('addPlantForm');
+            // Handle form submission
             addPlantFormElement.addEventListener('submit', function(e) {
-                // Adiciona as propriedades ao campo oculto como JSON
+                // Adiciona os dados das propriedades ao campo oculto como JSON
                 var propertiesInput = document.createElement('input');
                 propertiesInput.type = 'hidden';
-                propertiesInput.name = 'properties';
-                propertiesInput.value = JSON.stringify(propertiesArray);
+                propertiesInput.name = 'properties_data';
+                propertiesInput.value = JSON.stringify(propertiesData);
                 addPlantFormElement.appendChild(propertiesInput);
 
                 // Envia o formulário normalmente
@@ -977,7 +976,7 @@ if (isset($_GET['edit'])) {
 
             // Modal de Confirmação de Exclusão
             var confirmDeleteModal = document.getElementById('confirmDeleteModal');
-            confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+            confirmDeleteModal.addEventListener('show.bs.modal', function(event) {
                 var button = event.relatedTarget;
                 var id = button.getAttribute('data-id');
                 var deleteIdInput = confirmDeleteModal.querySelector('#deleteId');
