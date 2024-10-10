@@ -88,10 +88,19 @@ if (isset($_POST['edit_order'])) {
     }
 }
 
-$search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
+$search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
+
+$limit = 20;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$offset = ($page - 1) * $limit;
+
+$totalQuery = mysqli_query($con, "SELECT COUNT(*) as total FROM orders WHERE deleted_at IS NULL $searchQuery");
+$totalRow = mysqli_fetch_assoc($totalQuery);
+$totalRecords = $totalRow['total'];
+$totalPages = ceil($totalRecords / $limit);
 
 $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
-$ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL $searchQuery");
+$ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
 ?>
 
 <!DOCTYPE html>
@@ -136,7 +145,7 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="card-title mb-0">Ordens Cadastradas</h5>
-                                <form method="POST" action="" class="d-flex">
+                                <form method="GET" action="" class="d-flex">
                                     <input type="text" class="form-control me-2" name="search" placeholder="Buscar ordens" value="<?php echo htmlspecialchars($search); ?>">
                                     <button class="btn btn-primary" type="submit">Buscar</button>
                                     <?php if ($search) { ?>
@@ -171,6 +180,41 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
                         </div>
                     </div>
                 </div>
+                  <!-- Paginação -->
+                  <?php
+                $baseUrl = "?";
+                if ($search) {
+                    $baseUrl .= "search=" . urlencode($search) . "&";
+                }
+                ?>
+                <nav aria-label="Navegação de página">
+                    <ul class="pagination justify-content-center">
+                        <?php if ($page > 1) { ?>
+                            <li class="page-item">
+                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page - 1; ?>" aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Anterior</span>
+                                </a>
+                            </li>
+                        <?php } ?>
+
+                        <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
+                            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php } ?>
+
+                        <?php if ($page < $totalPages) { ?>
+                            <li class="page-item">
+                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page + 1; ?>" aria-label="Próximo">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Próximo</span>
+                                </a>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                </nav>
+                <!-- Fim da Paginação -->
             </main>
             <?php include('includes/footer.php'); ?>
         </div>
