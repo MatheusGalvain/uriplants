@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include_once('includes/config.php');
@@ -23,7 +22,6 @@ if (isset($_POST['add_region'])) {
         $image = file_get_contents($_FILES['image']['tmp_name']);
         $image_hash = md5($image);
         
-
         $check_name_sql = "SELECT COUNT(*) FROM RegionMap WHERE name = ?";
         $stmt = mysqli_prepare($con, $check_name_sql);
         if ($stmt) {
@@ -35,7 +33,6 @@ if (isset($_POST['add_region'])) {
             
             if ($name_count > 0) {
                 $error = "Erro: Já existe uma região com o nome '$name'.";
-
             }
         } else {
             $error = "Erro na preparação da consulta para verificação de nome: " . mysqli_error($con);
@@ -46,9 +43,7 @@ if (isset($_POST['add_region'])) {
             $stmt = mysqli_prepare($con, $sql);
             
             if ($stmt) {
-
                 mysqli_stmt_bind_param($stmt, 'sbss', $name, $null, $source, $description);
-                
                 mysqli_stmt_send_long_data($stmt, 1, $image);
                 
                 if (mysqli_stmt_execute($stmt)) {
@@ -78,7 +73,6 @@ if (isset($_POST['add_region'])) {
     }
 }
 
-
 if (isset($_POST['edit_region'])) {
 
     $id = intval($_POST['id']);
@@ -97,68 +91,55 @@ if (isset($_POST['edit_region'])) {
         $old_description = $old_row['description'];
         $old_image = $old_row['imagem'];
 
-
+        $new_image = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
             if (!in_array($_FILES['image']['type'], $allowedTypes)) {
                 $error = "Tipo de imagem não permitido. Apenas JPEG, PNG e GIF são aceitos.";
             } else {
-
                 $new_image = file_get_contents($_FILES['image']['tmp_name']);
-                
             }
         }
 
-        $sql = "UPDATE RegionMap SET name = ?, imagem = ?, source = ?, description = ? WHERE id = ?";
-        $stmt = mysqli_prepare($con, $sql);
-
-
-        if (empty($new_image)) {
-
-            $sql = "UPDATE RegionMap SET name = ?, source = ?, description = ? WHERE id = ?";
-            $stmt = mysqli_prepare($con, $sql);
-            if ($stmt) {
-
-                mysqli_stmt_bind_param($stmt, 'sssi', $name, $source, $description, $id);
-            }
-        } else {
-
-            $sql = "UPDATE RegionMap SET name = ?, imagem = ?, source = ?, description = ? WHERE id = ?";
-            $stmt = mysqli_prepare($con, $sql);
-            
-            if ($stmt) {
-
-                mysqli_stmt_bind_param($stmt, 'sbssi', $name, $null, $source, $description, $id);
-                
-                mysqli_stmt_send_long_data($stmt, 1, $new_image); 
-            }
-        }
-
-        if ($stmt) {
-            if (mysqli_stmt_execute($stmt)) {
-                $success = "Região atualizada com sucesso.";
-
-                $table = 'RegionMap';
-                $action_id = 3;
-                $changed_by = $_SESSION['id'];
-                $old_value = "Nome: $old_name, Fonte: $old_source, Descrição: $old_description";
-                $new_value = "Nome: $name, Fonte: $source, Descrição: $description";
-                if (!empty($new_image)) {
-                    $new_value .= ", Nova imagem inserida na edição";
+        if (!isset($error)) {
+            if ($new_image !== null) {
+                $sql = "UPDATE RegionMap SET name = ?, imagem = ?, source = ?, description = ? WHERE id = ?";
+                $stmt = mysqli_prepare($con, $sql);
+                if ($stmt) {
+                    mysqli_stmt_bind_param($stmt, 'sbssi', $name, $null, $source, $description, $id);
+                    mysqli_stmt_send_long_data($stmt, 1, $new_image); 
                 }
-                $plant_id = null;
-
-                log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
             } else {
-                $error = "Erro ao atualizar região: " . mysqli_stmt_error($stmt);
+                $sql = "UPDATE RegionMap SET name = ?, source = ?, description = ? WHERE id = ?";
+                $stmt = mysqli_prepare($con, $sql);
+                if ($stmt) {
+                    mysqli_stmt_bind_param($stmt, 'sssi', $name, $source, $description, $id);
+                }
             }
-            mysqli_stmt_close($stmt);
-        } else {
-            $error = "Erro na preparação da consulta: " . mysqli_error($con);
+
+            if ($stmt) {
+                if (mysqli_stmt_execute($stmt)) {
+                    $success = "Região atualizada com sucesso.";
+
+                    $table = 'RegionMap';
+                    $action_id = 3;
+                    $changed_by = $_SESSION['id'];
+                    $old_value = "Nome: $old_name, Fonte: $old_source, Descrição: $old_description";
+                    $new_value = "Nome: $name, Fonte: $source, Descrição: $description";
+                    if ($new_image !== null) {
+                        $new_value .= ", Nova imagem inserida na edição";
+                    }
+                    $plant_id = null;
+
+                    log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+                } else {
+                    $error = "Erro ao atualizar região: " . mysqli_stmt_error($stmt);
+                }
+                mysqli_stmt_close($stmt);
+            } else {
+                $error = "Erro na preparação da consulta: " . mysqli_error($con);
+            }
         }
-
-
     }
 }
 
@@ -205,12 +186,16 @@ if (isset($_POST['delete_region'])) {
     }
 }
 
-
 // Manipulação de Pesquisa
-$search = isset($_POST['search']) ? mysqli_real_escape_string($con, $_POST['search']) : '';
+$search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
+
+// Paginação
+$limit = 20; // Número de registros por página
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$offset = ($page - 1) * $limit;
 
 // Construção dinâmica da consulta com prepared statements
-$query = "SELECT * FROM RegionMap WHERE deleted_at IS NULL";
+$query = "SELECT SQL_CALC_FOUND_ROWS * FROM RegionMap WHERE deleted_at IS NULL";
 $params = [];
 $types = "";
 
@@ -221,22 +206,30 @@ if (!empty($search)) {
     $types .= "s";
 }
 
+$query .= " LIMIT ? OFFSET ?";
+$types .= "ii";
+$params[] = $limit;
+$params[] = $offset;
+
 $stmt = mysqli_prepare($con, $query);
 
 if ($stmt) {
-    if (!empty($params)) {
-        mysqli_stmt_bind_param($stmt, $types, ...$params);
-    }
-    
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
     mysqli_stmt_execute($stmt);
     $regionsQuery = mysqli_stmt_get_result($stmt);
+
+    // Obter o número total de registros encontrados
+    $totalResult = mysqli_query($con, "SELECT FOUND_ROWS() as total");
+    $totalRow = mysqli_fetch_assoc($totalResult);
+    $totalRecords = $totalRow['total'];
+    $totalPages = ceil($totalRecords / $limit);
+
 } else {
     // Tratamento de erro
     error_log("Erro na preparação da consulta: " . mysqli_error($con));
     die("Erro ao buscar regiões. Por favor, tente novamente mais tarde.");
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-BR"> 
 <head>
@@ -293,7 +286,7 @@ if ($stmt) {
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="card-title mb-0">Regiões Cadastradas</h5>
-                                <form method="POST" action="" class="d-flex">
+                                <form method="GET" action="" class="d-flex">
                                     <input type="text" class="form-control me-2" name="search" placeholder="Buscar regiões" value="<?php echo htmlspecialchars($search); ?>">
                                     <button class="btn btn-primary" type="submit">Buscar</button>
                                     <?php if ($search) { ?>
@@ -355,6 +348,41 @@ if ($stmt) {
                         </div>
                     </div>
                 </div>
+                <!-- Paginação -->
+                            <?php
+                            $baseUrl = "?";
+                            if ($search) {
+                                $baseUrl .= "search=" . urlencode($search) . "&";
+                            }
+                            ?>
+                            <nav aria-label="Navegação de página">
+                                <ul class="pagination justify-content-center">
+                                    <?php if ($page > 1) { ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page - 1; ?>" aria-label="Anterior">
+                                                <span aria-hidden="true">&laquo;</span>
+                                                <span class="sr-only">Anterior</span>
+                                            </a>
+                                        </li>
+                                    <?php } ?>
+
+                                    <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
+                                        <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                                            <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                        </li>
+                                    <?php } ?>
+
+                                    <?php if ($page < $totalPages) { ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page + 1; ?>" aria-label="Próximo">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">Próximo</span>
+                                            </a>
+                                        </li>
+                                    <?php } ?>
+                                </ul>
+                            </nav>
+                            <!-- Fim da Paginação -->
             </main>
             <?php include('includes/footer.php'); ?>
         </div>
