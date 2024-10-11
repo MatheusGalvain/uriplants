@@ -1091,6 +1091,7 @@ $qrcode_base_url = get_qrcode_url($con);
         <div class="modal-dialog">
             <form id="propertyForm">
                 <div class="modal-content">
+                    <div id="error-message" style="display: none;" class="alert alert-danger"></div>
                     <div class="modal-header">
                         <h5 class="modal-title">Adicionar Imagem</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
@@ -1234,6 +1235,16 @@ $qrcode_base_url = get_qrcode_url($con);
                 addPropertyModal.show();
             });
 
+            function displayError(message) {
+                var errorMessageElement = document.getElementById('error-message');
+                errorMessageElement.textContent = message;
+                errorMessageElement.style.display = 'block';
+            }
+
+            function hideError() {
+                var errorMessageElement = document.getElementById('error-message');
+                errorMessageElement.style.display = 'none';
+            }
 
             if (toggleFormButton) {
                 toggleFormButton.addEventListener('click', function() {
@@ -1269,6 +1280,7 @@ $qrcode_base_url = get_qrcode_url($con);
             // 'propertyForm' submit handler
             propertyForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                hideError(); 
                 var source = document.getElementById('source').value.trim();
                 var imageInput = document.getElementById('imageFile');
                 var file = imageInput.files[0];
@@ -1278,6 +1290,13 @@ $qrcode_base_url = get_qrcode_url($con);
                     var allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
                     if (!allowedTypes.includes(file.type)) {
                         alert('Tipo de imagem inválido. Apenas JPEG, PNG e GIF são permitidos.');
+                        return;
+                    }
+
+                    // Verifica o tamanho do arquivo (5 MB = 5 * 1024 * 1024 bytes)
+                    var maxFileSize = 5 * 1024 * 1024; // 5 MB
+                    if (file.size > maxFileSize) {
+                        displayError('O tamanho da imagem não pode exceder 5 MB.');
                         return;
                     }
 
