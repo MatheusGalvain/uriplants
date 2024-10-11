@@ -211,6 +211,28 @@ if (isset($_POST['add_plant'])) {
                 }
             }
         }
+        // Processar Links Úteis
+        $usefullinks_data = isset($_POST['usefullinks_data']) ? json_decode($_POST['usefullinks_data'], true) : [];
+
+        foreach ($usefullinks_data as $link) {
+            $link_name = filter_input_data_custom($con, $link['name']);
+            $link_url = filter_input_data_custom($con, $link['link']);
+
+            $stmt = $con->prepare("INSERT INTO usefullinks (name, link, plant_id) VALUES (?, ?, ?)");
+            if (!$stmt) {
+                throw new Exception("Erro na preparação da inserção de link: " . $con->error);
+            }
+            $stmt->bind_param("ssi", $link_name, $link_url, $plant_id);
+            if (!$stmt->execute()) {
+                throw new Exception("Erro ao adicionar link: " . $stmt->error);
+            }
+            $usefullink_id = mysqli_insert_id($con);
+            $stmt->close();
+
+            // Auditoria para inserção de link
+            $new_value = "Link: $link_name, URL: $link_url";
+            log_audit_action($con, 'usefullinks', 1, $changed_by, null, $new_value, $plant_id);
+        }
 
         mysqli_commit($con);
         $success = "Planta e propriedades com imagens adicionadas com sucesso.";
@@ -487,6 +509,96 @@ if (isset($_POST['edit_plant'])) {
 
             }
 
+            // Processar Links Úteis
+            $usefullinks_data = isset($_POST['usefullinks_data']) ? json_decode($_POST['usefullinks_data'], true) : [];
+
+            // Buscar links existentes no banco de dados
+            $stmt = $con->prepare("SELECT id, name, link FROM usefullinks WHERE plant_id = ? AND deleted_at IS NULL");
+            if (!$stmt) {
+                throw new Exception("Erro na preparação da consulta usefullinks: " . $con->error);
+            }
+            $stmt->bind_param("i", $edit_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $existing_links = [];
+            while ($row = $result->fetch_assoc()) {
+                $existing_links[$row['id']] = $row;
+            }
+            $stmt->close();
+
+            // Array para rastrear IDs de links submetidos
+            $submitted_link_ids = [];
+
+            // Processar cada link submetido
+            foreach ($usefullinks_data as $link) {
+                if (isset($link['id']) && intval($link['id']) > 0 && isset($existing_links[$link['id']])) {
+                    // Link existente: verificar se houve atualização
+                    $link_id = intval($link['id']);
+                    $link_name = filter_input_data_custom($con, $link['name']);
+                    $link_url = filter_input_data_custom($con, $link['link']);
+
+                    if ($link_name != $existing_links[$link_id]['name'] || $link_url != $existing_links[$link_id]['link']) {
+                        // Atualizar o link
+                        $stmt = $con->prepare("UPDATE usefullinks SET name = ?, link = ? WHERE id = ?");
+                        if (!$stmt) {
+                            throw new Exception("Erro na preparação da atualização do link: " . $con->error);
+                        }
+                        $stmt->bind_param("ssi", $link_name, $link_url, $link_id);
+                        if (!$stmt->execute()) {
+                            throw new Exception("Erro ao atualizar link: " . $stmt->error);
+                        }
+                        $stmt->close();
+
+                        // Auditoria para atualização de link
+                        $old_value = "Link: " . $existing_links[$link_id]['name'] . ", URL: " . $existing_links[$link_id]['link'];
+                        $new_value = "Link: $link_name, URL: $link_url";
+                        log_audit_action($con, 'usefullinks', 2, $changed_by, $old_value, $new_value, $edit_id);
+                    }
+
+                    $submitted_link_ids[] = $link_id;
+                } else {
+                    // Novo link: inserir
+                    $link_name = filter_input_data_custom($con, $link['name']);
+                    $link_url = filter_input_data_custom($con, $link['link']);
+
+                    $stmt = $con->prepare("INSERT INTO usefullinks (name, link, plant_id) VALUES (?, ?, ?)");
+                    if (!$stmt) {
+                        throw new Exception("Erro na preparação da inserção de link: " . $con->error);
+                    }
+                    $stmt->bind_param("ssi", $link_name, $link_url, $edit_id);
+                    if (!$stmt->execute()) {
+                        throw new Exception("Erro ao adicionar link: " . $stmt->error);
+                    }
+                    $usefullink_id = mysqli_insert_id($con);
+                    $stmt->close();
+
+                    // Auditoria para inserção de link
+                    $new_value = "Link: $link_name, URL: $link_url";
+                    log_audit_action($con, 'usefullinks', 1, $changed_by, null, $new_value, $edit_id);
+                }
+            }
+
+            // Determinar quais links foram removidos e marcar como excluídos
+            $links_to_delete = array_diff(array_keys($existing_links), $submitted_link_ids);
+            foreach ($links_to_delete as $link_id) {
+                $stmt = $con->prepare("UPDATE usefullinks SET deleted_at = NOW() WHERE id = ?");
+                if (!$stmt) {
+                    throw new Exception("Erro na preparação da exclusão do link: " . $con->error);
+                }
+                $stmt->bind_param("i", $link_id);
+                if (!$stmt->execute()) {
+                    throw new Exception("Erro ao excluir link: " . $stmt->error);
+                }
+                $stmt->close();
+
+                // Auditoria para exclusão de link
+                $old_value = "Link: " . $existing_links[$link_id]['name'] . ", URL: " . $existing_links[$link_id]['link'];
+                $new_value = null;
+                log_audit_action($con, 'usefullinks', 3, $changed_by, $old_value, $new_value, $edit_id);
+            }
+
+
+
             mysqli_commit($con);
             $success = "Planta atualizada com sucesso.";
         } catch (Exception $e) {
@@ -619,6 +731,17 @@ if (isset($_GET['edit'])) {
                         ];
                     }
                     $stmt_images->close();
+                }
+                $stmt = $con->prepare("SELECT id, name, link FROM usefullinks WHERE plant_id = ? AND deleted_at IS NULL");
+                if ($stmt) {
+                    $stmt->bind_param("i", $edit_id);
+                    $stmt->execute();
+                    $result_links = $stmt->get_result();
+                    $edit_plant['usefullinks'] = [];
+                    while ($row = $result_links->fetch_assoc()) {
+                        $edit_plant['usefullinks'][] = $row;
+                    }
+                  
                 }
                 $edit_mode = true;
             }
@@ -851,6 +974,16 @@ $qrcode_base_url = get_qrcode_url($con);
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
+                                <!-- Seção de Links Úteis -->
+                                <div class="mb-4">
+                                    <h4>Links Úteis</h4>
+                                    <button type="button" class="btn btn-primary btn-sm" id="addLinkButton">Adicionar Link</button>
+                                    <div id="usefullinks_list" class="mt-3">
+                                        <!-- Links adicionados aparecerão aqui -->
+                                    </div>
+                                </div>
+                                <input type="hidden" name="usefullinks_data" id="usefullinks_data">
+
 
                                 <?php if ($edit_mode) { ?>
                                     <button type="submit" name="edit_plant" class="btn btn-success">Atualizar Planta</button>
@@ -1266,6 +1399,100 @@ $qrcode_base_url = get_qrcode_url($con);
                 deleteIdInput.value = id;
             });
         });
+    </script>
+    <script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... código JavaScript existente ...
+
+        // Variável para armazenar os dados dos links úteis
+        var usefullinksData = [];
+        <?php if ($edit_mode && isset($edit_plant['usefullinks'])) { ?>
+            usefullinksData = <?php echo json_encode($edit_plant['usefullinks']); ?>;
+        <?php } ?>
+
+        var addLinkButton = document.getElementById('addLinkButton');
+        var usefullinksList = document.getElementById('usefullinks_list');
+
+        // Função para renderizar os links úteis na interface
+        function renderUsefullinks() {
+            usefullinksList.innerHTML = '';
+            usefullinksData.forEach(function(link, index) {
+                var linkItem = document.createElement('div');
+                linkItem.classList.add('link-item', 'mb-2');
+                linkItem.setAttribute('data-index', index);
+
+                var inputGroup = document.createElement('div');
+                inputGroup.classList.add('input-group');
+
+                var nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.classList.add('form-control', 'link-name');
+                nameInput.placeholder = 'Nome';
+                nameInput.value = link.name;
+                nameInput.required = true;
+
+                var urlInput = document.createElement('input');
+                urlInput.type = 'url';
+                urlInput.classList.add('form-control', 'link-url');
+                urlInput.placeholder = 'URL';
+                urlInput.value = link.link;
+                urlInput.required = true;
+
+                var removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.classList.add('btn', 'btn-danger');
+                removeButton.innerHTML = '&times;';
+                removeButton.addEventListener('click', function() {
+                    usefullinksData.splice(index, 1);
+                    renderUsefullinks();
+                });
+
+                inputGroup.appendChild(nameInput);
+                inputGroup.appendChild(urlInput);
+                inputGroup.appendChild(removeButton);
+
+                linkItem.appendChild(inputGroup);
+                usefullinksList.appendChild(linkItem);
+
+                // Atualizar os dados ao modificar os campos
+                nameInput.addEventListener('input', function() {
+                    usefullinksData[index].name = this.value;
+                });
+                urlInput.addEventListener('input', function() {
+                    usefullinksData[index].link = this.value;
+                });
+            });
+        }
+
+        // Inicializar a renderização dos links
+        renderUsefullinks();
+
+        // Evento para adicionar um novo link útil
+        addLinkButton.addEventListener('click', function() {
+            usefullinksData.push({
+                id: null, // Será definido no backend se for um link existente
+                name: '',
+                link: ''
+            });
+            renderUsefullinks();
+        });
+
+        // Evento de submissão do formulário para incluir os dados dos links úteis
+        var addPlantFormElement = document.getElementById('addPlantForm');
+        addPlantFormElement.addEventListener('submit', function(e) {
+            // Adiciona os dados dos links úteis no campo oculto
+            var usefullinksInput = document.getElementById('usefullinks_data');
+            usefullinksInput.value = JSON.stringify(usefullinksData);
+
+            // O restante do processamento do formulário continua normalmente
+        });
+
+        // ... restante do código JavaScript existente ...
+    });
+
+
+
     </script>
 </body>
 
