@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../config/database.php';
 
 class quizController {
@@ -13,12 +12,22 @@ class quizController {
         header('Content-Type: application/json');
 
         try {
-
-            $correctPlantQuery = "SELECT id, name FROM Plants ORDER BY RAND() LIMIT 1";
+            // Consulta para obter uma planta aleatória que tenha pelo menos uma imagem
+            $correctPlantQuery = "
+                SELECT p.id, p.name 
+                FROM Plants p
+                INNER JOIN PlantsProperties pp ON p.id = pp.plant_id
+                INNER JOIN Images i ON pp.id = i.plants_property_id
+                WHERE pp.property_id = 1
+                GROUP BY p.id
+                HAVING COUNT(i.imagem) > 0
+                ORDER BY RAND()
+                LIMIT 1
+            ";
             $result = $this->conn->query($correctPlantQuery);
 
             if ($result->num_rows === 0) {
-                echo json_encode(["message" => "Nenhuma planta encontrada."]);
+                echo json_encode(["message" => "Nenhuma planta com imagens encontrada."]);
                 return;
             }
 
@@ -26,11 +35,12 @@ class quizController {
             $correctPlantId = $correctPlant['id'];
             $correctPlantName = $correctPlant['name'];
 
+            // Consulta para obter as imagens da planta correta
             $imagesQuery = "
-                SELECT Images.imagem 
-                FROM Images 
-                INNER JOIN PlantsProperties ON Images.plants_property_id = PlantsProperties.id 
-                WHERE PlantsProperties.plant_id = ? AND PlantsProperties.property_id = 1
+                SELECT i.imagem 
+                FROM Images i
+                INNER JOIN PlantsProperties pp ON i.plants_property_id = pp.id 
+                WHERE pp.plant_id = ? AND pp.property_id = 1
             ";
             $stmt = $this->conn->prepare($imagesQuery);
             $stmt->bind_param("i", $correctPlantId);
@@ -39,9 +49,7 @@ class quizController {
 
             $images = [];
             while ($row = $imagesResult->fetch_assoc()) {
-
                 $base64 = base64_encode($row['imagem']);
-
                 $dataUrl = "data:image/png;base64," . $base64;
                 $images[] = $dataUrl;
             }
@@ -51,10 +59,16 @@ class quizController {
                 return;
             }
 
+            // Consulta para obter as opções incorretas
             $wrongOptionsQuery = "
-                SELECT name FROM Plants 
-                WHERE id != ? 
-                ORDER BY RAND() 
+                SELECT p.name 
+                FROM Plants p
+                INNER JOIN PlantsProperties pp ON p.id = pp.plant_id
+                INNER JOIN Images i ON pp.id = i.plants_property_id
+                WHERE p.id != ? AND pp.property_id = 1
+                GROUP BY p.id
+                HAVING COUNT(i.imagem) > 0
+                ORDER BY RAND()
                 LIMIT 3
             ";
             $stmt = $this->conn->prepare($wrongOptionsQuery);
@@ -72,10 +86,12 @@ class quizController {
                 return;
             }
 
+            // Embaralha as opções (incluindo a correta)
             $options = $wrongOptions;
             $options[] = $correctPlantName;
             shuffle($options);
 
+            // Resposta final do quiz
             $response = [
                 "images" => $images,
                 "question" => "Quem é esse pokémon?",
@@ -91,4 +107,5 @@ class quizController {
     }
 
 }
+
 ?>
