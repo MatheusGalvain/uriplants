@@ -3,11 +3,6 @@ session_start();
 include_once('includes/config.php');
 require_once('includes/audit.php'); 
 
-// Configurações de erro (apenas para desenvolvimento; remova em produção)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Verificação de autenticação
 if (strlen($_SESSION['id']) == 0) {
     header('location:logout.php');
@@ -34,15 +29,23 @@ function get_plant_name($con, $plant_id) {
 }
 
 function get_property_name($con, $property_id) {
-    $sql = "SELECT name FROM properties WHERE id = ?";
+    // Atualize a consulta SQL para incluir name e name_ref
+    $sql = "SELECT name, name_ref FROM properties WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, 'i', $property_id);
         mysqli_stmt_execute($stmt);
-        mysqli_stmt_bind_result($stmt, $property_name);
+
+        // Capture tanto name quanto name_ref
+        mysqli_stmt_bind_result($stmt, $property_name, $property_name_ref);
         mysqli_stmt_fetch($stmt);
         mysqli_stmt_close($stmt);
-        return $property_name;
+
+        // Retorne um array com os dois valores
+        return [
+            'name' => $property_name,
+            'name_ref' => $property_name_ref
+        ];
     }
     return "Desconhecida";
 }
@@ -51,6 +54,37 @@ function get_property_name($con, $property_id) {
 function filter_input_data_custom($con, $data) {
     return mysqli_real_escape_string($con, trim($data));
 }
+
+// Pega o url para gerar o qrcode dinamico
+function get_qrcode_url($con) {
+    $sql = "SELECT url FROM qrcode_url LIMIT 1";
+    
+    if ($stmt = $con->prepare($sql)) {
+        // Executa a consulta
+        if ($stmt->execute()) {
+            // Obtém o resultado
+            $stmt->bind_result($url);
+            if ($stmt->fetch()) {
+                $stmt->close();
+                return $url;
+            } else {
+                // Nenhum registro encontrado
+                $stmt->close();
+                return false;
+            }
+        } else {
+            // Erro na execução da consulta
+            error_log("Erro na execução da consulta: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+    } else {
+        // Erro na preparação da consulta
+        error_log("Erro na preparação da consulta: " . $con->error);
+        return false;
+    }
+}
+
 
 // Adicionar Planta com Propriedades e Imagens
 if (isset($_POST['add_plant'])) {
@@ -69,13 +103,12 @@ if (isset($_POST['add_plant'])) {
     $biology = filter_input_data_custom($con, $_POST['biology']);
 
     // Novos campos de descrição
-$bark_description = filter_input_data_custom($con, $_POST['casca_description'] ?? '');
-$trunk_description = filter_input_data_custom($con, $_POST['tronco_description'] ?? '');
-$leaf_description = filter_input_data_custom($con, $_POST['folha_description'] ?? '');
-$flower_description = filter_input_data_custom($con, $_POST['flor_description'] ?? '');
-$fruit_description = filter_input_data_custom($con, $_POST['fruta_description'] ?? '');
-$seed_description = filter_input_data_custom($con, $_POST['semente_description'] ?? '');
-
+    $bark_description = filter_input_data_custom($con, $_POST['bark_description'] ?? '');
+    $trunk_description = filter_input_data_custom($con, $_POST['trunk_description'] ?? '');
+    $leaf_description = filter_input_data_custom($con, $_POST['leaf_description'] ?? '');
+    $flower_description = filter_input_data_custom($con, $_POST['flower_description'] ?? '');
+    $fruit_description = filter_input_data_custom($con, $_POST['fruit_description'] ?? '');
+    $seed_description = filter_input_data_custom($con, $_POST['seed_description'] ?? '');
 
     // Coleta de dados das propriedades
     $properties_data = isset($_POST['properties_data']) ? json_decode($_POST['properties_data'], true) : [];
@@ -100,7 +133,7 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
         if (!$stmt) {
             throw new Exception("Erro na preparação da inserção: " . $con->error);
         }
-        $stmt->bind_param("ssiiiiisssssssssss", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description);
+        $stmt->bind_param("ssiiiiiissssssssss", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description);
         if (!$stmt->execute()) {
             throw new Exception("Erro ao adicionar planta: " . $stmt->error);
         }
@@ -133,7 +166,8 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
 
             // Auditoria para inserção de propriedade
             $plant_name = get_plant_name($con, $plant_id);
-            $property_name = get_property_name($con, $property_id);
+            $property_data = get_property_name($con, $property_id);
+            $property_name = $property_data['name'];
             $new_value = "Planta: $plant_name, Propriedade: $property_name";
             log_audit_action($con, 'PlantsProperties', 1, $changed_by, null, $new_value, $plant_id);
 
@@ -146,12 +180,25 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
                     // Decodifica a imagem Base64
                     $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
 
-                    // Insere na tabela images
-                    $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id) VALUES (?, ?, ?)");
+                    // Determina o próximo sort_order para esta propriedade
+                    $stmt_order = $con->prepare("SELECT MAX(sort_order) FROM images WHERE plants_property_id = ?");
+                    if ($stmt_order) {
+                        $stmt_order->bind_param("i", $plants_property_id);
+                        $stmt_order->execute();
+                        $stmt_order->bind_result($max_sort_order);
+                        $stmt_order->fetch();
+                        $next_sort_order = $max_sort_order !== null ? $max_sort_order + 1 : 1;
+                        $stmt_order->close();
+                    } else {
+                        $next_sort_order = 1; // Fallback caso a consulta falhe
+                    }
+
+                    // Insere na tabela images com sort_order
+                    $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
                     if (!$stmt) {
                         throw new Exception("Erro na preparação da consulta de imagem: " . $con->error);
                     }
-                    $stmt->bind_param("ssi", $image_data, $source, $plants_property_id);
+                    $stmt->bind_param("ssii", $image_data, $source, $plants_property_id, $next_sort_order);
                     if (!$stmt->execute()) {
                         throw new Exception("Erro ao adicionar a imagem: " . $stmt->error);
                     }
@@ -159,7 +206,7 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
                     $stmt->close();
 
                     // Auditoria para inserção de imagem
-                    $new_value = "Imagem ID: $image_id, Fonte: $source";
+                    $new_value = "Imagem ID: $image_id, Fonte: $source, Ordem: $next_sort_order";
                     log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $plant_id);
                 }
             }
@@ -239,14 +286,12 @@ if (isset($_POST['edit_plant'])) {
     $ecology = filter_input_data_custom($con, $_POST['ecology']);
     $biology = filter_input_data_custom($con, $_POST['biology']);
 
-
-$bark_description = filter_input_data_custom($con, $_POST['casca_description'] ?? '');
-$trunk_description = filter_input_data_custom($con, $_POST['tronco_description'] ?? '');
-$leaf_description = filter_input_data_custom($con, $_POST['folha_description'] ?? '');
-$flower_description = filter_input_data_custom($con, $_POST['flor_description'] ?? '');
-$fruit_description = filter_input_data_custom($con, $_POST['fruta_description'] ?? '');
-$seed_description = filter_input_data_custom($con, $_POST['semente_description'] ?? '');
-
+    $bark_description = filter_input_data_custom($con, $_POST['bark_description'] ?? '');
+    $trunk_description = filter_input_data_custom($con, $_POST['trunk_description'] ?? '');
+    $leaf_description = filter_input_data_custom($con, $_POST['leaf_description'] ?? '');
+    $flower_description = filter_input_data_custom($con, $_POST['flower_description'] ?? '');
+    $fruit_description = filter_input_data_custom($con, $_POST['fruit_description'] ?? '');
+    $seed_description = filter_input_data_custom($con, $_POST['seed_description'] ?? '');
 
     // Coleta de dados das propriedades
     $properties_data = isset($_POST['properties_data']) ? json_decode($_POST['properties_data'], true) : [];
@@ -255,14 +300,14 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
         mysqli_begin_transaction($con);
         try {
             // Verifica se a planta existe e não está deletada
-            $stmt = $con->prepare("SELECT name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, biology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description FROM Plants WHERE id = ? AND deleted_at IS NULL");
+            $stmt = $con->prepare("SELECT name FROM Plants WHERE id = ? AND deleted_at IS NULL");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da consulta: " . $con->error);
             }
             $stmt->bind_param("i", $edit_id);
             $stmt->execute();
-            $stmt->bind_result($old_name, $old_common_names, $old_division_id, $old_class_id, $old_order_id, $old_family_id, $old_genus_id, $old_region_id, $old_species, $old_applications, $old_ecology, $old_biology, $old_bark_description, $old_trunk_description, $old_leaf_description, $old_flower_description, $old_fruit_description, $old_seed_description);
-            if (!$stmt->fetch()) {
+            mysqli_stmt_bind_result($stmt, $plant_name);
+            if (!mysqli_stmt_fetch($stmt)) {
                 throw new Exception("Planta não encontrada ou já foi excluída.");
             }
             $stmt->close();
@@ -272,7 +317,7 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
             if (!$stmt) {
                 throw new Exception("Erro na preparação da atualização: " . $con->error);
             }
-            $stmt->bind_param("ssiiiiissssssssssi", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description, $edit_id);
+            $stmt->bind_param("ssiiiiiissssssssssi", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description, $edit_id);
             if (!$stmt->execute()) {
                 throw new Exception("Erro ao atualizar planta: " . $stmt->error);
             }
@@ -282,8 +327,8 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
             $table = 'Plants';
             $action_id = 2; // Atualização
             $changed_by = $_SESSION['id'];
-            $old_value = "Planta: $old_name, Espécie: $old_species";
-            $new_value = "Planta: $name, Espécie: $species";
+            $old_value = "Planta: $plant_name"; // Você pode expandir para incluir outros campos se desejar
+            $new_value = "Planta: $name"; // Similarmente, expanda conforme necessário
             log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $edit_id);
 
             // Obter propriedades existentes
@@ -321,26 +366,113 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
 
                     // Auditoria para inserção de propriedade
                     $plant_name = get_plant_name($con, $edit_id);
-                    $property_name = get_property_name($con, $property_id);
+                    $property_data = get_property_name($con, $property_id);
+                    $property_name = $property_data['name'];
                     $new_value = "Planta: $plant_name, Propriedade: $property_name";
                     log_audit_action($con, 'PlantsProperties', 1, $changed_by, null, $new_value, $edit_id);
                 }
 
-                // Inserir imagens para esta propriedade
-                if (!empty($images)) {
-                    foreach ($images as $imageData) {
+                // Atualizar imagens existentes e inserir novas imagens com sort_order
+                // Primeiro, obter as imagens existentes para esta propriedade
+                $stmt = $con->prepare("SELECT id, sort_order FROM images WHERE plants_property_id = ? ORDER BY sort_order ASC");
+                if (!$stmt) {
+                    throw new Exception("Erro na preparação da consulta de imagens: " . $con->error);
+                }
+                $stmt->bind_param("i", $plants_property_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $existing_images = [];
+                while ($row = $result->fetch_assoc()) {
+                    $existing_images[$row['id']] = $row['sort_order'];
+                }
+                $stmt->close();
+
+                // Coletar IDs das imagens enviadas no formulário
+                $form_image_ids = [];
+                foreach ($images as $imageData) {
+                    if (isset($imageData['id']) && $imageData['id'] > 0) {
+                        $form_image_ids[] = intval($imageData['id']);
+                    }
+                }
+
+                // Determinar quais imagens devem ser removidas (existentes no BD, mas não no formulário)
+                $images_to_delete = array_diff(array_keys($existing_images), $form_image_ids);
+
+                // Excluir as imagens que não estão mais presentes no formulário
+                if (!empty($images_to_delete)) {
+                    // Preparar placeholders para a consulta IN
+                    $placeholders = implode(',', array_fill(0, count($images_to_delete), '?'));
+                    $delete_sql = "DELETE FROM images WHERE id IN ($placeholders)";
+                    $stmt = $con->prepare($delete_sql);
+                    if ($stmt) {
+                        // Criar o tipo de parâmetro para bind_param
+                        $types = str_repeat('i', count($images_to_delete));
+                        // Vincular os parâmetros dinamicamente
+                        $stmt->bind_param($types, ...$images_to_delete);
+                        if (!$stmt->execute()) {
+                            throw new Exception("Erro ao excluir imagens: " . $stmt->error);
+                        }
+                        $stmt->close();
+
+                        // Auditoria para exclusão de imagens
+                        foreach ($images_to_delete as $image_id) {
+                            $table = 'images';
+                            $action_id = 3; // Supondo que 3 represente 'Exclusão' no sistema de auditoria
+                            $changed_by = $_SESSION['id'];
+                            $old_value = "Imagem ID: $image_id";
+                            $new_value = null;
+                            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $edit_id);
+                        }
+                    } else {
+                        throw new Exception("Erro na preparação da exclusão de imagens: " . $con->error);
+                    }
+                }
+
+                // Processar as imagens enviadas
+                foreach ($images as $order => $imageData) {
+                    if (isset($imageData['id']) && $imageData['id'] > 0) {
+                        // Atualizar o sort_order da imagem existente
+                        $image_id = intval($imageData['id']);
+                        $new_sort_order = intval($order) + 1; // Inicia em 1
+                        $stmt = $con->prepare("UPDATE images SET sort_order = ? WHERE id = ?");
+                        if ($stmt) {
+                            $stmt->bind_param("ii", $new_sort_order, $image_id);
+                            if (!$stmt->execute()) {
+                                throw new Exception("Erro ao atualizar sort_order da imagem: " . $stmt->error);
+                            }
+                            $stmt->close();
+
+                            // Auditoria para atualização de sort_order
+                            $new_value = "Imagem ID: $image_id, Nova Ordem: $new_sort_order";
+                            log_audit_action($con, 'images', 2, $changed_by, null, $new_value, $edit_id);
+                        }
+                    } else {
+                        // Inserir nova imagem
                         $source = filter_input_data_custom($con, $imageData['source']);
                         $image = $imageData['image']; // Base64 string
 
                         // Decodifica a imagem Base64
                         $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
 
-                        // Insere na tabela images
-                        $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id) VALUES (?, ?, ?)");
+                        // Determina o próximo sort_order para esta propriedade
+                        $stmt_order = $con->prepare("SELECT MAX(sort_order) FROM images WHERE plants_property_id = ?");
+                        if ($stmt_order) {
+                            $stmt_order->bind_param("i", $plants_property_id);
+                            $stmt_order->execute();
+                            $stmt_order->bind_result($max_sort_order);
+                            $stmt_order->fetch();
+                            $next_sort_order = $max_sort_order !== null ? $max_sort_order + 1 : 1;
+                            $stmt_order->close();
+                        } else {
+                            $next_sort_order = 1; // Fallback caso a consulta falhe
+                        }
+
+                        // Insere na tabela images com sort_order
+                        $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
                         if (!$stmt) {
                             throw new Exception("Erro na preparação da consulta de imagem: " . $con->error);
                         }
-                        $stmt->bind_param("ssi", $image_data, $source, $plants_property_id);
+                        $stmt->bind_param("ssii", $image_data, $source, $plants_property_id, $next_sort_order);
                         if (!$stmt->execute()) {
                             throw new Exception("Erro ao adicionar a imagem: " . $stmt->error);
                         }
@@ -348,10 +480,11 @@ $seed_description = filter_input_data_custom($con, $_POST['semente_description']
                         $stmt->close();
 
                         // Auditoria para inserção de imagem
-                        $new_value = "Imagem ID: $image_id, Fonte: $source";
+                        $new_value = "Imagem ID: $image_id, Fonte: $source, Ordem: $next_sort_order";
                         log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $edit_id);
                     }
                 }
+
             }
 
             mysqli_commit($con);
@@ -429,13 +562,12 @@ $regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap
 
 // Lista de propriedades
 $properties_list = [
-    ['id' => 1, 'name' => 'Planta'],
-    ['id' => 2, 'name' => 'Tronco'],
-    ['id' => 3, 'name' => 'Casca'],
-    ['id' => 4, 'name' => 'Folha'],
-    ['id' => 5, 'name' => 'Flor'],
-    ['id' => 6, 'name' => 'Fruta'],
-    ['id' => 7, 'name' => 'Semente']
+    ['id' => 2, 'name' => 'Tronco', 'name_ref' => 'trunk'],
+    ['id' => 3, 'name' => 'Casca', 'name_ref' => 'bark'],
+    ['id' => 4, 'name' => 'Folha', 'name_ref' => 'leaf'],
+    ['id' => 5, 'name' => 'Flor', 'name_ref' => 'flower'],
+    ['id' => 6, 'name' => 'Fruta', 'name_ref' => 'fruit'],
+    ['id' => 7, 'name' => 'Semente', 'name_ref' => 'seed']
 ];
 
 // Verificar se está no modo de edição
@@ -462,12 +594,39 @@ if (isset($_GET['edit'])) {
             $result = $stmt->get_result();
             if ($result->num_rows > 0) {
                 $edit_plant = $result->fetch_assoc();
+                // Recuperar as imagens existentes com sort_order
+                $stmt_images = $con->prepare("
+                    SELECT pp.property_id, i.id as image_id, i.imagem, i.source, i.sort_order 
+                    FROM PlantsProperties pp
+                    JOIN images i ON pp.id = i.plants_property_id
+                    WHERE pp.plant_id = ?
+                    ORDER BY i.sort_order ASC
+                ");
+                if ($stmt_images) {
+                    $stmt_images->bind_param("i", $edit_id);
+                    $stmt_images->execute();
+                    $result_images = $stmt_images->get_result();
+                    while ($row = $result_images->fetch_assoc()) {
+                        $property_id = $row['property_id'];
+                        if (!isset($edit_plant['properties'][$property_id])) {
+                            $edit_plant['properties'][$property_id] = [];
+                        }
+                        $edit_plant['properties'][$property_id][] = [
+                            'id' => $row['image_id'],
+                            'source' => $row['source'],
+                            'image' => 'data:image/jpeg;base64,' . base64_encode($row['imagem']),
+                            'sort_order' => $row['sort_order']
+                        ];
+                    }
+                    $stmt_images->close();
+                }
                 $edit_mode = true;
             }
             $stmt->close();
         }
     }
 }
+$qrcode_base_url = get_qrcode_url($con);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -550,12 +709,21 @@ if (isset($_GET['edit'])) {
                                 <?php if ($edit_mode) { ?>
                                     <input type="hidden" name="plant_id" value="<?php echo htmlspecialchars($edit_plant['id']); ?>">
                                 <?php } ?>
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-primary btn-sm" id="addPropertyButton">Adicionar Imagem</button>
+                                    <div id="images_list_1" class="mt-3 d-flex gap-2">
+                                        <!-- Propriedades adicionadas aparecerão aqui -->
+                                        <?php
+                                        ?>
+                                    </div>
+                                </div>
 
                                 <!-- Dados da Planta -->
                                 <div class="mb-3">
                                     <label for="name" class="form-label">*Nome Científico</label>
                                     <input type="text" class="form-control" id="name" name="name" required value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['name']) : ''; ?>">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="common_names" class="form-label">Nomes Comuns</label>
                                     <textarea class="form-control" id="common_names" name="common_names"><?php echo $edit_mode ? htmlspecialchars($edit_plant['common_names']) : ''; ?></textarea>
@@ -657,21 +825,30 @@ if (isset($_GET['edit'])) {
                                     <textarea class="form-control" id="biology" name="biology"><?php echo $edit_mode ? htmlspecialchars($edit_plant['biology']) : ''; ?></textarea>
                                 </div>
 
-                                <!-- Seção de Propriedades -->
+                                <!-- Seção de Propriedades com Imagens -->
                                 <?php foreach ($properties_list as $property_item): ?>
                                     <div class="property-section mb-4" data-property-id="<?php echo $property_item['id']; ?>">
                                         <h4><?php echo htmlspecialchars($property_item['name']); ?></h4>
-                                        <div class="mb-3">
-                                            <label for="description_<?php echo $property_item['id']; ?>" class="form-label">Descrição</label>
+                                        <button type="button" class="btn btn-primary btn-sm add-image-button" data-property-id="<?php echo $property_item['id']; ?>">Adicionar Imagem</button>
+                                        <div class="images-list image-preview mt-3" id="images_list_<?php echo $property_item['id']; ?>">
+                                            <?php 
+                                            if ($edit_mode && isset($edit_plant['properties'][$property_item['id']])) {
+                                                foreach ($edit_plant['properties'][$property_item['id']] as $image) { ?>
+                                                    <div class="image-item" data-id="<?php echo htmlspecialchars($image['id']); ?>">
+                                                        <button type="button" class="remove-image">&times;</button>
+                                                        <img src="<?php echo htmlspecialchars($image['image']); ?>" alt="Imagem">
+                                                    </div>
+                                            <?php }
+                                            } ?>
+                                        </div>
+                                        <div class="mb-3 mt-2">
+                                            <!-- <label for="description_<?php echo $property_item['id']; ?>" class="form-label">Descrição</label> -->
                                             <?php
                                             // Determina o nome do campo de descrição com base na propriedade
-                                            $description_field = strtolower($property_item['name']) . '_description';
+                                            $description_field = strtolower($property_item['name_ref']) . '_description';
                                             ?>
                                             <textarea class="form-control" id="<?php echo $description_field; ?>" name="<?php echo $description_field; ?>"><?php echo $edit_mode ? htmlspecialchars($edit_plant[$description_field]) : ''; ?></textarea>
-                                                     
                                         </div>
-                                        <button type="button" class="btn btn-primary btn-sm add-image-button" data-property-id="<?php echo $property_item['id']; ?>">Adicionar Imagem</button>
-                                        <div class="images-list image-preview mt-3" id="images_list_<?php echo $property_item['id']; ?>"></div>
                                     </div>
                                 <?php endforeach; ?>
 
@@ -722,6 +899,7 @@ if (isset($_GET['edit'])) {
 
                                             <td>
                                                 <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-sm">Editar</a>
+                                                <button type="button" class="btn btn-primary btn-sm qrcode-button" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">QR Code</button>
                                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">Excluir</button>
                                             </td>
                                         </tr>
@@ -803,6 +981,34 @@ if (isset($_GET['edit'])) {
         </div>
     </div>
 
+    <!-- Modal para QRCode -->
+    <div class="modal fade" id="qrcodeModal" tabindex="-1" aria-labelledby="qrcodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">QR Code da Planta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Nome da Planta:</strong> <span id="plantName"></span></p>
+                    <p><strong>ID da Planta:</strong> <span id="plantId"></span></p>
+                    <div class="mb-3">
+                        <label for="currentQrcodeUrl" class="form-label">URL atual:</label>
+                        <input type="text" class="form-control" id="currentQrcodeUrl" readonly>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <img id="qrcodeImage" src="" alt="QR Code" class="img-fluid mb-3">
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <a id="downloadQrcode" href="#" class="btn btn-primary me-2" download="qrcode.png">Baixar QR Code</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Modal de Confirmação de Exclusão -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -832,16 +1038,69 @@ if (isset($_GET['edit'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+             // Variável PHP passada para JavaScript
+             var qrcodeBaseUrl = "<?php echo htmlspecialchars($qrcode_base_url); ?>";
+
+            // Inicializa o modal do QR Code
+            var qrcodeModal = new bootstrap.Modal(document.getElementById('qrcodeModal'));
+            var qrcodeImage = document.getElementById('qrcodeImage');
+            var downloadQrcode = document.getElementById('downloadQrcode');
+
+            // Elementos da Modal
+            var plantNameSpan = document.getElementById('plantName');
+            var plantIdSpan = document.getElementById('plantId');
+            var currentQrcodeUrlInput = document.getElementById('currentQrcodeUrl');
+
+            // Adiciona evento de clique para todos os botões "QRCode"
+            document.querySelectorAll('.qrcode-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var plantId = this.getAttribute('data-id');
+                    var plantName = this.getAttribute('data-name');
+
+                    // Determina se a URL já possui parâmetros
+                    var separator = qrcodeBaseUrl.includes('?') ? '&' : '?';
+
+                    // Constrói a URL completa para o QR Code
+                    var qrContent = qrcodeBaseUrl + separator + "id=" + encodeURIComponent(plantId);
+
+                    // Utiliza uma API externa para gerar o QR Code
+                    var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(qrContent);
+
+                    // Preenche os campos da modal
+                    plantNameSpan.textContent = plantName;
+                    plantIdSpan.textContent = plantId;
+                    currentQrcodeUrlInput.value = qrContent;
+                    qrcodeImage.src = qrCodeUrl;
+                    downloadQrcode.href = qrCodeUrl;
+
+                    // Exibe o modal
+                    qrcodeModal.show();
+                });
+            });
             // Variáveis para armazenar dados
+            var addPropertyButton = document.getElementById('addPropertyButton');
             var propertiesData = {}; // Objeto para armazenar dados por propriedade
             var propertyCounter = 0; // Contador para IDs únicos
             var currentPropertyId = null; // ID da propriedade atual
+
+            // Inicializar propriedadesData com dados existentes se estiver no modo de edição
+            <?php if ($edit_mode && isset($edit_plant['properties'])) { ?>
+                propertiesData = <?php echo json_encode($edit_plant['properties']); ?>;
+            <?php } ?>
 
             // Mostrar/Esconder Formulário de Adição de Planta
             var toggleFormButton = document.getElementById('toggleForm');
             var plantForm = document.getElementById('plant-form');
             var plantList = document.getElementById('plant-list');
             var cancelAddPlant = document.getElementById('cancelAddPlant');
+
+            addPropertyButton.addEventListener('click', function() {
+                currentPropertyId = 1;
+                propertyForm.reset();
+                addPropertyModal.show();
+            });
+
 
             if (toggleFormButton) {
                 toggleFormButton.addEventListener('click', function() {
@@ -899,11 +1158,15 @@ if (isset($_GET['edit'])) {
                             propertiesData[currentPropertyId] = [];
                         }
 
+                        // Determina o sort_order com base na quantidade de imagens existentes
+                        var nextSortOrder = propertiesData[currentPropertyId].length + 1;
+
                         // Adiciona a imagem ao array da propriedade atual
                         propertiesData[currentPropertyId].push({
-                            id: propertyCounter++, // ID único
+                            id: null, // Será atribuído pelo backend
                             source: source,
-                            image: imageUrl // Armazena a URL Base64
+                            image: imageUrl, // Armazena a URL Base64
+                            sort_order: nextSortOrder
                         });
 
                         // Atualiza a visualização das imagens
@@ -923,10 +1186,11 @@ if (isset($_GET['edit'])) {
                 var imagesList = document.getElementById('images_list_' + propertyId);
                 imagesList.innerHTML = '';
                 var imagesArray = propertiesData[propertyId] || [];
+
                 imagesArray.forEach(function(imageData, index) {
                     var div = document.createElement('div');
                     div.classList.add('image-item');
-                    div.setAttribute('data-id', imageData.id);
+                    div.setAttribute('data-id', imageData.id !== null ? imageData.id : 'temp-' + index); // Usa ID real ou temporário
 
                     var removeBtn = document.createElement('button');
                     removeBtn.type = 'button';
@@ -934,6 +1198,10 @@ if (isset($_GET['edit'])) {
                     removeBtn.innerHTML = '&times;';
                     removeBtn.onclick = function() {
                         imagesArray.splice(index, 1);
+                        // Reatribuir sort_order após remoção
+                        imagesArray.forEach(function(img, idx) {
+                            img.sort_order = idx + 1;
+                        });
                         updateImagesList(propertyId);
                     };
 
@@ -953,14 +1221,29 @@ if (isset($_GET['edit'])) {
                     onEnd: function(evt) {
                         // Reordena o array com base na nova ordem
                         var orderedIds = Array.from(imagesList.children).map(function(child) {
-                            return parseInt(child.getAttribute('data-id'));
+                            return child.getAttribute('data-id');
                         });
+
                         propertiesData[propertyId].sort(function(a, b) {
-                            return orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id);
+                            var indexA = orderedIds.indexOf(a.id !== null ? a.id.toString() : 'temp-' + propertiesData[propertyId].indexOf(a));
+                            var indexB = orderedIds.indexOf(b.id !== null ? b.id.toString() : 'temp-' + propertiesData[propertyId].indexOf(b));
+                            return indexA - indexB;
+                        });
+
+                        // Reatribuir sort_order após reordenação
+                        propertiesData[propertyId].forEach(function(img, idx) {
+                            img.sort_order = idx + 1;
                         });
                     }
                 });
             }
+
+            // Inicializar listas de imagens existentes
+            <?php if ($edit_mode && isset($edit_plant['properties'])) { ?>
+                <?php foreach ($edit_plant['properties'] as $property_id => $images) { ?>
+                    updateImagesList(<?php echo $property_id; ?>);
+                <?php } ?>
+            <?php } ?>
 
             // Handle form submission
             addPlantFormElement.addEventListener('submit', function(e) {
