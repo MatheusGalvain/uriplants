@@ -16,8 +16,9 @@ class PlantController {
 
         $conn = getConnection();
 
-        $sql = "SELECT plants.id, plants.name, plants.common_names, plants.bark_description , plants.trunk_description, plants.leaf_description, plants.flower_description , plants.fruit_description, plants.seed_description , plants.biology, 
-                plants.species, plants.applications, plants.ecology, plants.created_at, 
+        $sql = "SELECT plants.id, plants.name, plants.common_names, plants.bark_description, plants.trunk_description, 
+                plants.leaf_description, plants.flower_description, plants.fruit_description, plants.seed_description, 
+                plants.biology, plants.species, plants.applications, plants.ecology, plants.created_at, 
                 plants.deleted_at, families.name AS family_name, orders.name AS order_name,
                 divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
                 regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
@@ -34,7 +35,8 @@ class PlantController {
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE plants.id = ?";
+                WHERE plants.id = ?
+                ORDER BY images.sort_order ASC"; // Adiciona ordenação
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -127,8 +129,8 @@ class PlantController {
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                 WHERE properties.name = 'planta'
                 GROUP BY plants.id
-                ORDER BY plants.id ASC
-                LIMIT ? OFFSET ?";
+                ORDER BY images.sort_order ASC, plants.id ASC
+                LIMIT ? OFFSET ?"; // Adiciona ordenação
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -187,6 +189,7 @@ class PlantController {
             echo json_encode(["message" => "Método não suportado"], JSON_UNESCAPED_UNICODE);
         }
     }
+
     public function getOtherPlants($currentPlantId, $limit = 4) {
         $conn = getConnection();
         
@@ -195,7 +198,7 @@ class PlantController {
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                 WHERE plants.id != ? 
-                ORDER BY RAND() LIMIT ?";
+                ORDER BY images.sort_order ASC, RAND() LIMIT ?"; // Adiciona ordenação
         
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -224,6 +227,7 @@ class PlantController {
             return $error;
         }
     }
+
     public function getPlantImages($plantId, $propertyId) {
         $conn = getConnection();
         
@@ -231,7 +235,8 @@ class PlantController {
                 FROM images
                 JOIN plantsproperties ON images.plants_property_id = plantsproperties.id
                 JOIN properties ON plantsproperties.property_id = properties.id
-                WHERE plantsproperties.plant_id = ? AND plantsproperties.property_id = ?";
+                WHERE plantsproperties.plant_id = ? AND plantsproperties.property_id = ?
+                ORDER BY images.sort_order ASC"; // Adiciona ordenação
         
         $stmt = $conn->prepare($sql);
         if (!$stmt) {

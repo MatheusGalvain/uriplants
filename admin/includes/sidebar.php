@@ -55,11 +55,11 @@
                                     Regiões
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a class="dropdown-item text-white ps-5" href="images.php">
                                     Imagens
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="nav-item">
                                 <a class="dropdown-item text-white ps-5" href="qrcode.php">
                                     QR Code URL

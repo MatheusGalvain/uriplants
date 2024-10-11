@@ -731,9 +731,9 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                 <!-- Seleção da Divisão -->
                                 <div class="mb-3">
-                                    <label for="division_id" class="form-label">*Divisão</label>
+                                    <label for="division_id" class="form-label">Divisão</label>
                                     <select class="form-select" id="division_id" name="division_id" required>
-                                        <option value="">Selecione a divisão</option>
+                                        <option value="0">Selecione a divisão</option>
                                         <?php foreach ($divisions as $division) { ?>
                                             <option value="<?php echo htmlspecialchars($division['id']); ?>" <?php echo ($edit_mode && $edit_plant['division_id'] == $division['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($division['name']); ?>
@@ -744,9 +744,9 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                 <!-- Seleção da Classe -->
                                 <div class="mb-3">
-                                    <label for="class_id" class="form-label">*Classe</label>
+                                    <label for="class_id" class="form-label">Classe</label>
                                     <select class="form-select" id="class_id" name="class_id" required>
-                                        <option value="">Selecione a classe</option>
+                                        <option value="0">Selecione a classe</option>
                                         <?php foreach ($classes as $class) { ?>
                                             <option value="<?php echo htmlspecialchars($class['id']); ?>" <?php echo ($edit_mode && $edit_plant['class_id'] == $class['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($class['name']); ?>
@@ -757,9 +757,9 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                 <!-- Seleção da Ordem -->
                                 <div class="mb-3">
-                                    <label for="order_id" class="form-label">*Ordem</label>
+                                    <label for="order_id" class="form-label">Ordem</label>
                                     <select class="form-select" id="order_id" name="order_id" required>
-                                        <option value="">Selecione a ordem</option>
+                                        <option value="0">Selecione a ordem</option>
                                         <?php foreach ($orders as $order) { ?>
                                             <option value="<?php echo htmlspecialchars($order['id']); ?>" <?php echo ($edit_mode && $edit_plant['order_id'] == $order['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($order['name']); ?>
@@ -770,9 +770,9 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                 <!-- Seleção da Família -->
                                 <div class="mb-3">
-                                    <label for="family_id" class="form-label">*Família</label>
+                                    <label for="family_id" class="form-label">Família</label>
                                     <select class="form-select" id="family_id" name="family_id" required>
-                                        <option value="">Selecione a família</option>
+                                        <option value="0">Selecione a família</option>
                                         <?php foreach ($families as $family) { ?>
                                             <option value="<?php echo htmlspecialchars($family['id']); ?>" <?php echo ($edit_mode && $edit_plant['family_id'] == $family['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($family['name']); ?>
@@ -785,7 +785,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                 <div class="mb-3">
                                     <label for="genus_id" class="form-label">Gênero</label>
                                     <select class="form-select" id="genus_id" name="genus_id">
-                                        <option value="">Selecione o gênero</option>
+                                        <option value="0">Selecione o gênero</option>
                                         <?php foreach ($genus as $genusItem) { ?>
                                             <option value="<?php echo htmlspecialchars($genusItem['id']); ?>" <?php echo ($edit_mode && $edit_plant['genus_id'] == $genusItem['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($genusItem['name']); ?>
@@ -798,7 +798,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                 <div class="mb-3">
                                     <label for="region_id" class="form-label">Região</label>
                                     <select class="form-select" id="region_id" name="region_id">
-                                        <option value="">Selecione a região</option>
+                                        <option value="0">Selecione a região</option>
                                         <?php foreach ($regionMap as $region) { ?>
                                             <option value="<?php echo htmlspecialchars($region['id']); ?>" <?php echo ($edit_mode && $edit_plant['region_id'] == $region['id']) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($region['name']); ?>
