@@ -139,7 +139,6 @@ if (isset($_POST['edit_region'])) {
     }
 }
 
-// Manipulação de Exclusão de Região (Soft Delete)
 if (isset($_POST['delete_region'])) {
     $id = intval($_POST['id']);
 
@@ -182,25 +181,21 @@ if (isset($_POST['delete_region'])) {
     }
 }
 
-// Manipulação de Pesquisa
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
-// Paginação
-$limit = 20; // Número de registros por página
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-$offset = ($page - 1) * $limit;
-
-// Construção dinâmica da consulta com prepared statements
 $query = "SELECT SQL_CALC_FOUND_ROWS * FROM RegionMap WHERE deleted_at IS NULL";
 $params = [];
 $types = "";
 
-// Adicionar condição de busca se $search não estiver vazio
 if (!empty($search)) {
-    $query .= " AND source LIKE ?";
+    $query .= " AND name LIKE ?";
     $params[] = '%' . $search . '%';
     $types .= "s";
 }
+
+$limit = 20;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
 
 $query .= " LIMIT ? OFFSET ?";
 $types .= "ii";
@@ -214,23 +209,25 @@ if ($stmt) {
     mysqli_stmt_execute($stmt);
     $regionsQuery = mysqli_stmt_get_result($stmt);
 
-    // Obter o número total de registros encontrados
     $totalResult = mysqli_query($con, "SELECT FOUND_ROWS() as total");
     $totalRow = mysqli_fetch_assoc($totalResult);
     $totalRecords = $totalRow['total'];
-    $totalPages = ceil($totalRecords / $limit);
+    $total_pages = ceil($totalRecords / $limit);
 
 } else {
-    // Tratamento de erro
     error_log("Erro na preparação da consulta: " . mysqli_error($con));
     die("Erro ao buscar regiões. Por favor, tente novamente mais tarde.");
+
 }
+
 ?>
+
 <!DOCTYPE html>
     <html lang="pt-BR"> 
     <head>
         <?php include_once("includes/head.php"); ?>
         <title>Admin | Regiões</title>
+        <link href="css/pagination.css" rel="stylesheet" />
     </head>
 
     <body class="sb-nav-fixed">
@@ -339,41 +336,7 @@ if ($stmt) {
                             </div>
                         </div>
                     </div>
-                    <!-- Paginação -->
-                                <?php
-                                $baseUrl = "?";
-                                if ($search) {
-                                    $baseUrl .= "search=" . urlencode($search) . "&";
-                                }
-                                ?>
-                                <nav aria-label="Navegação de página">
-                                    <ul class="pagination justify-content-center">
-                                        <?php if ($page > 1) { ?>
-                                            <li class="page-item">
-                                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page - 1; ?>" aria-label="Anterior">
-                                                    <span aria-hidden="true">&laquo;</span>
-                                                    <span class="sr-only">Anterior</span>
-                                                </a>
-                                            </li>
-                                        <?php } ?>
-
-                                        <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
-                                            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                                            </li>
-                                        <?php } ?>
-
-                                        <?php if ($page < $totalPages) { ?>
-                                            <li class="page-item">
-                                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page + 1; ?>" aria-label="Próximo">
-                                                    <span aria-hidden="true">&raquo;</span>
-                                                    <span class="sr-only">Próximo</span>
-                                                </a>
-                                            </li>
-                                        <?php } ?>
-                                    </ul>
-                                </nav>
-                                <!-- Fim da Paginação -->
+                    <?php include('includes/pagination.php'); ?> 
                 </main>
                 <?php include('includes/footer.php'); ?>
             </div>
