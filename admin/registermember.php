@@ -3,7 +3,8 @@ require_once('includes/config.php');
 
 check_user_session();
 
-// Código para Registro
+$message = '';
+
 if (isset($_POST['submit'])) {
     $fname = $_POST['fname'];
     $email = $_POST['email'];
@@ -11,29 +12,27 @@ if (isset($_POST['submit'])) {
     $confirm_password = $_POST['confirmpassword'];
     $is_administrator = $_POST['is_administrator'];
 
-    // Verifica se as senhas coincidem
     if ($password !== $confirm_password) {
-        echo "<script>alert('A senha e a confirmação de senha não coincidem.');</script>";
+        $message = 'A senha e a confirmação de senha não coincidem.';
     } elseif (strlen($password) < 6) {
-        echo "<script>alert('A senha deve ter mais de 6 dígitos.');</script>";
+         $message = 'A senha deve ter mais de 6 dígitos.';
     } else {
-        // Verifica se o email já existe
+
         $sql = mysqli_query($con, "SELECT id FROM users WHERE email='$email'");
         $row = mysqli_num_rows($sql);
 
         if ($row > 0) {
-            echo "<script>alert('Email já cadastrado em outra conta. Por favor, tente com outro email.');</script>";
+             $message = 'Email já cadastrado em outra conta. Por favor, tente com outro email.';
         } else {
-            // Criptografa a senha
+
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            // Insere o novo usuário
             $msg = mysqli_query($con, "INSERT INTO users (fname, email, password, is_administrator) VALUES ('$fname', '$email', '$hashed_password', '$is_administrator')");
             if ($msg) {
-                echo "<script>alert('Registrado com sucesso');</script>";
-                echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
+                $message = 'Registrado com sucesso';
+
             } else {
-                echo "<script>alert('Erro ao registrar.');</script>";
+                 $message = 'Erro ao registrar.';
             }
         }
     }
@@ -70,7 +69,7 @@ if (isset($_POST['submit'])) {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                <a href="manage-users.php" class="btn btn-outline-primary mt-4"> Voltar</a>
+             
                     <h1 class="mt-4 mb-4">Cadastrar Novo Usuário</h1>
 
                         <div class="card-body">
@@ -116,8 +115,9 @@ if (isset($_POST['submit'])) {
                                         </td>
                                     </tr>
                                 </table>
-                                <div class="d-flex justify-content-center">
+                                <div class="d-flex justify-content-center gap-3 ">
                                     <button type="submit" class="btn btn-primary mb-3" name="submit">Criar Conta</button>
+                                    <a href="manage-users.php" class="btn btn-secondary mb-3">Voltar</a>
                                 </div>
                             </form>
                         </div>
@@ -126,6 +126,61 @@ if (isset($_POST['submit'])) {
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
+
+     <!-- Modal -->
+     <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo usuário</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="messageModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
+    <script>
+
+        window.addEventListener('DOMContentLoaded', event => {
+            const datatablesSimple = document.getElementById('datatablesSimple');
+            if (datatablesSimple) {
+                new simpleDatatables.DataTable(datatablesSimple, {
+                    labels: {
+                        placeholder: "Buscar...", 
+                        perPage: "por página",
+                        noRows: "Nenhum registro encontrado",
+                        info: "Mostrando {start} a {end} de {rows} entradas",
+                        noResults: "Nenhum resultado correspondente",
+                        perPageSelect: "entradas"
+                    }
+                });
+            }
+        });
+
+        function showMessageModal(message) {
+            const modalBody = document.getElementById('messageModalBody');
+            modalBody.textContent = message;
+            const modalElement = document.getElementById('messageModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    </script>
+
+    <?php if (!empty($message)): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showMessageModal('<?php echo addslashes($message); ?>');
+            });
+        </script>
+    <?php endif; ?>
+
 </body>
 
 </html>

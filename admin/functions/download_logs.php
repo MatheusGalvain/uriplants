@@ -1,8 +1,6 @@
 <?php
 include_once('includes/config.php');
 
-check_user_session();
-
 // Definir cabeçalhos para download de arquivo CSV
 header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename=relatorio_logs_' . date('Y-m-d') . '.csv');

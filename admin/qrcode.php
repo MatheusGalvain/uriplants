@@ -13,11 +13,10 @@ if (isset($_POST['edit_url'])) {
     $id = intval($_POST['id']);
     $url = mysqli_real_escape_string($con, $_POST['url']);
 
-    // Verificar se já existe uma entrada com id = 1
     $query = mysqli_query($con, "SELECT url FROM qrcode_url WHERE id = 1");
 
     if (mysqli_num_rows($query) > 0) {
-        // Entrada existe, realizar UPDATE
+
         $old_row = mysqli_fetch_assoc($query);
         $old_url = $old_row['url'];
 
@@ -25,9 +24,8 @@ if (isset($_POST['edit_url'])) {
         if (mysqli_query($con, $sql)) {
             $success = "URL atualizado com sucesso.";
 
-            // Auditoria para atualização da URL
             $table = 'qrcode_url';
-            $action_id = 2; // Atualização
+            $action_id = 2; 
             $changed_by = $_SESSION['id'];
             $old_value = $old_url;
             $new_value = $url;
@@ -38,14 +36,13 @@ if (isset($_POST['edit_url'])) {
             $error = "Erro ao atualizar a URL: " . mysqli_error($con);
         }
     } else {
-        // Entrada não existe, realizar INSERT
+
         $sql = "INSERT INTO qrcode_url (id, url) VALUES (1, '$url')";
         if (mysqli_query($con, $sql)) {
             $success = "URL inserida com sucesso.";
 
-            // Auditoria para inserção da URL
             $table = 'qrcode_url';
-            $action_id = 1; // Inserção
+            $action_id = 1; 
             $changed_by = $_SESSION['id'];
             $old_value = null;
             $new_value = $url;
@@ -91,8 +88,8 @@ $urlQuery = mysqli_query($con, "SELECT url FROM qrcode_url WHERE id = 1");
                         <div class="card-body">
                             <h5 class="card-title">Editar URL</h5>
                             <form method="POST" action="">
-                                <!-- Campo Oculto para o ID -->
-                                <input type="hidden" name="id" value="1"> <!-- Considerando que o ID fixo é 1 -->
+                               
+                                <input type="hidden" name="id" value="1">
                                 
                                 <div class="mb-3">
                                     <label for="url" class="form-label">Novo endereço</label>

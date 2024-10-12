@@ -36,7 +36,7 @@ class PlantController {
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                 WHERE plants.id = ?
-                ORDER BY images.sort_order ASC"; // Adiciona ordenação
+                ORDER BY images.sort_order ASC"; 
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -94,7 +94,7 @@ class PlantController {
                      LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                      LEFT JOIN properties ON plantsproperties.property_id = properties.id
                      LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                     WHERE properties.name = 'planta'";
+                     WHERE plants.deleted_at IS NULL";
 
         $countStmt = $conn->prepare($countSql);
         if (!$countStmt) {
@@ -127,10 +127,10 @@ class PlantController {
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE properties.name = 'planta'
+                WHERE plants.deleted_at IS NULL
                 GROUP BY plants.id
                 ORDER BY images.sort_order ASC, plants.id ASC
-                LIMIT ? OFFSET ?"; // Adiciona ordenação
+                LIMIT ? OFFSET ?"; 
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -198,7 +198,7 @@ class PlantController {
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                 WHERE plants.id != ? 
-                ORDER BY images.sort_order ASC, RAND() LIMIT ?"; // Adiciona ordenação
+                ORDER BY images.sort_order ASC, RAND() LIMIT ?"; 
         
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -236,7 +236,7 @@ class PlantController {
                 JOIN plantsproperties ON images.plants_property_id = plantsproperties.id
                 JOIN properties ON plantsproperties.property_id = properties.id
                 WHERE plantsproperties.plant_id = ? AND plantsproperties.property_id = ?
-                ORDER BY images.sort_order ASC"; // Adiciona ordenação
+                ORDER BY images.sort_order ASC"; 
         
         $stmt = $conn->prepare($sql);
         if (!$stmt) {

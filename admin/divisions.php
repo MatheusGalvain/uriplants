@@ -24,7 +24,6 @@ if (isset($_POST['add_division'])) {
             $new_value = "ID: $new_class_id, Nome: $name";
             $plant_id = null;
 
-
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 
         } else {
