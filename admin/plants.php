@@ -648,7 +648,7 @@ $plantsQuery = mysqli_query($con, "
 ");
 if (!$plantsQuery) {
     $error = "Erro na consulta de plantas: " . mysqli_error($con);
-}
+};
 
 // Dados para selects
 $divisions = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Divisions WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
@@ -734,8 +734,10 @@ if (isset($_GET['edit'])) {
             $stmt->close();
         }
     }
-}
+};
+
 $qrcode_base_url = get_qrcode_url($con);
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

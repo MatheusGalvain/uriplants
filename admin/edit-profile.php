@@ -3,21 +3,21 @@ include_once('includes/config.php');
 
 check_user_session();
 
-    // Código para atualização do perfil
-    if (isset($_POST['update'])) {
-        $fname = $_POST['fname'];
-        $email = $_POST['email'];
-        $userid = $_SESSION['id'];
+// Código para atualização do perfil
+if (isset($_POST['update'])) {
+    $fname = $_POST['fname'];
+    $email = $_POST['email'];
+    $userid = $_SESSION['id'];
 
-        // Prepara a consulta de atualização com o e-mail
-        $updateQuery = "UPDATE users SET fname='$fname', email='$email' WHERE id='$userid'";
-        $msg = mysqli_query($con, $updateQuery);
+    // Prepara a consulta de atualização com o e-mail
+    $updateQuery = "UPDATE users SET fname='$fname', email='$email' WHERE id='$userid'";
+    $msg = mysqli_query($con, $updateQuery);
 
-        if ($msg) {
-            echo "<script>alert('Perfil atualizado com sucesso');</script>";
-            echo "<script type='text/javascript'>document.location = 'profile.php';</script>";
-        }
+    if ($msg) {
+        echo "<script>alert('Perfil atualizado com sucesso');</script>";
+        echo "<script type='text/javascript'>document.location = 'profile.php';</script>";
     }
+}
 ?>
 
 <!DOCTYPE html>

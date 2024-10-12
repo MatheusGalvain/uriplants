@@ -1,109 +1,109 @@
 <?php
-    session_start();
-    include_once('includes/config.php');
-    require_once('includes/audit.php');
+include_once('includes/config.php');
 
-    check_user_session();
+check_user_session();
 
-    if (isset($_POST['add_division'])) {
-        $name = mysqli_real_escape_string($con, $_POST['name']);
+if (isset($_POST['add_division'])) {
+    $name = mysqli_real_escape_string($con, $_POST['name']);
 
-        $query = mysqli_query($con, "SELECT * FROM Divisions WHERE name='$name'");
-        if (mysqli_num_rows($query) > 0) {
-            $error = "Uma divisão com esse nome já existe.";
+    $query = mysqli_query($con, "SELECT * FROM Divisions WHERE name='$name'");
+    if (mysqli_num_rows($query) > 0) {
+        $error = "Uma divisão com esse nome já existe.";
+    } else {
+
+        $sql = "INSERT INTO Divisions (name) VALUES ('$name')";
+        if (mysqli_query($con, $sql)) {
+            $success = "Divisão adicionada com sucesso.";
+
+            $new_class_id = mysqli_insert_id($con);
+
+            $table = 'divisions';
+            $action_id = 1; 
+            $changed_by = $_SESSION['id'];
+            $old_value = null; 
+            $new_value = "ID: $new_class_id, Nome: $name";
+            $plant_id = null;
+
+
+            log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
         } else {
-
-            $sql = "INSERT INTO Divisions (name) VALUES ('$name')";
-            if (mysqli_query($con, $sql)) {
-                $success = "Divisão adicionada com sucesso.";
-
-                $new_class_id = mysqli_insert_id($con);
-
-                $table = 'divisions';
-                $action_id = 1; 
-                $changed_by = $_SESSION['id'];
-                $old_value = null; 
-                $new_value = "ID: $new_class_id, Nome: $name";
-                $plant_id = null;
-    
-    
-                log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
-            } else {
-                $error = "Erro ao adicionar divisão: " . mysqli_error($con);
-            }
+            $error = "Erro ao adicionar divisão: " . mysqli_error($con);
         }
     }
+}
 
-    if (isset($_POST['delete_division'])) {
-        $id = intval($_POST['id']);
+if (isset($_POST['delete_division'])) {
+    $id = intval($_POST['id']);
 
+    $old_query = mysqli_query($con, "SELECT name FROM divisions WHERE id = $id");
+    $old_row = mysqli_fetch_assoc($old_query);
+    $old_name = $old_row['name'];
+
+    $sql = "UPDATE Divisions SET deleted_at = NOW() WHERE id = $id";
+    if (mysqli_query($con, $sql)) {
+        $success = "Divisão excluída com sucesso.";
+
+        $table = 'divisions';
+        $action_id = 2; 
+        $changed_by = $_SESSION['id'];
+        $old_value = "Nome: $old_name";
+        $new_value = null; 
+        $plant_id = null; 
+
+        log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+
+    } else {
+        $error = "Erro ao excluir divisão: " . mysqli_error($con);
+    }
+}
+
+if (isset($_POST['edit_division'])) {
+    $id = intval($_POST['id']);
+    $name = mysqli_real_escape_string($con, $_POST['name']);
+
+    $query = mysqli_query($con, "SELECT * FROM Divisions WHERE name='$name' AND id != $id");
+    if (mysqli_num_rows($query) > 0) {
+        $error = "Uma divisão com esse nome já existe.";
+    } else {
         $old_query = mysqli_query($con, "SELECT name FROM divisions WHERE id = $id");
         $old_row = mysqli_fetch_assoc($old_query);
         $old_name = $old_row['name'];
 
-        $sql = "UPDATE Divisions SET deleted_at = NOW() WHERE id = $id";
+        $sql = "UPDATE Divisions SET name='$name' WHERE id=$id";
         if (mysqli_query($con, $sql)) {
-            $success = "Divisão excluída com sucesso.";
+            $success = "Divisão editada com sucesso.";
 
-            $table = 'divisions';
-            $action_id = 2; 
-            $changed_by = $_SESSION['id'];
-            $old_value = "Nome: $old_name";
-            $new_value = null; 
-            $plant_id = null; 
-    
-            log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+        $table = 'divisions';
+        $action_id = 3; 
+        $changed_by = $_SESSION['id'];
+        $old_value = "$old_name";
+        $new_value = "$name";
+        $plant_id = null; 
 
+        log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
         } else {
-            $error = "Erro ao excluir divisão: " . mysqli_error($con);
+            $error = "Erro ao editar divisão: " . mysqli_error($con);
         }
     }
+}
 
-    if (isset($_POST['edit_division'])) {
-        $id = intval($_POST['id']);
-        $name = mysqli_real_escape_string($con, $_POST['name']);
+$search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
-        $query = mysqli_query($con, "SELECT * FROM Divisions WHERE name='$name' AND id != $id");
-        if (mysqli_num_rows($query) > 0) {
-            $error = "Uma divisão com esse nome já existe.";
-        } else {
-            $old_query = mysqli_query($con, "SELECT name FROM divisions WHERE id = $id");
-            $old_row = mysqli_fetch_assoc($old_query);
-            $old_name = $old_row['name'];
+$limit = 1;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
 
-            $sql = "UPDATE Divisions SET name='$name' WHERE id=$id";
-            if (mysqli_query($con, $sql)) {
-                $success = "Divisão editada com sucesso.";
+$count_query = "SELECT COUNT(*) AS total FROM divisions WHERE deleted_at IS NULL $searchQuery";
 
-            $table = 'divisions';
-            $action_id = 3; 
-            $changed_by = $_SESSION['id'];
-            $old_value = "$old_name";
-            $new_value = "$name";
-            $plant_id = null; 
+$count_result = mysqli_query($con, $count_query);
+$total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
 
-            log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-            } else {
-                $error = "Erro ao editar divisão: " . mysqli_error($con);
-            }
-        }
-    }
+$total_pages = ceil($total_logs / $limit);
 
-    $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
+$searchQuery = $search ? "AND name LIKE '%$search%'" : "";
+$divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
 
-    $limit = 20;
-    $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-    $offset = ($page - 1) * $limit;
-
-    $totalQuery = mysqli_query($con, "SELECT COUNT(*) as total FROM divisions WHERE deleted_at IS NULL $searchQuery");
-    $totalRow = mysqli_fetch_assoc($totalQuery);
-    $totalRecords = $totalRow['total'];
-    $totalPages = ceil($totalRecords / $limit);
-
-
-    $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
-    $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
 ?>
 
 <!DOCTYPE html>
@@ -112,6 +112,7 @@
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Divisões</title>
+    <link href="css/pagination.css" rel="stylesheet" />
 </head>
 
 <body class="sb-nav-fixed">
@@ -183,41 +184,7 @@
                         </table>
                     </div>
                 </div>
-                <!-- Paginação -->
-                <?php
-                $baseUrl = "?";
-                if ($search) {
-                    $baseUrl .= "search=" . urlencode($search) . "&";
-                }
-                ?>
-                <nav aria-label="Navegação de página">
-                    <ul class="pagination justify-content-center">
-                        <?php if ($page > 1) { ?>
-                            <li class="page-item">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page - 1; ?>" aria-label="Anterior">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">Anterior</span>
-                                </a>
-                            </li>
-                        <?php } ?>
-
-                        <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
-                            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                            </li>
-                        <?php } ?>
-
-                        <?php if ($page < $totalPages) { ?>
-                            <li class="page-item">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page + 1; ?>" aria-label="Próximo">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">Próximo</span>
-                                </a>
-                            </li>
-                        <?php } ?>
-                    </ul>
-                </nav>
-                <!-- Fim da Paginação -->
+                <?php include('includes/pagination.php'); ?> 
             </main>
             <?php include('includes/footer.php'); ?>
         </div>

@@ -86,15 +86,15 @@ if (isset($_POST['edit_genus'])) {
 
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
-$limit = 20;
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$limit = 1;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$totalQuery = mysqli_query($con, "SELECT COUNT(*) as total FROM genus WHERE deleted_at IS NULL $searchQuery");
-$totalRow = mysqli_fetch_assoc($totalQuery);
-$totalRecords = $totalRow['total'];
-$totalPages = ceil($totalRecords / $limit);
+$count_query = "SELECT COUNT(*) as total FROM genus WHERE deleted_at IS NULL $searchQuery";
 
+$count_result = mysqli_query($con, $count_query);
+$total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
+$total_pages = ceil($total_logs / $limit);
 
 $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
 $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
@@ -106,6 +106,7 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Gêneros</title>
+    <link href="css/pagination.css" rel="stylesheet" /> 
 </head>
 
 <body class="sb-nav-fixed">
@@ -179,41 +180,7 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
                         </div>
                     </div>
                 </div>
-                  <!-- Paginação -->
-                  <?php
-                $baseUrl = "?";
-                if ($search) {
-                    $baseUrl .= "search=" . urlencode($search) . "&";
-                }
-                ?>
-                <nav aria-label="Navegação de página">
-                    <ul class="pagination justify-content-center">
-                        <?php if ($page > 1) { ?>
-                            <li class="page-item">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page - 1; ?>" aria-label="Anterior">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">Anterior</span>
-                                </a>
-                            </li>
-                        <?php } ?>
-
-                        <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
-                            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                            </li>
-                        <?php } ?>
-
-                        <?php if ($page < $totalPages) { ?>
-                            <li class="page-item">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page + 1; ?>" aria-label="Próximo">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">Próximo</span>
-                                </a>
-                            </li>
-                        <?php } ?>
-                    </ul>
-                </nav>
-                <!-- Fim da Paginação -->
+                <?php include('includes/pagination.php'); ?> 
             </main>
             <?php include('includes/footer.php'); ?>
         </div>

@@ -1,5 +1,6 @@
 <?php
 include_once('includes/session.php');
+require_once('includes/audit.php');
 
 start_session_if_none();
 
