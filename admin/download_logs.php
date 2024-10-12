@@ -1,12 +1,7 @@
 <?php
-session_start();
 include_once('includes/config.php');
 
-// Verificar se o usuário está autenticado
-if (!isset($_SESSION['id']) || strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
 
 // Definir cabeçalhos para download de arquivo CSV
 header('Content-Type: text/csv; charset=utf-8');

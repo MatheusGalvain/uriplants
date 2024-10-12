@@ -1,13 +1,8 @@
 <?php
-session_start();
 include_once('includes/config.php');
 require_once('includes/audit.php'); 
 
-// Verificação de autenticação
-if (strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
 
 // Funções auxiliares para auditoria e obtenção de nomes
 function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id = null) {

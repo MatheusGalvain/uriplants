@@ -1,8 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 include_once('includes/config.php');
+
+check_user_session();
 
 // Verifica se a sessão do usuário está ativa
 if (!isset($_SESSION['id']) || empty($_SESSION['id'])) {

@@ -1,14 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-};
 include_once('includes/config.php');
 
-// Verificar se a sessão está ativa
-if (!isset($_SESSION['id']) || strlen($_SESSION['id']) == 0) {
-    header('Location: logout.php');
-    exit;
-}
+check_user_session();
 
 // Verificar se o formulário foi enviado
 if (isset($_POST['update'])) {

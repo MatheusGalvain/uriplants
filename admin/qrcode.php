@@ -1,7 +1,8 @@
 <?php
-session_start();
 include_once('includes/config.php');
 require_once('includes/audit.php');
+
+check_user_session();
 
 if (strlen($_SESSION['id']) == 0) {
     header('location:logout.php');

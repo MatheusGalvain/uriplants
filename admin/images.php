@@ -1,20 +1,8 @@
 <?php
-// images.php
-
-session_start();
 include_once('includes/config.php');
 require_once('includes/audit.php'); 
 
-// Configuração de exibição de erros
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Verificação de sessão
-if (empty($_SESSION['id'])) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
 
 function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id = null) {
     log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);

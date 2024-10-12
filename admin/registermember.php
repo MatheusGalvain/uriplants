@@ -1,8 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-};
 require_once('includes/config.php');
+
+check_user_session();
 
 // Código para Registro
 if (isset($_POST['submit'])) {

@@ -1,10 +1,8 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 include_once('includes/config.php');
-
 require 'vendor/autoload.php';
+
+check_user_session();
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

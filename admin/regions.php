@@ -1,12 +1,8 @@
 <?php
-session_start();
 include_once('includes/config.php');
 require_once('includes/audit.php'); 
 
-if (strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
 
 function display_value($value) {
     return isset($value) ? htmlspecialchars($value) : 'N/A';

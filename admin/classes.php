@@ -1,12 +1,8 @@
 <?php
-session_start();
 include_once('includes/config.php');
-require_once('includes/audit.php');
 
-if (strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
+
 
 if (isset($_POST['add_class'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);

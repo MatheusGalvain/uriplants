@@ -1,13 +1,7 @@
 <?php
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    };
-    include_once('includes/config.php');
+include_once('includes/config.php');
 
-    if (strlen($_SESSION['id']) == 0) {
-        header('location:logout.php');
-        exit();
-    }
+check_user_session();
 
     $userId = $_SESSION['id'];
     $query = mysqli_query($con, "SELECT * FROM users WHERE id='$userId'");

@@ -1,8 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 include_once('includes/config.php');
+
+check_user_session();
 
 if (isset($_GET['token'])) {
     $token = $_GET['token'];

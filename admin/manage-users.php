@@ -1,14 +1,7 @@
 <?php 
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    include_once('includes/config.php');
+include_once('includes/config.php');
 
-    // Verifica se o usuário está autenticado
-    if (strlen($_SESSION['id']) == 0) {
-        header('location:logout.php');
-        exit;
-    }
+check_user_session();
 
     // Verifica se o admin está logado
     $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';

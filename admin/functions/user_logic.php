@@ -4,7 +4,6 @@
     }
     include_once('includes/config.php');
 
-    // Verifica se o usuário está autenticado
     if (!isset($_SESSION['id']) || strlen($_SESSION['id']) == 0) {
         header('Location: logout.php');
         exit();
