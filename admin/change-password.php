@@ -1,6 +1,8 @@
 <?php
 include_once('includes/config.php');
 
+check_user_session();
+
 if (isset($_POST['update'])) {
     $oldpassword = md5($_POST['currentpassword']);
     $newpassword = md5($_POST['newpassword']);
