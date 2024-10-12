@@ -1,15 +1,9 @@
 <?php
-session_start();
 include_once('includes/config.php');
-require_once('includes/audit.php'); 
+require_once('functions/audit.php'); 
 
-// Verificação de autenticação
-if (strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
 
-// Funções auxiliares para auditoria e obtenção de nomes
 function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id = null) {
     log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 }
@@ -28,20 +22,19 @@ function get_plant_name($con, $plant_id) {
     return "Desconhecida";
 }
 
+// Para listar as propriedades que a planta pode ter
 function get_property_name($con, $property_id) {
-    // Atualize a consulta SQL para incluir name e name_ref
+
     $sql = "SELECT name, name_ref FROM properties WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, 'i', $property_id);
         mysqli_stmt_execute($stmt);
 
-        // Capture tanto name quanto name_ref
         mysqli_stmt_bind_result($stmt, $property_name, $property_name_ref);
         mysqli_stmt_fetch($stmt);
         mysqli_stmt_close($stmt);
 
-        // Retorne um array com os dois valores
         return [
             'name' => $property_name,
             'name_ref' => $property_name_ref
@@ -50,42 +43,39 @@ function get_property_name($con, $property_id) {
     return "Desconhecida";
 }
 
-// Função para filtrar entrada
 function filter_input_data_custom($con, $data) {
     return mysqli_real_escape_string($con, trim($data));
 }
 
-// Pega o url para gerar o qrcode dinamico
 function get_qrcode_url($con) {
     $sql = "SELECT url FROM qrcode_url LIMIT 1";
     
     if ($stmt = $con->prepare($sql)) {
-        // Executa a consulta
+
         if ($stmt->execute()) {
-            // Obtém o resultado
+
             $stmt->bind_result($url);
             if ($stmt->fetch()) {
                 $stmt->close();
                 return $url;
             } else {
-                // Nenhum registro encontrado
+
                 $stmt->close();
                 return false;
             }
         } else {
-            // Erro na execução da consulta
+
             error_log("Erro na execução da consulta: " . $stmt->error);
             $stmt->close();
             return false;
         }
     } else {
-        // Erro na preparação da consulta
+
         error_log("Erro na preparação da consulta: " . $con->error);
         return false;
     }
 }
 
-// Adicionar Planta com Propriedades e Imagens
 if (isset($_POST['add_plant'])) {
     // Dados da Planta
     $name = filter_input_data_custom($con, $_POST['name']);
@@ -100,8 +90,6 @@ if (isset($_POST['add_plant'])) {
     $applications = filter_input_data_custom($con, $_POST['applications']);
     $ecology = filter_input_data_custom($con, $_POST['ecology']);
     $biology = filter_input_data_custom($con, $_POST['biology']);
-
-    // Novos campos de descrição
     $bark_description = filter_input_data_custom($con, $_POST['bark_description'] ?? '');
     $trunk_description = filter_input_data_custom($con, $_POST['trunk_description'] ?? '');
     $leaf_description = filter_input_data_custom($con, $_POST['leaf_description'] ?? '');
@@ -109,12 +97,11 @@ if (isset($_POST['add_plant'])) {
     $fruit_description = filter_input_data_custom($con, $_POST['fruit_description'] ?? '');
     $seed_description = filter_input_data_custom($con, $_POST['seed_description'] ?? '');
 
-    // Coleta de dados das propriedades
     $properties_data = isset($_POST['properties_data']) ? json_decode($_POST['properties_data'], true) : [];
 
     mysqli_begin_transaction($con);
     try {
-        // Verifica se a planta já existe
+
         $stmt = $con->prepare("SELECT id FROM Plants WHERE name = ? AND deleted_at IS NULL");
         if (!$stmt) {
             throw new Exception("Erro na preparação da consulta: " . $con->error);
@@ -127,7 +114,7 @@ if (isset($_POST['add_plant'])) {
         }
         $stmt->close();
 
-        // Inserir nova planta
+
         $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, biology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             throw new Exception("Erro na preparação da inserção: " . $con->error);
@@ -139,19 +126,18 @@ if (isset($_POST['add_plant'])) {
         $plant_id = mysqli_insert_id($con);
         $stmt->close();
 
-        // Auditoria para inserção de planta
-        $table = 'Plants';
-        $action_id = 1; // Adição
+
+        $table = 'Plantas';
+        $action_id = 1;
         $changed_by = $_SESSION['id'];
         $old_value = null;
         $new_value = "Planta: $name, Espécie: $species";
         log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 
-        // Processar propriedades e imagens
+
         foreach ($properties_data as $property_id => $images) {
             $property_id = intval($property_id);
 
-            // Inserir na tabela PlantsProperties
             $stmt = $con->prepare("INSERT INTO PlantsProperties (plant_id, property_id) VALUES (?, ?)");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da consulta PlantsProperties: " . $con->error);
@@ -167,12 +153,10 @@ if (isset($_POST['add_plant'])) {
             if (!empty($images)) {
                 foreach ($images as $imageData) {
                     $source = filter_input_data_custom($con, $imageData['source']);
-                    $image = $imageData['image']; // Base64 string
+                    $image = $imageData['image']; 
 
-                    // Decodifica a imagem Base64
                     $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
 
-                    // Determina o próximo sort_order para esta propriedade
                     $stmt_order = $con->prepare("SELECT MAX(sort_order) FROM images WHERE plants_property_id = ?");
                     if ($stmt_order) {
                         $stmt_order->bind_param("i", $plants_property_id);
@@ -182,10 +166,9 @@ if (isset($_POST['add_plant'])) {
                         $next_sort_order = $max_sort_order !== null ? $max_sort_order + 1 : 1;
                         $stmt_order->close();
                     } else {
-                        $next_sort_order = 1; // Fallback caso a consulta falhe
+                        $next_sort_order = 1; 
                     }
 
-                    // Insere na tabela images com sort_order
                     $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
                     if (!$stmt) {
                         throw new Exception("Erro na preparação da consulta de imagem: " . $con->error);
@@ -197,13 +180,12 @@ if (isset($_POST['add_plant'])) {
                     $image_id = mysqli_insert_id($con);
                     $stmt->close();
 
-                    // Auditoria para inserção de imagem
                     $new_value = "Imagem ID: $image_id, Fonte: $source";
                     log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $plant_id);
                 }
             }
         }
-        // Processar Links Úteis
+
         $usefullinks_data = isset($_POST['usefullinks_data']) ? json_decode($_POST['usefullinks_data'], true) : [];
 
         foreach ($usefullinks_data as $link) {
@@ -221,7 +203,6 @@ if (isset($_POST['add_plant'])) {
             $usefullink_id = mysqli_insert_id($con);
             $stmt->close();
 
-            // Auditoria para inserção de link
             $new_value = "$link_name, URL: $link_url";
             log_audit_action($con, 'usefullinks', 1, $changed_by, null, $new_value, $plant_id);
         }
@@ -234,13 +215,12 @@ if (isset($_POST['add_plant'])) {
     }
 }
 
-// Excluir Planta
 if (isset($_POST['delete_plant'])) {
     $delete_id = intval($_POST['id']);
     if ($delete_id > 0) {
         mysqli_begin_transaction($con);
         try {
-            // Verifica se a planta existe e não está deletada
+           
             $stmt = $con->prepare("SELECT name FROM Plants WHERE id = ? AND deleted_at IS NULL");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da consulta: " . $con->error);
@@ -253,7 +233,6 @@ if (isset($_POST['delete_plant'])) {
             }
             $stmt->close();
 
-            // Atualiza o campo deleted_at
             $stmt = $con->prepare("UPDATE Plants SET deleted_at = NOW() WHERE id = ?");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da atualização: " . $con->error);
@@ -264,9 +243,8 @@ if (isset($_POST['delete_plant'])) {
             }
             $stmt->close();
 
-            // Auditoria para exclusão de planta
-            $table = 'Plants';
-            $action_id = 3; // Exclusão
+            $table = 'Plantas';
+            $action_id = 3;
             $changed_by = $_SESSION['id'];
             $old_value = "Planta: $plant_name";
             $new_value = null;
@@ -283,9 +261,8 @@ if (isset($_POST['delete_plant'])) {
     }
 }
 
-// Editar Planta
 if (isset($_POST['edit_plant'])) {
-    // Dados da Planta
+   
     $edit_id = intval($_POST['plant_id']);
     $name = filter_input_data_custom($con, $_POST['name']);
     $common_names = filter_input_data_custom($con, $_POST['common_names']);
@@ -299,7 +276,6 @@ if (isset($_POST['edit_plant'])) {
     $applications = filter_input_data_custom($con, $_POST['applications']);
     $ecology = filter_input_data_custom($con, $_POST['ecology']);
     $biology = filter_input_data_custom($con, $_POST['biology']);
-
     $bark_description = filter_input_data_custom($con, $_POST['bark_description'] ?? '');
     $trunk_description = filter_input_data_custom($con, $_POST['trunk_description'] ?? '');
     $leaf_description = filter_input_data_custom($con, $_POST['leaf_description'] ?? '');
@@ -307,13 +283,12 @@ if (isset($_POST['edit_plant'])) {
     $fruit_description = filter_input_data_custom($con, $_POST['fruit_description'] ?? '');
     $seed_description = filter_input_data_custom($con, $_POST['seed_description'] ?? '');
 
-    // Coleta de dados das propriedades
     $properties_data = isset($_POST['properties_data']) ? json_decode($_POST['properties_data'], true) : [];
 
     if ($edit_id > 0) {
         mysqli_begin_transaction($con);
         try {
-            // Verifica se a planta existe e não está deletada
+
             $stmt = $con->prepare("
             SELECT name, common_names, species, applications, ecology, biology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description 
             FROM Plants 
@@ -332,7 +307,6 @@ if (isset($_POST['edit_plant'])) {
             }
             $stmt->close();
 
-            // Atualizar os dados da planta
             $stmt = $con->prepare("UPDATE Plants SET name = ?, common_names = ?, division_id = ?, class_id = ?, `order_id` = ?, family_id = ?, genus_id = ?, region_id = ?, species = ?, applications = ?, ecology = ?, biology = ?, bark_description = ?, trunk_description = ?, leaf_description = ?, flower_description = ?, fruit_description = ?, seed_description = ? WHERE id = ?");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da atualização: " . $con->error);
@@ -343,15 +317,14 @@ if (isset($_POST['edit_plant'])) {
             }
             $stmt->close();
 
-            // Auditoria para atualização de planta
-            $table = 'Plants';
-            $action_id = 3; // Atualização
+            $table = 'Plantas';
+            $action_id = 3;
             $changed_by = $_SESSION['id'];
             $old_value = "Planta: $plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description";
             $new_value = "Planta: $name, $common_names, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description";
+            
             log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $edit_id);
 
-            // Obter propriedades existentes
             $stmt = $con->prepare("SELECT property_id, id FROM PlantsProperties WHERE plant_id = ?");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da consulta PlantsProperties: " . $con->error);
@@ -372,7 +345,7 @@ if (isset($_POST['edit_plant'])) {
                 if (isset($existing_properties[$property_id])) {
                     $plants_property_id = $existing_properties[$property_id];
                 } else {
-                    // Inserir nova propriedade
+
                     $stmt = $con->prepare("INSERT INTO PlantsProperties (plant_id, property_id) VALUES (?, ?)");
                     if (!$stmt) {
                         throw new Exception("Erro na preparação da consulta PlantsProperties: " . $con->error);
@@ -413,14 +386,14 @@ if (isset($_POST['edit_plant'])) {
 
                 // Excluir as imagens que não estão mais presentes no formulário
                 if (!empty($images_to_delete)) {
-                    // Preparar placeholders para a consulta IN
+
                     $placeholders = implode(',', array_fill(0, count($images_to_delete), '?'));
                     $delete_sql = "DELETE FROM images WHERE id IN ($placeholders)";
                     $stmt = $con->prepare($delete_sql);
                     if ($stmt) {
-                        // Criar o tipo de parâmetro para bind_param
+
                         $types = str_repeat('i', count($images_to_delete));
-                        // Vincular os parâmetros dinamicamente
+
                         $stmt->bind_param($types, ...$images_to_delete);
                         if (!$stmt->execute()) {
                             throw new Exception("Erro ao excluir imagens: " . $stmt->error);
@@ -430,7 +403,7 @@ if (isset($_POST['edit_plant'])) {
                         // Auditoria para exclusão de imagens
                         foreach ($images_to_delete as $image_id) {
                             $table = 'images';
-                            $action_id = 3; // Supondo que 3 represente 'Exclusão' no sistema de auditoria
+                            $action_id = 3;
                             $changed_by = $_SESSION['id'];
                             $old_value = "Imagem ID: $image_id";
                             $new_value = null;
@@ -444,9 +417,9 @@ if (isset($_POST['edit_plant'])) {
                 // Processar as imagens enviadas
                 foreach ($images as $order => $imageData) {
                     if (isset($imageData['id']) && $imageData['id'] > 0) {
-                        // Atualizar o sort_order da imagem existente
+                       
                         $image_id = intval($imageData['id']);
-                        $new_sort_order = intval($order) + 1; // Inicia em 1
+                        $new_sort_order = intval($order) + 1; 
                         $stmt = $con->prepare("UPDATE images SET sort_order = ? WHERE id = ?");
                         if ($stmt) {
                             $stmt->bind_param("ii", $new_sort_order, $image_id);
@@ -454,20 +427,15 @@ if (isset($_POST['edit_plant'])) {
                                 throw new Exception("Erro ao atualizar sort_order da imagem: " . $stmt->error);
                             }
                             $stmt->close();
-
-                            // Auditoria para atualização de sort_order
-                            $new_value = "Imagem ID: $image_id";
-                            log_audit_action($con, 'images', 2, $changed_by, null, $new_value, $edit_id);
                         }
+
                     } else {
                         // Inserir nova imagem
                         $source = filter_input_data_custom($con, $imageData['source']);
-                        $image = $imageData['image']; // Base64 string
+                        $image = $imageData['image']; 
 
-                        // Decodifica a imagem Base64
                         $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
 
-                        // Determina o próximo sort_order para esta propriedade
                         $stmt_order = $con->prepare("SELECT MAX(sort_order) FROM images WHERE plants_property_id = ?");
                         if ($stmt_order) {
                             $stmt_order->bind_param("i", $plants_property_id);
@@ -477,10 +445,9 @@ if (isset($_POST['edit_plant'])) {
                             $next_sort_order = $max_sort_order !== null ? $max_sort_order + 1 : 1;
                             $stmt_order->close();
                         } else {
-                            $next_sort_order = 1; // Fallback caso a consulta falhe
+                            $next_sort_order = 1; 
                         }
 
-                        // Insere na tabela images com sort_order
                         $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
                         if (!$stmt) {
                             throw new Exception("Erro na preparação da consulta de imagem: " . $con->error);
@@ -492,7 +459,6 @@ if (isset($_POST['edit_plant'])) {
                         $image_id = mysqli_insert_id($con);
                         $stmt->close();
 
-                        // Auditoria para inserção de imagem
                         $new_value = "Imagem ID: $image_id, Fonte: $source";
                         log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $edit_id);
                     }
@@ -503,7 +469,6 @@ if (isset($_POST['edit_plant'])) {
             // Processar Links Úteis
             $usefullinks_data = isset($_POST['usefullinks_data']) ? json_decode($_POST['usefullinks_data'], true) : [];
 
-            // Buscar links existentes no banco de dados
             $stmt = $con->prepare("SELECT id, name, link FROM usefullinks WHERE plant_id = ? AND deleted_at IS NULL");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da consulta usefullinks: " . $con->error);
@@ -517,19 +482,17 @@ if (isset($_POST['edit_plant'])) {
             }
             $stmt->close();
 
-            // Array para rastrear IDs de links submetidos
             $submitted_link_ids = [];
 
-            // Processar cada link submetido
             foreach ($usefullinks_data as $link) {
                 if (isset($link['id']) && intval($link['id']) > 0 && isset($existing_links[$link['id']])) {
-                    // Link existente: verificar se houve atualização
+     
                     $link_id = intval($link['id']);
                     $link_name = filter_input_data_custom($con, $link['name']);
                     $link_url = filter_input_data_custom($con, $link['link']);
 
                     if ($link_name != $existing_links[$link_id]['name'] || $link_url != $existing_links[$link_id]['link']) {
-                        // Atualizar o link
+
                         $stmt = $con->prepare("UPDATE usefullinks SET name = ?, link = ? WHERE id = ?");
                         if (!$stmt) {
                             throw new Exception("Erro na preparação da atualização do link: " . $con->error);
@@ -540,7 +503,6 @@ if (isset($_POST['edit_plant'])) {
                         }
                         $stmt->close();
 
-                        // Auditoria para atualização de link
                         $old_value = "Link: " . $existing_links[$link_id]['name'] . ", URL: " . $existing_links[$link_id]['link'];
                         $new_value = "Link: $link_name, URL: $link_url";
                         log_audit_action($con, 'usefullinks', 2, $changed_by, $old_value, $new_value, $edit_id);
@@ -548,7 +510,7 @@ if (isset($_POST['edit_plant'])) {
 
                     $submitted_link_ids[] = $link_id;
                 } else {
-                    // Novo link: inserir
+                    // Novo link inserir
                     $link_name = filter_input_data_custom($con, $link['name']);
                     $link_url = filter_input_data_custom($con, $link['link']);
 
@@ -563,7 +525,6 @@ if (isset($_POST['edit_plant'])) {
                     $usefullink_id = mysqli_insert_id($con);
                     $stmt->close();
 
-                    // Auditoria para inserção de link
                     $new_value = "Link: $link_name, URL: $link_url";
                     log_audit_action($con, 'usefullinks', 1, $changed_by, null, $new_value, $edit_id);
                 }
@@ -582,13 +543,10 @@ if (isset($_POST['edit_plant'])) {
                 }
                 $stmt->close();
 
-                // Auditoria para exclusão de link
                 $old_value = "Link: " . $existing_links[$link_id]['name'] . ", URL: " . $existing_links[$link_id]['link'];
                 $new_value = null;
                 log_audit_action($con, 'usefullinks', 3, $changed_by, $old_value, $new_value, $edit_id);
             }
-
-
 
             mysqli_commit($con);
             $success = "Planta atualizada com sucesso.";
@@ -602,15 +560,13 @@ if (isset($_POST['edit_plant'])) {
 }
 
 // Configuração de Paginação
-$items_per_page = 10; // Número de plantas por página
+$items_per_page = 10; 
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? intval($_GET['page']) : 1;
 if ($page < 1) $page = 1;
 
-// Captura do termo de busca
 $search = isset($_GET['search']) ? filter_input_data_custom($con, $_GET['search']) : '';
 $searchQuery = $search ? "AND (p.name LIKE '%$search%' OR p.common_names LIKE '%$search%')" : "";
 
-// Contagem total de plantas para paginação
 $count_sql = "
     SELECT COUNT(*) as total
     FROM Plants p
@@ -653,7 +609,7 @@ $plantsQuery = mysqli_query($con, "
 ");
 if (!$plantsQuery) {
     $error = "Erro na consulta de plantas: " . mysqli_error($con);
-}
+};
 
 // Dados para selects
 $divisions = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Divisions WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
@@ -697,7 +653,7 @@ if (isset($_GET['edit'])) {
             $result = $stmt->get_result();
             if ($result->num_rows > 0) {
                 $edit_plant = $result->fetch_assoc();
-                // Recuperar as imagens existentes com sort_order
+
                 $stmt_images = $con->prepare("
                     SELECT pp.property_id, i.id as image_id, i.imagem, i.source, i.sort_order 
                     FROM PlantsProperties pp
@@ -739,8 +695,10 @@ if (isset($_GET['edit'])) {
             $stmt->close();
         }
     }
-}
+};
+
 $qrcode_base_url = get_qrcode_url($con);
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -749,7 +707,6 @@ $qrcode_base_url = get_qrcode_url($con);
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Gerenciar Plantas</title>
     <style>
-        /* Estilos para a lista de imagens */
         .image-preview {
             display: flex;
             flex-wrap: wrap;
@@ -781,7 +738,6 @@ $qrcode_base_url = get_qrcode_url($con);
             cursor: pointer;
         }
 
-        /* Estilos para paginação */
         .pagination {
             justify-content: center;
         }
@@ -810,7 +766,6 @@ $qrcode_base_url = get_qrcode_url($con);
                         <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                     <?php } ?>
 
-                    <!-- Botão para abrir o formulário de Adição de Planta -->
                     <?php if (!$edit_mode) { ?>
                         <button id="toggleForm" class="btn btn-primary mb-4">Nova Planta</button>
                     <?php } ?>
@@ -826,13 +781,11 @@ $qrcode_base_url = get_qrcode_url($con);
                                 <div class="mb-3">
                                     <button type="button" class="btn btn-primary btn-sm" id="addPropertyButton">Adicionar Imagem</button>
                                     <div id="images_list_1" class="mt-3 d-flex gap-2">
-                                        <!-- Propriedades adicionadas aparecerão aqui -->
                                         <?php
                                         ?>
                                     </div>
                                 </div>
 
-                                <!-- Dados da Planta -->
                                 <div class="mb-3">
                                     <label for="name" class="form-label">*Nome Científico</label>
                                     <input type="text" class="form-control" id="name" name="name" required value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['name']) : ''; ?>">
@@ -843,7 +796,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <textarea class="form-control" id="common_names" name="common_names"><?php echo $edit_mode ? htmlspecialchars($edit_plant['common_names']) : ''; ?></textarea>
                                 </div>
 
-                                <!-- Seleção da Divisão -->
                                 <div class="mb-3">
                                     <label for="division_id" class="form-label">Divisão</label>
                                     <select class="form-select" id="division_id" name="division_id" required>
@@ -856,7 +808,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </select>
                                 </div>
 
-                                <!-- Seleção da Classe -->
                                 <div class="mb-3">
                                     <label for="class_id" class="form-label">Classe</label>
                                     <select class="form-select" id="class_id" name="class_id" required>
@@ -869,7 +820,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </select>
                                 </div>
 
-                                <!-- Seleção da Ordem -->
                                 <div class="mb-3">
                                     <label for="order_id" class="form-label">Ordem</label>
                                     <select class="form-select" id="order_id" name="order_id" required>
@@ -882,7 +832,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </select>
                                 </div>
 
-                                <!-- Seleção da Família -->
                                 <div class="mb-3">
                                     <label for="family_id" class="form-label">Família</label>
                                     <select class="form-select" id="family_id" name="family_id" required>
@@ -895,7 +844,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </select>
                                 </div>
 
-                                <!-- Seleção do Gênero -->
                                 <div class="mb-3">
                                     <label for="genus_id" class="form-label">Gênero</label>
                                     <select class="form-select" id="genus_id" name="genus_id">
@@ -908,7 +856,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </select>
                                 </div>
 
-                                <!-- Seleção da Região -->
                                 <div class="mb-3">
                                     <label for="region_id" class="form-label">Região</label>
                                     <select class="form-select" id="region_id" name="region_id">
@@ -921,7 +868,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </select>
                                 </div>
 
-                                <!-- Outros campos opcionais -->
                                 <div class="mb-3">
                                     <label for="species" class="form-label">Espécie</label>
                                     <input type="text" class="form-control" id="species" name="species" value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['species']) : ''; ?>">
@@ -939,7 +885,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <textarea class="form-control" id="biology" name="biology"><?php echo $edit_mode ? htmlspecialchars($edit_plant['biology']) : ''; ?></textarea>
                                 </div>
 
-                                <!-- Seção de Propriedades com Imagens -->
                                 <?php foreach ($properties_list as $property_item): ?>
                                     <div class="property-section mb-4" data-property-id="<?php echo $property_item['id']; ?>">
                                         <h4><?php echo htmlspecialchars($property_item['name']); ?></h4>
@@ -965,12 +910,11 @@ $qrcode_base_url = get_qrcode_url($con);
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
-                                <!-- Seção de Links Úteis -->
+
                                 <div class="mb-4">
                                     <h4>Links Úteis</h4>
                                     <button type="button" class="btn btn-primary btn-sm" id="addLinkButton">Adicionar Link</button>
                                     <div id="usefullinks_list" class="mt-3">
-                                        <!-- Links adicionados aparecerão aqui -->
                                     </div>
                                 </div>
                                 <input type="hidden" name="usefullinks_data" id="usefullinks_data">
@@ -1040,16 +984,15 @@ $qrcode_base_url = get_qrcode_url($con);
                             <?php if ($total_pages > 1) { ?>
                                 <nav>
                                     <ul class="pagination">
-                                        <!-- Página Anterior -->
+
                                         <li class="page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
                                             <a class="page-link" href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>" aria-label="Anterior">
                                                 <span aria-hidden="true">&laquo;</span>
                                             </a>
                                         </li>
 
-                                        <!-- Páginas -->
                                         <?php
-                                        // Definir intervalo de páginas a exibir
+
                                         $range = 2;
                                         for ($i = max(1, $page - $range); $i <= min($page + $range, $total_pages); $i++) {
                                             if ($i == $page) {
@@ -1060,7 +1003,6 @@ $qrcode_base_url = get_qrcode_url($con);
                                         }
                                         ?>
 
-                                        <!-- Próxima Página -->
                                         <li class="page-item <?php echo ($page >= $total_pages) ? 'disabled' : ''; ?>">
                                             <a class="page-link" href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>" aria-label="Próximo">
                                                 <span aria-hidden="true">&raquo;</span>
@@ -1069,6 +1011,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </ul>
                                 </nav>
                             <?php } ?>
+                            <!-- Paginação -->
                         </div>
                     </div>
                 </div>
@@ -1156,76 +1099,73 @@ $qrcode_base_url = get_qrcode_url($con);
         </div>
     </div>
 
-    <!-- Scripts Necessários -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Inclusão do Sortable.js via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Base URL para o QR Code
+        var qrcodeBaseUrl = "<?php echo htmlspecialchars($qrcode_base_url); ?>";
+
+        // Elementos do Modal de QR Code
+        var qrcodeModal = new bootstrap.Modal(document.getElementById('qrcodeModal'));
+        var qrcodeImage = document.getElementById('qrcodeImage');
+        var downloadQrcode = document.getElementById('downloadQrcode');
+
+        // Elementos para exibir informações da planta
+        var plantNameSpan = document.getElementById('plantName');
+        var plantIdSpan = document.getElementById('plantId');
+        var currentQrcodeUrlInput = document.getElementById('currentQrcodeUrl');
+
+        // Adiciona eventos aos botões de QR Code
+        document.querySelectorAll('.qrcode-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var plantId = this.getAttribute('data-id');
+                var plantName = this.getAttribute('data-name');
+
+                var separator = qrcodeBaseUrl.includes('?') ? '&' : '?';
+                var qrContent = qrcodeBaseUrl + separator + "id=" + encodeURIComponent(plantId);
+                var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(qrContent);
+
+                // Atualiza o conteúdo do Modal
+                plantNameSpan.textContent = plantName;
+                plantIdSpan.textContent = plantId;
+                currentQrcodeUrlInput.value = qrContent;
+                qrcodeImage.src = qrCodeUrl;
+                downloadQrcode.href = qrCodeUrl;
+
+                // Exibe o Modal
+                qrcodeModal.show();
+            });
+        });
+    });
+</script>
+
+    <!-- Imagens -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
-             // Variável PHP passada para JavaScript
-             var qrcodeBaseUrl = "<?php echo htmlspecialchars($qrcode_base_url); ?>";
-
-            // Inicializa o modal do QR Code
-            var qrcodeModal = new bootstrap.Modal(document.getElementById('qrcodeModal'));
-            var qrcodeImage = document.getElementById('qrcodeImage');
-            var downloadQrcode = document.getElementById('downloadQrcode');
-
-            // Elementos da Modal
-            var plantNameSpan = document.getElementById('plantName');
-            var plantIdSpan = document.getElementById('plantId');
-            var currentQrcodeUrlInput = document.getElementById('currentQrcodeUrl');
-
-            // Adiciona evento de clique para todos os botões "QRCode"
-            document.querySelectorAll('.qrcode-button').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var plantId = this.getAttribute('data-id');
-                    var plantName = this.getAttribute('data-name');
-
-                    // Determina se a URL já possui parâmetros
-                    var separator = qrcodeBaseUrl.includes('?') ? '&' : '?';
-
-                    // Constrói a URL completa para o QR Code
-                    var qrContent = qrcodeBaseUrl + separator + "id=" + encodeURIComponent(plantId);
-
-                    // Utiliza uma API externa para gerar o QR Code
-                    var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(qrContent);
-
-                    // Preenche os campos da modal
-                    plantNameSpan.textContent = plantName;
-                    plantIdSpan.textContent = plantId;
-                    currentQrcodeUrlInput.value = qrContent;
-                    qrcodeImage.src = qrCodeUrl;
-                    downloadQrcode.href = qrCodeUrl;
-
-                    // Exibe o modal
-                    qrcodeModal.show();
-                });
-            });
-            // Variáveis para armazenar dados
+            // Elementos do Modal de Propriedades
             var addPropertyButton = document.getElementById('addPropertyButton');
-            var propertiesData = {}; // Objeto para armazenar dados por propriedade
-            var propertyCounter = 0; // Contador para IDs únicos
-            var currentPropertyId = null; // ID da propriedade atual
+            var addPropertyModal = new bootstrap.Modal(document.getElementById('addPropertyModal'));
+            var propertyForm = document.getElementById('propertyForm');
 
-            // Inicializar propriedadesData com dados existentes se estiver no modo de edição
+            // Controles de UI
+            var plantForm = document.getElementById('plant-form');
+            var plantList = document.getElementById('plant-list');
+            var toggleFormButton = document.getElementById('toggleForm');
+            var cancelAddPlant = document.getElementById('cancelAddPlant');
+
+            // Dados das Propriedades
+            var propertiesData = {}; 
+            var propertyCounter = 0; 
+            var currentPropertyId = null; 
+
             <?php if ($edit_mode && isset($edit_plant['properties'])) { ?>
                 propertiesData = <?php echo json_encode($edit_plant['properties']); ?>;
             <?php } ?>
 
-            // Mostrar/Esconder Formulário de Adição de Planta
-            var toggleFormButton = document.getElementById('toggleForm');
-            var plantForm = document.getElementById('plant-form');
-            var plantList = document.getElementById('plant-list');
-            var cancelAddPlant = document.getElementById('cancelAddPlant');
-
-            addPropertyButton.addEventListener('click', function() {
-                currentPropertyId = 1;
-                propertyForm.reset();
-                addPropertyModal.show();
-            });
-
+            // Exibir e ocultar mensagens de erro
             function displayError(message) {
                 var errorMessageElement = document.getElementById('error-message');
                 errorMessageElement.textContent = message;
@@ -1237,6 +1177,7 @@ $qrcode_base_url = get_qrcode_url($con);
                 errorMessageElement.style.display = 'none';
             }
 
+            // Alternar o formulário de plantas
             if (toggleFormButton) {
                 toggleFormButton.addEventListener('click', function() {
                     plantForm.style.display = 'block';
@@ -1253,22 +1194,24 @@ $qrcode_base_url = get_qrcode_url($con);
                 });
             }
 
-            // Event listener para botões 'Adicionar Imagem'
+            // Adicionar uma nova propriedade
+            addPropertyButton.addEventListener('click', function() {
+                currentPropertyId = 1;
+                propertyForm.reset();
+                addPropertyModal.show();
+            });
+
+            // Adicionar imagens a uma propriedade existente
             document.querySelectorAll('.add-image-button').forEach(function(button) {
                 button.addEventListener('click', function() {
                     var propertyId = this.getAttribute('data-property-id');
-                    currentPropertyId = propertyId; // Armazena o ID da propriedade atual
-                    // Abre a modal
+                    currentPropertyId = propertyId; 
                     propertyForm.reset();
                     addPropertyModal.show();
                 });
             });
 
-            var addPropertyModal = new bootstrap.Modal(document.getElementById('addPropertyModal'));
-            var propertyForm = document.getElementById('propertyForm');
-            var addPlantFormElement = document.getElementById('addPlantForm');
-
-            // 'propertyForm' submit handler
+            // Submit
             propertyForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 hideError(); 
@@ -1277,15 +1220,14 @@ $qrcode_base_url = get_qrcode_url($con);
                 var file = imageInput.files[0];
 
                 if (currentPropertyId && source && file) {
-                    // Verifica o tipo de arquivo
                     var allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
                     if (!allowedTypes.includes(file.type)) {
                         alert('Tipo de imagem inválido. Apenas JPEG, PNG e GIF são permitidos.');
                         return;
                     }
 
-                    // Verifica o tamanho do arquivo (5 MB = 5 * 1024 * 1024 bytes)
-                    var maxFileSize = 5 * 1024 * 1024; // 5 MB
+                    // Tamanho do arquivo (5 MB)
+                    var maxFileSize = 5 * 1024 * 1024; 
                     if (file.size > maxFileSize) {
                         displayError('O tamanho da imagem não pode exceder 5 MB.');
                         return;
@@ -1296,26 +1238,22 @@ $qrcode_base_url = get_qrcode_url($con);
                     reader.onload = function(event) {
                         var imageUrl = event.target.result;
 
-                        // Inicializa o array para a propriedade atual se não existir
                         if (!propertiesData[currentPropertyId]) {
                             propertiesData[currentPropertyId] = [];
                         }
 
-                        // Determina o sort_order com base na quantidade de imagens existentes
                         var nextSortOrder = propertiesData[currentPropertyId].length + 1;
 
                         // Adiciona a imagem ao array da propriedade atual
                         propertiesData[currentPropertyId].push({
-                            id: null, // Será atribuído pelo backend
+                            id: null, 
                             source: source,
-                            image: imageUrl, // Armazena a URL Base64
+                            image: imageUrl, 
                             sort_order: nextSortOrder
                         });
 
-                        // Atualiza a visualização das imagens
                         updateImagesList(currentPropertyId);
 
-                        // Fecha a modal
                         addPropertyModal.hide();
                     };
                     reader.readAsDataURL(file);
@@ -1324,7 +1262,7 @@ $qrcode_base_url = get_qrcode_url($con);
                 }
             });
 
-            // Função para atualizar a lista de imagens de uma propriedade
+            // Atualizar a lista de imagens de uma propriedade
             function updateImagesList(propertyId) {
                 var imagesList = document.getElementById('images_list_' + propertyId);
                 imagesList.innerHTML = '';
@@ -1341,7 +1279,7 @@ $qrcode_base_url = get_qrcode_url($con);
                     removeBtn.innerHTML = '&times;';
                     removeBtn.onclick = function() {
                         imagesArray.splice(index, 1);
-                        // Reatribuir sort_order após remoção
+
                         imagesArray.forEach(function(img, idx) {
                             img.sort_order = idx + 1;
                         });
@@ -1357,7 +1295,7 @@ $qrcode_base_url = get_qrcode_url($con);
                     imagesList.appendChild(div);
                 });
 
-                // Inicializa o Sortable.js para permitir reordenação via drag-and-drop
+                // Inicializa Sortable.js para drag-and-drop
                 Sortable.create(imagesList, {
                     animation: 150,
                     ghostClass: 'sortable-ghost',
@@ -1373,7 +1311,6 @@ $qrcode_base_url = get_qrcode_url($con);
                             return indexA - indexB;
                         });
 
-                        // Reatribuir sort_order após reordenação
                         propertiesData[propertyId].forEach(function(img, idx) {
                             img.sort_order = idx + 1;
                         });
@@ -1388,7 +1325,8 @@ $qrcode_base_url = get_qrcode_url($con);
                 <?php } ?>
             <?php } ?>
 
-            // Handle form submission
+            // Submit
+            var addPlantFormElement = document.getElementById('addPlantForm');
             addPlantFormElement.addEventListener('submit', function(e) {
                 // Adiciona os dados das propriedades ao campo oculto como JSON
                 var propertiesInput = document.createElement('input');
@@ -1396,114 +1334,134 @@ $qrcode_base_url = get_qrcode_url($con);
                 propertiesInput.name = 'properties_data';
                 propertiesInput.value = JSON.stringify(propertiesData);
                 addPlantFormElement.appendChild(propertiesInput);
+            });
+        });
+    </script>
 
-                // Envia o formulário normalmente
+    <!-- usefullinks -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            var usefullinksData = [];
+            <?php if ($edit_mode && isset($edit_plant['usefullinks'])) { ?>
+                usefullinksData = <?php echo json_encode($edit_plant['usefullinks']); ?>;
+            <?php } ?>
+
+            var addLinkButton = document.getElementById('addLinkButton');
+            var usefullinksList = document.getElementById('usefullinks_list');
+
+            // Função para renderizar os links úteis na interface
+            function renderUsefullinks() {
+                usefullinksList.innerHTML = '';
+                usefullinksData.forEach(function(link, index) {
+                    var linkItem = document.createElement('div');
+                    linkItem.classList.add('link-item', 'mb-2');
+                    linkItem.setAttribute('data-index', index);
+
+                    var inputGroup = document.createElement('div');
+                    inputGroup.classList.add('input-group');
+
+                    var nameInput = document.createElement('input');
+                    nameInput.type = 'text';
+                    nameInput.classList.add('form-control', 'link-name');
+                    nameInput.placeholder = 'Nome';
+                    nameInput.value = link.name;
+                    nameInput.required = true;
+
+                    var urlInput = document.createElement('input');
+                    urlInput.type = 'url';
+                    urlInput.classList.add('form-control', 'link-url', 'w-50');
+                    urlInput.placeholder = 'URL';
+                    urlInput.value = link.link;
+                    urlInput.required = true;
+
+                    var removeButton = document.createElement('button');
+                    removeButton.type = 'button';
+                    removeButton.classList.add('btn', 'btn-danger');
+                    removeButton.innerHTML = '&times;';
+                    removeButton.addEventListener('click', function() {
+                        usefullinksData.splice(index, 1);
+                        renderUsefullinks();
+                    });
+
+                    inputGroup.appendChild(nameInput);
+                    inputGroup.appendChild(urlInput);
+                    inputGroup.appendChild(removeButton);
+
+                    linkItem.appendChild(inputGroup);
+                    usefullinksList.appendChild(linkItem);
+
+                    // Atualizar os dados ao modificar os campos
+                    nameInput.addEventListener('input', function() {
+                        usefullinksData[index].name = this.value;
+                    });
+                    urlInput.addEventListener('input', function() {
+                        usefullinksData[index].link = this.value;
+                    });
+                });
+            }
+
+            renderUsefullinks();
+
+            // Evento para adicionar um novo link útil
+            addLinkButton.addEventListener('click', function() {
+                usefullinksData.push({
+                    id: null, 
+                    name: '',
+                    link: ''
+                });
+                renderUsefullinks();
             });
 
-            // Modal de Confirmação de Exclusão
-            var confirmDeleteModal = document.getElementById('confirmDeleteModal');
-            confirmDeleteModal.addEventListener('show.bs.modal', function(event) {
+            // Submit
+            var addPlantFormElement = document.getElementById('addPlantForm');
+            addPlantFormElement.addEventListener('submit', function(e) {
+                // Adiciona os dados dos links úteis no campo oculto
+                var usefullinksInput = document.getElementById('usefullinks_data');
+                usefullinksInput.value = JSON.stringify(usefullinksData);
+            });
+        });
+    </script>
+
+    <!-- deleteConfirmation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            var confirmDeleteModalElement = document.getElementById('confirmDeleteModal');
+
+            confirmDeleteModalElement.addEventListener('show.bs.modal', function(event) {
                 var button = event.relatedTarget;
                 var id = button.getAttribute('data-id');
-                var deleteIdInput = confirmDeleteModal.querySelector('#deleteId');
+                var deleteIdInput = confirmDeleteModalElement.querySelector('#deleteId');
                 deleteIdInput.value = id;
             });
         });
     </script>
+
+    <!-- Eventos para alternar a exibição do formulário de plantas -->
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleFormButton = document.getElementById('toggleForm');
+            var plantForm = document.getElementById('plant-form');
+            var plantList = document.getElementById('plant-list');
+            var cancelAddPlant = document.getElementById('cancelAddPlant');
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // ... código JavaScript existente ...
-
-        // Variável para armazenar os dados dos links úteis
-        var usefullinksData = [];
-        <?php if ($edit_mode && isset($edit_plant['usefullinks'])) { ?>
-            usefullinksData = <?php echo json_encode($edit_plant['usefullinks']); ?>;
-        <?php } ?>
-
-        var addLinkButton = document.getElementById('addLinkButton');
-        var usefullinksList = document.getElementById('usefullinks_list');
-
-        // Função para renderizar os links úteis na interface
-        function renderUsefullinks() {
-            usefullinksList.innerHTML = '';
-            usefullinksData.forEach(function(link, index) {
-                var linkItem = document.createElement('div');
-                linkItem.classList.add('link-item', 'mb-2');
-                linkItem.setAttribute('data-index', index);
-
-                var inputGroup = document.createElement('div');
-                inputGroup.classList.add('input-group');
-
-                var nameInput = document.createElement('input');
-                nameInput.type = 'text';
-                nameInput.classList.add('form-control', 'link-name');
-                nameInput.placeholder = 'Nome';
-                nameInput.value = link.name;
-                nameInput.required = true;
-
-                var urlInput = document.createElement('input');
-                urlInput.type = 'url';
-                urlInput.classList.add('form-control', 'link-url');
-                urlInput.placeholder = 'URL';
-                urlInput.value = link.link;
-                urlInput.required = true;
-
-                var removeButton = document.createElement('button');
-                removeButton.type = 'button';
-                removeButton.classList.add('btn', 'btn-danger');
-                removeButton.innerHTML = '&times;';
-                removeButton.addEventListener('click', function() {
-                    usefullinksData.splice(index, 1);
-                    renderUsefullinks();
+            if (toggleFormButton) {
+                toggleFormButton.addEventListener('click', function() {
+                    plantForm.style.display = 'block';
+                    plantList.style.display = 'none';
+                    toggleFormButton.style.display = 'none';
                 });
+            }
 
-                inputGroup.appendChild(nameInput);
-                inputGroup.appendChild(urlInput);
-                inputGroup.appendChild(removeButton);
-
-                linkItem.appendChild(inputGroup);
-                usefullinksList.appendChild(linkItem);
-
-                // Atualizar os dados ao modificar os campos
-                nameInput.addEventListener('input', function() {
-                    usefullinksData[index].name = this.value;
+            if (cancelAddPlant) {
+                cancelAddPlant.addEventListener('click', function() {
+                    plantForm.style.display = 'none';
+                    plantList.style.display = 'block';
+                    toggleFormButton.style.display = 'block';
                 });
-                urlInput.addEventListener('input', function() {
-                    usefullinksData[index].link = this.value;
-                });
-            });
-        }
-
-        // Inicializar a renderização dos links
-        renderUsefullinks();
-
-        // Evento para adicionar um novo link útil
-        addLinkButton.addEventListener('click', function() {
-            usefullinksData.push({
-                id: null, // Será definido no backend se for um link existente
-                name: '',
-                link: ''
-            });
-            renderUsefullinks();
+            }
         });
-
-        // Evento de submissão do formulário para incluir os dados dos links úteis
-        var addPlantFormElement = document.getElementById('addPlantForm');
-        addPlantFormElement.addEventListener('submit', function(e) {
-            // Adiciona os dados dos links úteis no campo oculto
-            var usefullinksInput = document.getElementById('usefullinks_data');
-            usefullinksInput.value = JSON.stringify(usefullinksData);
-
-            // O restante do processamento do formulário continua normalmente
-        });
-
-        // ... restante do código JavaScript existente ...
-    });
-
-
-
     </script>
 </body>
-
 </html>

@@ -1,12 +1,8 @@
 <?php
-session_start();
 include_once('includes/config.php');
-require_once('includes/audit.php');
+require_once('functions/audit.php');
 
-if (strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
 
 if (isset($_POST['add_order'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);
@@ -22,7 +18,7 @@ if (isset($_POST['add_order'])) {
 
             $new_class_id = mysqli_insert_id($con);
 
-            $table = 'orders';
+            $table = 'Ordem';
             $action_id = 1; 
             $changed_by = $_SESSION['id'];
             $old_value = null; 
@@ -48,7 +44,7 @@ if (isset($_POST['delete_order'])) {
     if (mysqli_query($con, $sql)) {
         $success = "Ordem excluída com sucesso.";
 
-        $table = 'orders';
+        $table = 'Ordem';
         $action_id = 2; 
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";
@@ -75,7 +71,7 @@ if (isset($_POST['edit_order'])) {
     if (mysqli_query($con, $sql)) {
         $success = "Ordem atualizada com sucesso.";
 
-        $table = 'orders';
+        $table = 'Ordem';
         $action_id = 3; 
         $changed_by = $_SESSION['id'];
         $old_value = "$old_name";
@@ -91,16 +87,18 @@ if (isset($_POST['edit_order'])) {
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
 $limit = 20;
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$totalQuery = mysqli_query($con, "SELECT COUNT(*) as total FROM orders WHERE deleted_at IS NULL $searchQuery");
-$totalRow = mysqli_fetch_assoc($totalQuery);
-$totalRecords = $totalRow['total'];
-$totalPages = ceil($totalRecords / $limit);
+$count_query = "SELECT COUNT(*) as total FROM orders WHERE deleted_at IS NULL $searchQuery";
+
+$count_result = mysqli_query($con, $count_query);
+$total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
+$total_pages = ceil($total_logs / $limit);
 
 $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
 $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
+
 ?>
 
 <!DOCTYPE html>
@@ -109,6 +107,7 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Ordens</title>
+    <link href="css/pagination.css" rel="stylesheet" /> 
 </head>
 
 <body class="sb-nav-fixed">
@@ -180,42 +179,8 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
                         </div>
                     </div>
                 </div>
-                  <!-- Paginação -->
-                  <?php
-                $baseUrl = "?";
-                if ($search) {
-                    $baseUrl .= "search=" . urlencode($search) . "&";
-                }
-                ?>
-                <nav aria-label="Navegação de página">
-                    <ul class="pagination justify-content-center">
-                        <?php if ($page > 1) { ?>
-                            <li class="page-item">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page - 1; ?>" aria-label="Anterior">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">Anterior</span>
-                                </a>
-                            </li>
-                        <?php } ?>
-
-                        <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
-                            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                            </li>
-                        <?php } ?>
-
-                        <?php if ($page < $totalPages) { ?>
-                            <li class="page-item">
-                                <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page + 1; ?>" aria-label="Próximo">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">Próximo</span>
-                                </a>
-                            </li>
-                        <?php } ?>
-                    </ul>
-                </nav>
-                <!-- Fim da Paginação -->
-            </main>
+                <?php include('includes/pagination.php'); ?> 
+                            </main>
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
@@ -265,11 +230,12 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
     <script>
 
         document.addEventListener('DOMContentLoaded', function() {
-            var editButtons = document.querySelectorAll('[data-bs-target="#editOrderModal"]');
+            var deleteIdInput = document.getElementById('deleteId');
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
+
             var editIdInput = document.getElementById('editId');
             var editNameInput = document.getElementById('editName');
-            var deleteIdInput = document.getElementById('deleteId');
+            var editButtons = document.querySelectorAll('[data-bs-target="#editOrderModal"]');
             
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function() {

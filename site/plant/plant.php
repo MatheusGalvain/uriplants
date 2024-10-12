@@ -128,7 +128,7 @@ if (isset($_GET['id'])) {
                 <li class="lifont">@ 2024 URI Câmpus de Erechim</li>
                 <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a politica de privacidade">Política de privacidade</a></li>
                 <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a reitoria">Reitoria</a></li>
-                <li class="lihover"><a class="acesslink" href="https://www.uricer.edu.br/site/informacao?uri=000139000000000000000000000" target="_BLANK" alt="acesso a uri sustentabilidade">URI Sustentabilidade</a></li>
+                <li class="lihover"><a class="acesslink" href="https://www.uricer.edu.br/site/informacao?uri=000139000000000000000000000" target="_BLANK" alt="acesso a URI sustentabilidade">URI Sustentabilidade</a></li>
             </ul>
         </div>
     </div>
@@ -137,7 +137,7 @@ if (isset($_GET['id'])) {
             <a href="#" alt="Logo da uri" class="logoheader"><img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim"></a>
             <ul class="ulheader">
                 <li class="liheaderhover"><a href="#">URI Quiz</a></li>
-                <li class="liheaderhover"><a href="#">Uri Plantas</a></li>
+                <li class="liheaderhover"><a href="#">URI Plantas</a></li>
                 <li>
                     <form action="../list/list.php" method="GET" class="search-form">
                         <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">

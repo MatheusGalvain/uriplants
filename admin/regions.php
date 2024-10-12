@@ -1,12 +1,8 @@
 <?php
-session_start();
 include_once('includes/config.php');
-require_once('includes/audit.php'); 
+require_once('functions/audit.php'); 
 
-if (strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
 
 function display_value($value) {
     return isset($value) ? htmlspecialchars($value) : 'N/A';
@@ -51,7 +47,7 @@ if (isset($_POST['add_region'])) {
                     
                     $new_region_id = mysqli_insert_id($con);
                     
-                    $table = 'RegionMap';
+                    $table = 'Regiões';
                     $action_id = 1; 
                     $changed_by = $_SESSION['id'];
                     $old_value = null; 
@@ -121,7 +117,7 @@ if (isset($_POST['edit_region'])) {
                 if (mysqli_stmt_execute($stmt)) {
                     $success = "Região atualizada com sucesso.";
 
-                    $table = 'RegionMap';
+                    $table = 'Regiões';
                     $action_id = 3;
                     $changed_by = $_SESSION['id'];
                     $old_value = "Nome: $old_name, Fonte: $old_source, Descrição: $old_description";
@@ -143,7 +139,6 @@ if (isset($_POST['edit_region'])) {
     }
 }
 
-// Manipulação de Exclusão de Região (Soft Delete)
 if (isset($_POST['delete_region'])) {
     $id = intval($_POST['id']);
 
@@ -167,7 +162,7 @@ if (isset($_POST['delete_region'])) {
                 $success = "Região marcada como excluída com sucesso.";
 
                 // Registrar no log de auditoria
-                $table = 'RegionMap';
+                $table = 'Regiões';
                 $action_id = 2; // Supondo que 2 representa "Excluir"
                 $changed_by = $_SESSION['id'];
                 $old_value = "Nome: $old_name, Fonte: $old_source, Descrição: $old_description, Imagem deletada";
@@ -186,25 +181,21 @@ if (isset($_POST['delete_region'])) {
     }
 }
 
-// Manipulação de Pesquisa
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
-// Paginação
-$limit = 20; // Número de registros por página
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-$offset = ($page - 1) * $limit;
-
-// Construção dinâmica da consulta com prepared statements
 $query = "SELECT SQL_CALC_FOUND_ROWS * FROM RegionMap WHERE deleted_at IS NULL";
 $params = [];
 $types = "";
 
-// Adicionar condição de busca se $search não estiver vazio
 if (!empty($search)) {
-    $query .= " AND source LIKE ?";
+    $query .= " AND name LIKE ?";
     $params[] = '%' . $search . '%';
     $types .= "s";
 }
+
+$limit = 20;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
 
 $query .= " LIMIT ? OFFSET ?";
 $types .= "ii";
@@ -218,273 +209,231 @@ if ($stmt) {
     mysqli_stmt_execute($stmt);
     $regionsQuery = mysqli_stmt_get_result($stmt);
 
-    // Obter o número total de registros encontrados
     $totalResult = mysqli_query($con, "SELECT FOUND_ROWS() as total");
     $totalRow = mysqli_fetch_assoc($totalResult);
     $totalRecords = $totalRow['total'];
-    $totalPages = ceil($totalRecords / $limit);
+    $total_pages = ceil($totalRecords / $limit);
 
 } else {
-    // Tratamento de erro
     error_log("Erro na preparação da consulta: " . mysqli_error($con));
     die("Erro ao buscar regiões. Por favor, tente novamente mais tarde.");
+
 }
+
 ?>
+
 <!DOCTYPE html>
-<html lang="pt-BR"> 
-<head>
-    <?php include_once("includes/head.php"); ?>
-    <title>Admin | Regiões</title>
-</head>
+    <html lang="pt-BR"> 
+    <head>
+        <?php include_once("includes/head.php"); ?>
+        <title>Admin | Regiões</title>
+        <link href="css/pagination.css" rel="stylesheet" />
+    </head>
 
-<body class="sb-nav-fixed">
-    <?php include_once('includes/navbar.php'); ?>
-    <div id="layoutSidenav">
-        <?php include_once('includes/sidebar.php'); ?>
-        <div id="layoutSidenav_content">
-            <main>
-                <div class="container-fluid px-4">
-                    <h1 class="mt-4 mb-4">Gerenciar Regiões</h1>
+    <body class="sb-nav-fixed">
+        <?php include_once('includes/navbar.php'); ?>
+        <div id="layoutSidenav">
+            <?php include_once('includes/sidebar.php'); ?>
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4 mb-4">Gerenciar Regiões</h1>
 
-                    <!-- Exibição de Mensagens de Sucesso ou Erro -->
-                    <?php if (isset($success)) { ?>
-                        <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
-                    <?php } ?>
+                        <?php if (isset($success)) { ?>
+                            <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+                        <?php } ?>
 
-                    <?php if (isset($error)) { ?>
-                        <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
-                    <?php } ?>
+                        <?php if (isset($error)) { ?>
+                            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+                        <?php } ?>
 
-                    <!-- Formulário de Adição de Nova Região -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Adicionar uma Nova Região</h5>
-                            <form method="POST" action="" enctype="multipart/form-data">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Nome</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="source" class="form-label">Fonte</label>
-                                    <input type="text" class="form-control" id="source" name="source" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="description" class="form-label">Descrição</label>
-                                    <input type="text" class="form-control" id="description" name="description" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="image" class="form-label">Imagem</label>
-                                    <input type="file" class="form-control" id="image" name="image" required>
-                                </div>
-                                <button type="submit" name="add_region" class="btn btn-primary">Adicionar região</button>
-                            </form>
-                        </div>
-                    </div>
-                    
-                    <!-- Listagem de Regiões Cadastradas -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="card-title mb-0">Regiões Cadastradas</h5>
-                                <form method="GET" action="" class="d-flex">
-                                    <input type="text" class="form-control me-2" name="search" placeholder="Buscar regiões" value="<?php echo htmlspecialchars($search); ?>">
-                                    <button class="btn btn-primary" type="submit">Buscar</button>
-                                    <?php if ($search) { ?>
-                                        <a href="regions.php" class="btn btn-secondary ms-2">Remover Filtro</a>
-                                    <?php } ?>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Adicionar uma Nova Região</h5>
+                                <form method="POST" action="" enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Nome</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="source" class="form-label">Fonte</label>
+                                        <input type="text" class="form-control" id="source" name="source" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Descrição</label>
+                                        <input type="text" class="form-control" id="description" name="description" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="image" class="form-label">Imagem</label>
+                                        <input type="file" class="form-control" id="image" name="image" required>
+                                    </div>
+                                    <button type="submit" name="add_region" class="btn btn-primary">Adicionar região</button>
                                 </form>
                             </div>
-
-                            <!-- Tabela de Regiões -->
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Descrição</th>
-                                        <th>Imagem</th>
-                                        <th>Fonte</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (mysqli_num_rows($regionsQuery) > 0): ?>
-                                        <?php while ($row = mysqli_fetch_array($regionsQuery)) { ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                                <td>
-                                                    <?php if ($row['imagem']) { ?>
-                                                        <img src="data:image/jpeg;base64,<?php echo base64_encode($row['imagem']); ?>" alt="Imagem" style="width: 100px; height: auto;">
-                                                    <?php } else { ?>
-                                                        N/A
-                                                    <?php } ?>
-                                                </td>
-                                                <td><?php echo htmlspecialchars($row['source']); ?></td>
-                                                <td>
-                                                    <!-- Botão para Abrir Modal de Edição -->
-                                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editRegionModal"
-                                                        data-id="<?php echo htmlspecialchars($row['id']); ?>"
-                                                        data-name="<?php echo htmlspecialchars($row['name']); ?>"
-                                                        data-source="<?php echo htmlspecialchars($row['source']); ?>"
-                                                        data-description="<?php echo htmlspecialchars($row['description']); ?>">
-                                                        Editar
-                                                    </button>
-
-                                                    <!-- Botão para Abrir Modal de Exclusão -->
-                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
-                                                        data-id="<?php echo htmlspecialchars($row['id']); ?>">
-                                                        Excluir
-                                                    </button>
-                                                </td>
-                                            </tr>
+                        </div>
+                        
+                        <!-- Listagem de Regiões Cadastradas -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">Regiões Cadastradas</h5>
+                                    <form method="GET" action="" class="d-flex">
+                                        <input type="text" class="form-control me-2" name="search" placeholder="Buscar regiões" value="<?php echo htmlspecialchars($search); ?>">
+                                        <button class="btn btn-primary" type="submit">Buscar</button>
+                                        <?php if ($search) { ?>
+                                            <a href="regions.php" class="btn btn-secondary ms-2">Remover Filtro</a>
                                         <?php } ?>
-                                    <?php else: ?>
+                                    </form>
+                                </div>
+
+                                <table class="table table-bordered">
+                                    <thead>
                                         <tr>
-                                            <td colspan="5" class="text-center">Nenhuma região encontrada.</td>
+                                            <th>Nome</th>
+                                            <th>Descrição</th>
+                                            <th>Imagem</th>
+                                            <th>Fonte</th>
+                                            <th>Ações</th>
                                         </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (mysqli_num_rows($regionsQuery) > 0): ?>
+                                            <?php while ($row = mysqli_fetch_array($regionsQuery)) { ?>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                                    <td><?php echo htmlspecialchars($row['description']); ?></td>
+                                                    <td>
+                                                        <?php if ($row['imagem']) { ?>
+                                                            <img src="data:image/jpeg;base64,<?php echo base64_encode($row['imagem']); ?>" alt="Imagem" style="width: 100px; height: auto;">
+                                                        <?php } else { ?>
+                                                            N/A
+                                                        <?php } ?>
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($row['source']); ?></td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editRegionModal"
+                                                            data-id="<?php echo htmlspecialchars($row['id']); ?>"
+                                                            data-name="<?php echo htmlspecialchars($row['name']); ?>"
+                                                            data-source="<?php echo htmlspecialchars($row['source']); ?>"
+                                                            data-description="<?php echo htmlspecialchars($row['description']); ?>">
+                                                            Editar
+                                                        </button>
+
+                                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                                                            data-id="<?php echo htmlspecialchars($row['id']); ?>">
+                                                            Excluir
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="5" class="text-center">Nenhuma região encontrada.</td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- Paginação -->
-                            <?php
-                            $baseUrl = "?";
-                            if ($search) {
-                                $baseUrl .= "search=" . urlencode($search) . "&";
-                            }
-                            ?>
-                            <nav aria-label="Navegação de página">
-                                <ul class="pagination justify-content-center">
-                                    <?php if ($page > 1) { ?>
-                                        <li class="page-item">
-                                            <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page - 1; ?>" aria-label="Anterior">
-                                                <span aria-hidden="true">&laquo;</span>
-                                                <span class="sr-only">Anterior</span>
-                                            </a>
-                                        </li>
-                                    <?php } ?>
-
-                                    <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
-                                        <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                                            <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                                        </li>
-                                    <?php } ?>
-
-                                    <?php if ($page < $totalPages) { ?>
-                                        <li class="page-item">
-                                            <a class="page-link" href="<?php echo $baseUrl; ?>page=<?php echo $page + 1; ?>" aria-label="Próximo">
-                                                <span aria-hidden="true">&raquo;</span>
-                                                <span class="sr-only">Próximo</span>
-                                            </a>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            </nav>
-                            <!-- Fim da Paginação -->
-            </main>
-            <?php include('includes/footer.php'); ?>
+                    <?php include('includes/pagination.php'); ?> 
+                </main>
+                <?php include('includes/footer.php'); ?>
+            </div>
         </div>
-    </div>
 
-    <!-- Modal de Confirmação de Exclusão -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Exclusão</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Modal de Confirmação de Exclusão -->
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Você realmente deseja excluir esta região?
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="">
+                            <input type="hidden" name="id" id="deleteId">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" name="delete_region" class="btn btn-danger">Excluir</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    Você realmente deseja excluir esta região?
-                </div>
-                <div class="modal-footer">
-                    <form method="POST" action="">
-                        <input type="hidden" name="id" id="deleteId">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" name="delete_region" class="btn btn-danger">Excluir</button>
+            </div>
+        </div>
+
+        <!-- Modal de Edição de Região -->
+        <div class="modal fade" id="editRegionModal" tabindex="-1" aria-labelledby="editRegionModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editRegionModalLabel">Editar Região</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" id="editRegionId">
+                            <div class="mb-3">
+                                <label for="editName" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="editName" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editSource" class="form-label">Fonte</label>
+                                <input type="text" class="form-control" id="editSource" name="source" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDescription" class="form-label">Descrição</label>
+                                <input type="text" class="form-control" id="editDescription" name="description" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editImage" class="form-label">Imagem (deixe em branco para não alterar)</label>
+                                <input type="file" class="form-control" id="editImage" name="image">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" name="edit_region" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal de Edição de Região -->
-    <div class="modal fade" id="editRegionModal" tabindex="-1" aria-labelledby="editRegionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form method="POST" action="" enctype="multipart/form-data">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editRegionModalLabel">Editar Região</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="id" id="editRegionId">
-                        <div class="mb-3">
-                            <label for="editName" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="editName" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editSource" class="form-label">Fonte</label>
-                            <input type="text" class="form-control" id="editSource" name="source" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editDescription" class="form-label">Descrição</label>
-                            <input type="text" class="form-control" id="editDescription" name="description" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editImage" class="form-label">Imagem (deixe em branco para não alterar)</label>
-                            <input type="file" class="form-control" id="editImage" name="image">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" name="edit_region" class="btn btn-primary">Salvar Alterações</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
+                var deleteIdInput = document.getElementById('deleteId');
 
-    <!-- Scripts JavaScript para Manipulação de Modais -->
-    <script>
-        // Manipulação do Modal de Exclusão
-        document.addEventListener('DOMContentLoaded', function() {
-            var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
-            var deleteIdInput = document.getElementById('deleteId');
+                var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editRegionModal"]');
+                var editRegionIdInput = document.getElementById('editRegionId');
+                var editNameInput = document.getElementById('editName');
+                var editSourceInput = document.getElementById('editSource');
+                var editDescriptionInput = document.getElementById('editDescription');
+                
+                deleteButtons.forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var id = this.getAttribute('data-id');
+                        deleteIdInput.value = id;
+                    });
+                });
             
-            deleteButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var id = this.getAttribute('data-id');
-                    deleteIdInput.value = id;
+                editButtons.forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var id = this.getAttribute('data-id');
+                        var name = this.getAttribute('data-name');
+                        var source = this.getAttribute('data-source');
+                        var description = this.getAttribute('data-description');
+
+                        editRegionIdInput.value = id;
+                        editNameInput.value = name;
+                        editSourceInput.value = source;
+                        editDescriptionInput.value = description;
+                    });
                 });
             });
-        });
-
-        // Manipulação do Modal de Edição
-        document.addEventListener('DOMContentLoaded', function() {
-            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editRegionModal"]');
-            var editRegionIdInput = document.getElementById('editRegionId');
-            var editNameInput = document.getElementById('editName');
-            var editSourceInput = document.getElementById('editSource');
-            var editDescriptionInput = document.getElementById('editDescription');
-
-            editButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var id = this.getAttribute('data-id');
-                    var name = this.getAttribute('data-name');
-                    var source = this.getAttribute('data-source');
-                    var description = this.getAttribute('data-description');
-
-                    editRegionIdInput.value = id;
-                    editNameInput.value = name;
-                    editSourceInput.value = source;
-                    editDescriptionInput.value = description;
-                });
-            });
-        });
-    </script>
-</body>
+        </script>
+    </body>
 
 </html>

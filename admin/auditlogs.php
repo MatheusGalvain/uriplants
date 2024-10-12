@@ -1,29 +1,36 @@
 <?php
-session_start();
 include_once('includes/config.php');
 
-if (!isset($_SESSION['id']) || strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
+check_user_session();
 
 function display_value($value) {
     return isset($value) ? htmlspecialchars($value) : 'N/A';
 }
 
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+$search_escaped = mysqli_real_escape_string($con, $search);
+
 $limit = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
+$where = "al.deleted_at IS NULL";
+
+if ($search !== '') {
+    $where .= " AND (al.table_name LIKE '%$search_escaped%' OR p.name LIKE '%$search_escaped%')";
+}
+
 $count_query = "
     SELECT COUNT(*) AS total
     FROM auditlogs AS al
-    WHERE al.deleted_at IS NULL
+    LEFT JOIN plants AS p ON al.plant_id = p.id
+    WHERE $where
 ";
 $count_result = mysqli_query($con, $count_query);
 $total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
-
 $total_pages = ceil($total_logs / $limit);
+
 
 $query = "
     SELECT 
@@ -43,55 +50,26 @@ $query = "
     INNER JOIN actions AS a ON al.action_id = a.id
     INNER JOIN users AS u ON al.changed_by = u.id
     LEFT JOIN plants AS p ON al.plant_id = p.id
-    WHERE al.deleted_at IS NULL
+    WHERE $where
     ORDER BY al.change_time DESC
     LIMIT $limit OFFSET $offset
 ";
 
 $result = mysqli_query($con, $query);
-
 $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <?php include_once("includes/head.php"); ?>
+    <link href="css/pagination.css" rel="stylesheet" />
     <title>Admin | Gerenciamento de Logs</title>
-    <style>
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .pagination a, .pagination span {
-            margin: 0 5px;
-            padding: 8px 12px;
-            text-decoration: none;
-            border: 1px solid #ddd;
-            color: #007bff;
-        }
-        .pagination a:hover {
-            background-color: #f1f1f1;
-        }
-        .pagination .active {
-            background-color: #007bff;
-            color: white;
-            border: 1px solid #007bff;
-        }
-        .pagination .disabled {
-            color: #ccc;
-            pointer-events: none;
-            border: 1px solid #ddd;
-        }
-    </style>
 </head>
 <body class="sb-nav-fixed">
     <?php include_once('includes/navbar.php'); ?>
-
     <div id="layoutSidenav">
         <?php include_once('includes/sidebar.php'); ?>
-
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
@@ -101,6 +79,12 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <i class="fas fa-download"></i> Baixar Relatório
                         </a>
                     </div>
+                    <form method="GET" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="Buscar por Tabela ou Planta" value="<?php echo htmlspecialchars($search); ?>">
+                            <button class="btn btn-primary" type="submit">Buscar</button>
+                        </div>
+                    </form>
                     <div class="card mb-4">
                         <div class="card-body">
                             <table id="logsTable" class="table table-bordered">
@@ -153,34 +137,10 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <?php endif; ?>
                                 </tbody>
                             </table>
-                            
-                            <!-- Paginação -->
-                            <?php if ($total_pages > 1): ?>
-                                <div class="pagination">
-                                    <?php if ($page > 1): ?>
-                                        <a href="?page=<?php echo $page - 1; ?>">&laquo; Anterior</a>
-                                    <?php else: ?>
-                                        <span class="disabled">&laquo; Anterior</span>
-                                    <?php endif; ?>
-                                    <?php
-                                    $range = 2;
-                                    for ($i = max(1, $page - $range); $i <= min($page + $range, $total_pages); $i++):
-                                        if ($i == $page):
-                                    ?>
-                                            <span class="active"><?php echo $i; ?></span>
-                                        <?php else: ?>
-                                            <a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                                        <?php endif; ?>
-                                    <?php endfor; ?>
-                                    <?php if ($page < $total_pages): ?>
-                                        <a href="?page=<?php echo $page + 1; ?>">Próxima &raquo;</a>
-                                    <?php else: ?>
-                                        <span class="disabled">Próxima &raquo;</span>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endif; ?>
-                            <!--  -->
-
+                            <?php 
+                            $_GET['search'] = $search;
+                            include('includes/pagination.php'); 
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -188,6 +148,5 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
-
 </body>
 </html>
