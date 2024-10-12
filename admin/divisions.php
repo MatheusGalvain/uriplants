@@ -90,7 +90,7 @@ if (isset($_POST['edit_division'])) {
 
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
-$limit = 1;
+$limit = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
