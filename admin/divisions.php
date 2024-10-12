@@ -17,7 +17,7 @@ if (isset($_POST['add_division'])) {
 
             $new_class_id = mysqli_insert_id($con);
 
-            $table = 'divisions';
+            $table = 'Divisões';
             $action_id = 1; 
             $changed_by = $_SESSION['id'];
             $old_value = null; 
@@ -43,7 +43,7 @@ if (isset($_POST['delete_division'])) {
     if (mysqli_query($con, $sql)) {
         $success = "Divisão excluída com sucesso.";
 
-        $table = 'divisions';
+        $table = 'Divisões';
         $action_id = 2; 
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";
@@ -73,7 +73,7 @@ if (isset($_POST['edit_division'])) {
         if (mysqli_query($con, $sql)) {
             $success = "Divisão editada com sucesso.";
 
-        $table = 'divisions';
+        $table = 'Divisões';
         $action_id = 3; 
         $changed_by = $_SESSION['id'];
         $old_value = "$old_name";

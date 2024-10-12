@@ -1,6 +1,6 @@
 <?php
 include_once('includes/config.php');
-require_once('includes/audit.php'); 
+require_once('functions/audit.php'); 
 
 check_user_session();
 
@@ -135,7 +135,7 @@ if (isset($_POST['add_plant'])) {
         $stmt->close();
 
         // Auditoria para inserção de planta
-        $table = 'Plants';
+        $table = 'Plantas';
         $action_id = 1; // Adição
         $changed_by = $_SESSION['id'];
         $old_value = null;
@@ -260,7 +260,7 @@ if (isset($_POST['delete_plant'])) {
             $stmt->close();
 
             // Auditoria para exclusão de planta
-            $table = 'Plants';
+            $table = 'Plantas';
             $action_id = 3; // Exclusão
             $changed_by = $_SESSION['id'];
             $old_value = "Planta: $plant_name";
@@ -339,7 +339,7 @@ if (isset($_POST['edit_plant'])) {
             $stmt->close();
 
             // Auditoria para atualização de planta
-            $table = 'Plants';
+            $table = 'Plantas';
             $action_id = 3; // Atualização
             $changed_by = $_SESSION['id'];
             $old_value = "Planta: $plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description";

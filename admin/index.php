@@ -44,7 +44,7 @@ if (isset($_POST['login'])) {
         <section id="main-admin">
             <div class="container">
                 <article class="title-admin">
-                    <!-- Ajustar href -->
+                    <!-- TODO:  Ajustar href -->
                     <a class="returnbtn" href="#" alt="Link do Site"> 
                     <i class="fas fa-angle-left"></i>
                     Voltar ao site</a>
@@ -56,10 +56,8 @@ if (isset($_POST['login'])) {
                 <form class="custom-form" method="post">
                     <div class="form-group">
                         <input class="form-input" placeholder="E-mail" name="uemail" id="inputEmail" required/>
-                        <!-- <label class="form-label" for="inputEmail">Endereço de E-mail:</label> -->
                     </div>
                     <div class="form-group">
-                        <!-- <label class="form-label" for="inputPassword">Senha:</label> -->
                         <input class="form-input" placeholder="Senha" name="password" type="password" id="inputPassword" required />
                     </div>
                     <div class="form-actions">
@@ -69,7 +67,7 @@ if (isset($_POST['login'])) {
                 </form>
                 <div class="logo-wrapp">
                     <div class="logocontainer">
-                        <!-- Ajustar href para ir pro site-->
+                        <!-- TODO: Ajustar href para ir pro site-->
                         <img href="#" class="logoadmin" src="images/logouri.png" alt="Logo da URI">
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 <?php
 include_once('includes/config.php');
-require_once('includes/audit.php');
+require_once('functions/audit.php');
 
 check_user_session();
 
@@ -17,13 +17,12 @@ if (isset($_POST['add_genus'])) {
 
             $new_class_id = mysqli_insert_id($con);
 
-            $table = 'genus';
+            $table = 'Gênero';
             $action_id = 1; 
             $changed_by = $_SESSION['id'];
             $old_value = null; 
             $new_value = "ID: $new_class_id, Nome: $name";
             $plant_id = null;
-
 
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 
@@ -44,7 +43,7 @@ if (isset($_POST['delete_genus'])) {
     if (mysqli_query($con, $sql)) {
         $success = "Gênero excluído com sucesso."; 
 
-        $table = 'genus';
+        $table = 'Gênero';
         $action_id = 2; 
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";
@@ -70,7 +69,7 @@ if (isset($_POST['edit_genus'])) {
     if (mysqli_query($con, $sql)) {
         $success = "Gênero atualizado com sucesso.";
 
-        $table = 'genus';
+        $table = 'Gênero';
         $action_id = 3; 
         $changed_by = $_SESSION['id'];
         $old_value = "$old_name";

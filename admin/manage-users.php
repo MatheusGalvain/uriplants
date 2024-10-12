@@ -199,7 +199,6 @@ if ($editUserId) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
     <script>
-
         window.addEventListener('DOMContentLoaded', event => {
             const datatablesSimple = document.getElementById('datatablesSimple');
             if (datatablesSimple) {

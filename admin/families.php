@@ -1,6 +1,6 @@
 <?php
 include_once('includes/config.php');
-require_once('includes/audit.php');
+require_once('functions/audit.php');
 
 check_user_session();
 
@@ -18,7 +18,7 @@ if (isset($_POST['add_family'])) {
 
             $new_class_id = mysqli_insert_id($con);
 
-            $table = 'families';
+            $table = 'Família';
             $action_id = 1; 
             $changed_by = $_SESSION['id'];
             $old_value = null; 
@@ -51,7 +51,7 @@ if (isset($_POST['edit_family'])) {
             $success = "Nome da família atualizado com sucesso.";
 
             
-            $table = 'families';
+            $table = 'Família';
             $action_id = 3; 
             $changed_by = $_SESSION['id'];
             $old_value = "$old_name";
@@ -76,7 +76,7 @@ if (isset($_POST['delete_family'])) {
     if (mysqli_query($con, $sql)) {
         $success = "Família excluída com sucesso.";
 
-        $table = 'families';
+        $table = 'Família';
         $action_id = 2; 
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";

@@ -1,6 +1,6 @@
 <?php
 include_once('includes/config.php');
-require_once('includes/audit.php'); 
+require_once('functions/audit.php'); 
 
 check_user_session();
 
@@ -47,7 +47,7 @@ if (isset($_POST['add_region'])) {
                     
                     $new_region_id = mysqli_insert_id($con);
                     
-                    $table = 'RegionMap';
+                    $table = 'Regiões';
                     $action_id = 1; 
                     $changed_by = $_SESSION['id'];
                     $old_value = null; 
@@ -117,7 +117,7 @@ if (isset($_POST['edit_region'])) {
                 if (mysqli_stmt_execute($stmt)) {
                     $success = "Região atualizada com sucesso.";
 
-                    $table = 'RegionMap';
+                    $table = 'Regiões';
                     $action_id = 3;
                     $changed_by = $_SESSION['id'];
                     $old_value = "Nome: $old_name, Fonte: $old_source, Descrição: $old_description";
@@ -162,7 +162,7 @@ if (isset($_POST['delete_region'])) {
                 $success = "Região marcada como excluída com sucesso.";
 
                 // Registrar no log de auditoria
-                $table = 'RegionMap';
+                $table = 'Regiões';
                 $action_id = 2; // Supondo que 2 representa "Excluir"
                 $changed_by = $_SESSION['id'];
                 $old_value = "Nome: $old_name, Fonte: $old_source, Descrição: $old_description, Imagem deletada";

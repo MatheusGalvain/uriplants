@@ -22,28 +22,28 @@ if (isset($_POST['recover'])) {
         $stmt->bind_param("is", $user_id, $token);
         $stmt->execute();
 
-        // ALTERAR PARA URL CORRETA
+        // TODO: ALTERAR PARA URL CORRETA
         $resetLink = "http://localhost/uriplants/admin/password-reset.php?token=" . $token;
 
         $mail = new PHPMailer(true);
 
         try {
-            // CONFIGURAÇÕES DO SERVIDOR DE E-MAIL
+            // TODO: CONFIGURAÇÕES DO SERVIDOR DE E-MAIL
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'uriplantaspi3@gmail.com';   // Endereço de e-mail 
-            $mail->Password = 'xcpp nbia xrnl liyi';        // Senha de app - FAVOR NÃO DEIXAR AQUI QUEM FOR BOTAR ISSO EM PROD
+            $mail->Username = 'uriplantaspi3@gmail.com';   // TODO: Endereço de e-mail 
+            $mail->Password = 'xcpp nbia xrnl liyi';        // TODO: Senha de app - FAVOR NÃO DEIXAR AQUI QUEM FOR BOTAR ISSO EM PROD
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
             $mail->Port = 587; 
 
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
 
-            $mail->setFrom('uriplantaspi3@gmail.com', 'URI Plantas'); // Altera o remetente
+            $mail->setFrom('uriplantaspi3@gmail.com', 'URI Plantas'); // TODO: Altera o remetente
             $mail->addAddress($useremail, $num['fname']);
 
-            // Conteúdo do e-mail - personalizar conforme necessário
+            // TODO: Conteúdo do e-mail - personalizar conforme necessário
             $mail->isHTML(true); 
             $mail->Subject = 'Recuperação de Senha';
             $mail->Body    = "
@@ -103,7 +103,7 @@ if (isset($_POST['recover'])) {
         <section id="main-admin">
             <div class="container">
                 <article class="title-admin">
-                    <!-- Ajustar href -->
+                    <!-- TODO: Ajustar href -->
                     <a class="returnbtn" href="index.php" alt="Link do Site"> 
                         <i class="fas fa-angle-left"></i>
                         Voltar para o login

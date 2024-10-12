@@ -1,6 +1,6 @@
 <?php
 include_once('includes/config.php');
-require_once('includes/audit.php');
+require_once('functions/audit.php');
 
 check_user_session();
 
@@ -24,7 +24,7 @@ if (isset($_POST['edit_url'])) {
         if (mysqli_query($con, $sql)) {
             $success = "URL atualizado com sucesso.";
 
-            $table = 'qrcode_url';
+            $table = 'QR Code URL';
             $action_id = 2; 
             $changed_by = $_SESSION['id'];
             $old_value = $old_url;
@@ -41,7 +41,7 @@ if (isset($_POST['edit_url'])) {
         if (mysqli_query($con, $sql)) {
             $success = "URL inserida com sucesso.";
 
-            $table = 'qrcode_url';
+            $table = 'QR Code URL';
             $action_id = 1; 
             $changed_by = $_SESSION['id'];
             $old_value = null;

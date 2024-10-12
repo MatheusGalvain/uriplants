@@ -17,7 +17,7 @@ if (isset($_POST['add_class'])) {
 
             $new_class_id = mysqli_insert_id($con);
 
-            $table = 'classes';
+            $table = 'Classes';
             $action_id = 1; 
             $changed_by = $_SESSION['id'];
             $old_value = null; 
@@ -49,7 +49,7 @@ if (isset($_POST['edit_class'])) {
         if (mysqli_query($con, $sql)) {
             $success = "Nome da classe atualizado com sucesso.";
 
-            $table = 'classes';
+            $table = 'Classes';
             $action_id = 3; 
             $changed_by = $_SESSION['id'];
             $old_value = "$old_name";
@@ -74,7 +74,7 @@ if (isset($_POST['delete_class'])) {
     if (mysqli_query($con, $sql)) {
         $success = "Classe excluída com sucesso.";
 
-        $table = 'classes';
+        $table = 'Classes';
         $action_id = 2; 
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";

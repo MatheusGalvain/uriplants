@@ -6,7 +6,7 @@ check_user_session();
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
 
-    $stmt = $con->prepare("SELECT user_id FROM PasswordResets WHERE token = ?");
+    $stmt = $con->prepare("SELECT user_id FROM password_resets WHERE token = ?");
     $stmt->bind_param("s", $token);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -27,7 +27,7 @@ if (isset($_GET['token'])) {
                 $stmt->bind_param("si", $hashed_password, $user_id);
                 $stmt->execute();
 
-                $stmt = $con->prepare("DELETE FROM PasswordResets WHERE token = ?");
+                $stmt = $con->prepare("DELETE FROM password_resets WHERE token = ?");
                 $stmt->bind_param("s", $token);
                 $stmt->execute();
 
