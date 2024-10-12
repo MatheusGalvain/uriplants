@@ -96,7 +96,6 @@ $offset = ($page - 1) * $limit;
 
 $count_query = "SELECT COUNT(*) as total FROM classes WHERE deleted_at IS NULL";
 
-
 $count_result = mysqli_query($con, $count_query);
 $total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
 $total_pages = ceil($total_logs / $limit);

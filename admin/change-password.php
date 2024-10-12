@@ -1,24 +1,19 @@
 <?php
 include_once('includes/config.php');
 
-check_user_session();
-
-// Verificar se o formulário foi enviado
 if (isset($_POST['update'])) {
     $oldpassword = md5($_POST['currentpassword']);
     $newpassword = md5($_POST['newpassword']);
 
-    // Escapar as entradas para prevenir SQL Injection
     $oldpassword = mysqli_real_escape_string($con, $oldpassword);
     $newpassword = mysqli_real_escape_string($con, $newpassword);
     $userid = $_SESSION['id'];
 
-    // Buscar a senha atual do usuário
     $sql = mysqli_query($con, "SELECT password FROM users WHERE id='$userid'");
     $num = mysqli_fetch_array($sql);
 
     if ($num && password_verify($oldpassword, $num['password'])) {
-        // Atualizar a senha (armazenar hashes de senha)
+
         $hashed_password = password_hash($newpassword, PASSWORD_DEFAULT);
         $ret = mysqli_query($con, "UPDATE users SET password='$hashed_password' WHERE id='$userid'");
 
@@ -30,6 +25,7 @@ if (isset($_POST['update'])) {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 

@@ -3,58 +3,58 @@ include_once('includes/config.php');
 
 check_user_session();
 
-    // Verifica se o admin está logado
-    $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+// Verifica se o admin está logado
+$isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 
-    // Código para atualização do perfil
-    if (isset($_POST['update'])) {
-        $fname = mysqli_real_escape_string($con, $_POST['fname']);
-        $email = mysqli_real_escape_string($con, $_POST['email']);
-        $userid = intval($_POST['userid']);
+// Código para atualização do perfil
+if (isset($_POST['update'])) {
+    $fname = mysqli_real_escape_string($con, $_POST['fname']);
+    $email = mysqli_real_escape_string($con, $_POST['email']);
+    $userid = intval($_POST['userid']);
 
-        // Prepara a consulta de atualização com o e-mail
-        $updateQuery = "UPDATE users SET fname='$fname', email='$email' WHERE id='$userid'";
-        $msg = mysqli_query($con, $updateQuery);
+    // Prepara a consulta de atualização com o e-mail
+    $updateQuery = "UPDATE users SET fname='$fname', email='$email' WHERE id='$userid'";
+    $msg = mysqli_query($con, $updateQuery);
 
-        if ($msg) {
-            echo "<script>alert('Perfil atualizado com sucesso');</script>";
-            echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
-        } else {
-            echo "<script>alert('Erro ao atualizar o perfil.');</script>";
-        }
+    if ($msg) {
+        echo "<script>alert('Perfil atualizado com sucesso');</script>";
+        echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
+    } else {
+        echo "<script>alert('Erro ao atualizar o perfil.');</script>";
     }
+}
 
-    // Código para exclusão do usuário
-    if (isset($_GET['delete'])) {
-        $deleteUserId = intval($_GET['delete']);
+// Código para exclusão do usuário
+if (isset($_GET['delete'])) {
+    $deleteUserId = intval($_GET['delete']);
+    
+    if ($deleteUserId) {
+        $deleteQuery = "DELETE FROM users WHERE id='$deleteUserId'";
+        $msg = mysqli_query($con, $deleteQuery);
         
-        if ($deleteUserId) {
-            $deleteQuery = "DELETE FROM users WHERE id='$deleteUserId'";
-            $msg = mysqli_query($con, $deleteQuery);
-            
-            if ($msg) {
-                echo "<script>alert('Usuário excluído com sucesso');</script>";
-            } else {
-                echo "<script>alert('Erro ao excluir o usuário.');</script>";
-            }
-            
-            echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
+        if ($msg) {
+            echo "<script>alert('Usuário excluído com sucesso');</script>";
+        } else {
+            echo "<script>alert('Erro ao excluir o usuário.');</script>";
         }
+        
+        echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
     }
+}
 
-    // Verifica se o ID do usuário para editar foi fornecido
-    $editUserId = isset($_GET['uid']) ? intval($_GET['uid']) : null;
+// Verifica se o ID do usuário para editar foi fornecido
+$editUserId = isset($_GET['uid']) ? intval($_GET['uid']) : null;
 
-    if ($editUserId) {
-        // Recupera os dados do usuário
-        $query = mysqli_query($con, "SELECT * FROM users WHERE id='$editUserId'");
-        $editUser = mysqli_fetch_array($query);
-        if (!$editUser) {
-            echo "<script>alert('Usuário não encontrado.');</script>";
-            echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
-            exit;
-        }
+if ($editUserId) {
+    // Recupera os dados do usuário
+    $query = mysqli_query($con, "SELECT * FROM users WHERE id='$editUserId'");
+    $editUser = mysqli_fetch_array($query);
+    if (!$editUser) {
+        echo "<script>alert('Usuário não encontrado.');</script>";
+        echo "<script type='text/javascript'>document.location = 'manage-users.php';</script>";
+        exit;
     }
+}
 ?>
 
 <!DOCTYPE html>
