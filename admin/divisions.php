@@ -237,8 +237,10 @@ $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at I
         document.addEventListener('DOMContentLoaded', function() {
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
             var deleteIdInput = document.getElementById('deleteId');
+
             var editIdInput = document.getElementById('editId');
             var editNameInput = document.getElementById('editName');
+            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
             
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
@@ -247,7 +249,6 @@ $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at I
                 });
             });
 
-            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');
@@ -258,8 +259,6 @@ $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at I
             });
         });
     </script>
-
-    <?php include_once("includes/scripts.php"); ?>
 </body>
 
 </html>

@@ -4,7 +4,6 @@ require_once('includes/audit.php');
 
 check_user_session();
 
-
 if (isset($_POST['add_family'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
@@ -192,7 +191,8 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
-
+    
+<!-- Modal para excluir -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -214,6 +214,7 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
         </div>
     </div>
 
+<!-- Modal para editar -->
     <div class="modal fade" id="editFamilyModal" tabindex="-1" aria-labelledby="editFamilyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -237,8 +238,13 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
             var deleteIdInput = document.getElementById('deleteId');
+           
+            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editFamilyModal"]');
+            var editIdInput = document.getElementById('editId');
+            var editNameInput = document.getElementById('editName');
 
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
@@ -246,13 +252,6 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
                     deleteIdInput.value = id;
                 });
             });
-        });
-
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editFamilyModal"]');
-            var editIdInput = document.getElementById('editId');
-            var editNameInput = document.getElementById('editName');
 
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function() {

@@ -230,11 +230,12 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var editButtons = document.querySelectorAll('[data-bs-target="#editGenusModal"]');
+            var deleteIdInput = document.getElementById('deleteId');
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
+
             var editIdInput = document.getElementById('editId');
             var editNameInput = document.getElementById('editName');
-            var deleteIdInput = document.getElementById('deleteId');
+            var editButtons = document.querySelectorAll('[data-bs-target="#editGenusModal"]');
             
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function() {

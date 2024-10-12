@@ -3,20 +3,15 @@ include_once('includes/config.php');
 
 check_user_session();
 
-// Verifica se a sessão do usuário está ativa
-if (!isset($_SESSION['id']) || empty($_SESSION['id'])) {
-    header('location:logout.php');
-    exit();
-} else {
-    $userid = $_SESSION['id'];
-    // Consulta SQL segura com prepared statements
-    $stmt = $con->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->bind_param("i", $userid);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    $stmt->close();
-}
+$userid = $_SESSION['id'];
+
+$stmt = $con->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->bind_param("i", $userid);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$stmt->close();
+
 ?>
 
 <!DOCTYPE html>

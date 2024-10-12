@@ -239,18 +239,16 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
             var deleteIdInput = document.getElementById('deleteId');
 
+            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editClassModal"]');
+            var editIdInput = document.getElementById('editId');
+            var editNameInput = document.getElementById('editName');
+
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');
                     deleteIdInput.value = id;
                 });
             });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editClassModal"]');
-            var editIdInput = document.getElementById('editId');
-            var editNameInput = document.getElementById('editName');
 
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
