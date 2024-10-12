@@ -85,7 +85,6 @@ function get_qrcode_url($con) {
     }
 }
 
-
 // Adicionar Planta com Propriedades e Imagens
 if (isset($_POST['add_plant'])) {
     // Dados da Planta
@@ -116,7 +115,7 @@ if (isset($_POST['add_plant'])) {
     mysqli_begin_transaction($con);
     try {
         // Verifica se a planta já existe
-        $stmt = $con->prepare("SELECT id FROM Plants WHERE name = ?");
+        $stmt = $con->prepare("SELECT id FROM Plants WHERE name = ? AND deleted_at IS NULL");
         if (!$stmt) {
             throw new Exception("Erro na preparação da consulta: " . $con->error);
         }
@@ -164,13 +163,6 @@ if (isset($_POST['add_plant'])) {
             $plants_property_id = mysqli_insert_id($con);
             $stmt->close();
 
-            // Auditoria para inserção de propriedade
-            $plant_name = get_plant_name($con, $plant_id);
-            $property_data = get_property_name($con, $property_id);
-            $property_name = $property_data['name'];
-            $new_value = "Planta: $plant_name, Propriedade: $property_name";
-            log_audit_action($con, 'PlantsProperties', 1, $changed_by, null, $new_value, $plant_id);
-
             // Inserir imagens para esta propriedade
             if (!empty($images)) {
                 foreach ($images as $imageData) {
@@ -206,7 +198,7 @@ if (isset($_POST['add_plant'])) {
                     $stmt->close();
 
                     // Auditoria para inserção de imagem
-                    $new_value = "Imagem ID: $image_id, Fonte: $source, Ordem: $next_sort_order";
+                    $new_value = "Imagem ID: $image_id, Fonte: $source";
                     log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $plant_id);
                 }
             }
@@ -230,7 +222,7 @@ if (isset($_POST['add_plant'])) {
             $stmt->close();
 
             // Auditoria para inserção de link
-            $new_value = "Link: $link_name, URL: $link_url";
+            $new_value = "$link_name, URL: $link_url";
             log_audit_action($con, 'usefullinks', 1, $changed_by, null, $new_value, $plant_id);
         }
 
@@ -322,13 +314,19 @@ if (isset($_POST['edit_plant'])) {
         mysqli_begin_transaction($con);
         try {
             // Verifica se a planta existe e não está deletada
-            $stmt = $con->prepare("SELECT name FROM Plants WHERE id = ? AND deleted_at IS NULL");
+            $stmt = $con->prepare("
+            SELECT name, common_names, species, applications, ecology, biology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description 
+            FROM Plants 
+            WHERE id = ? AND deleted_at IS NULL
+        ");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da consulta: " . $con->error);
             }
             $stmt->bind_param("i", $edit_id);
             $stmt->execute();
-            mysqli_stmt_bind_result($stmt, $plant_name);
+
+            $stmt->bind_result($plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description);
+
             if (!mysqli_stmt_fetch($stmt)) {
                 throw new Exception("Planta não encontrada ou já foi excluída.");
             }
@@ -347,10 +345,10 @@ if (isset($_POST['edit_plant'])) {
 
             // Auditoria para atualização de planta
             $table = 'Plants';
-            $action_id = 2; // Atualização
+            $action_id = 3; // Atualização
             $changed_by = $_SESSION['id'];
-            $old_value = "Planta: $plant_name"; // Você pode expandir para incluir outros campos se desejar
-            $new_value = "Planta: $name"; // Similarmente, expanda conforme necessário
+            $old_value = "Planta: $plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description";
+            $new_value = "Planta: $name, $common_names, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description";
             log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $edit_id);
 
             // Obter propriedades existentes
@@ -386,16 +384,9 @@ if (isset($_POST['edit_plant'])) {
                     $plants_property_id = mysqli_insert_id($con);
                     $stmt->close();
 
-                    // Auditoria para inserção de propriedade
-                    $plant_name = get_plant_name($con, $edit_id);
-                    $property_data = get_property_name($con, $property_id);
-                    $property_name = $property_data['name'];
-                    $new_value = "Planta: $plant_name, Propriedade: $property_name";
-                    log_audit_action($con, 'PlantsProperties', 1, $changed_by, null, $new_value, $edit_id);
                 }
 
-                // Atualizar imagens existentes e inserir novas imagens com sort_order
-                // Primeiro, obter as imagens existentes para esta propriedade
+                // Atualizar imagens existentes
                 $stmt = $con->prepare("SELECT id, sort_order FROM images WHERE plants_property_id = ? ORDER BY sort_order ASC");
                 if (!$stmt) {
                     throw new Exception("Erro na preparação da consulta de imagens: " . $con->error);
@@ -465,7 +456,7 @@ if (isset($_POST['edit_plant'])) {
                             $stmt->close();
 
                             // Auditoria para atualização de sort_order
-                            $new_value = "Imagem ID: $image_id, Nova Ordem: $new_sort_order";
+                            $new_value = "Imagem ID: $image_id";
                             log_audit_action($con, 'images', 2, $changed_by, null, $new_value, $edit_id);
                         }
                     } else {
@@ -502,7 +493,7 @@ if (isset($_POST['edit_plant'])) {
                         $stmt->close();
 
                         // Auditoria para inserção de imagem
-                        $new_value = "Imagem ID: $image_id, Fonte: $source, Ordem: $next_sort_order";
+                        $new_value = "Imagem ID: $image_id, Fonte: $source";
                         log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $edit_id);
                     }
                 }
