@@ -28,12 +28,12 @@ check_user_session();
                             <div class="card-body">
                                 <table class="table table-bordered">
                                     <tr>
-                                        <th class="fw-normal">Nome do usuário:</th>
+                                        <th style="width: 20%;" class="fw-normal">Nome do usuário:</th>
                                         <td class="fw-bold"><?php echo htmlspecialchars($result['fname']); ?></td>
                                     </tr>
                                     <tr>
                                         <th class="fw-normal">Email:</th>
-                                        <td colspan="3" class="fw-bold"><?php echo htmlspecialchars($result['email']); ?></td>
+                                        <td class="fw-bold"><?php echo htmlspecialchars($result['email']); ?></td>
                                     </tr>
                                 </table>
                                 <a class="btn btn-primary btn-block" href="edit-profile.php">Editar perfil</a>

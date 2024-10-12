@@ -63,9 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <title>Admin | Mudar Senha</title>
     <?php include_once("includes/head.php"); ?>
+
     <script type="text/javascript">
         function valid() {
-            if (document.changepassword.newpassword.value != document.changepassword.confirmpassword.value) {
+            if (document.changepassword.newpassword.value !== document.changepassword.confirmpassword.value) {
                 alert("A nova senha e a confirmação de senha são diferentes!");
                 document.changepassword.confirmpassword.focus();
                 return false;
@@ -87,20 +88,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <form method="post" name="changepassword" onsubmit="return valid();">
                             <table class="table table-bordered">
                                 <tr>
-                                    <th>Senha Atual</th>
+                                    <th style="width: 20%;">Senha Atual:</th>
                                     <td><input class="form-control" id="currentpassword" name="currentpassword" type="password" value="" required /></td>
                                 </tr>
                                 <tr>
-                                    <th>Nova Senha</th>
+                                    <th>Nova Senha:</th>
                                     <td><input class="form-control" id="newpassword" name="newpassword" type="password" value="" required /></td>
                                 </tr>
                                 <tr>
-                                    <th>Confirme sua senha</th>
+                                    <th>Confirme sua senha:</th>
                                     <td><input class="form-control" id="confirmpassword" name="confirmpassword" type="password" required /></td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <div class= "d-flex gap-2">
+                                        <div class="d-flex gap-2">
                                             <button type="submit" class="btn btn-primary mt-4" name="update">Mudar Senha</button>
                                             <a href="profile.php" class="btn btn-secondary mt-4"> Voltar</a>
                                         </div>
@@ -109,7 +110,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </table>
                         </form>
                     </div>
-                    
                 </div>
             </main>
             <?php include('includes/footer.php'); ?>
@@ -134,6 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <?php if (!empty($message)): ?>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
@@ -143,6 +145,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
             messageModal.show();
+
+            if (message === 'Senha alterada com sucesso!') {
+                var modalElement = document.getElementById('messageModal');
+                modalElement.addEventListener('hidden.bs.modal', function(event) {
+                    window.location.href = 'profile.php'; 
+                });
+            }
         });
     </script>
     <?php endif; ?>
