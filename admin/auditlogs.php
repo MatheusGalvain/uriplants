@@ -7,17 +7,30 @@ function display_value($value) {
     return isset($value) ? htmlspecialchars($value) : 'N/A';
 }
 
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+$search_escaped = mysqli_real_escape_string($con, $search);
+
 $limit = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
+
+$where = "al.deleted_at IS NULL";
+
+if ($search !== '') {
+    $where .= " AND (al.table_name LIKE '%$search_escaped%' OR p.name LIKE '%$search_escaped%')";
+}
+
 $count_query = "
     SELECT COUNT(*) AS total
     FROM auditlogs AS al
-    WHERE al.deleted_at IS NULL
+    LEFT JOIN plants AS p ON al.plant_id = p.id
+    WHERE $where
 ";
 $count_result = mysqli_query($con, $count_query);
 $total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
 $total_pages = ceil($total_logs / $limit);
+
 
 $query = "
     SELECT 
@@ -37,7 +50,7 @@ $query = "
     INNER JOIN actions AS a ON al.action_id = a.id
     INNER JOIN users AS u ON al.changed_by = u.id
     LEFT JOIN plants AS p ON al.plant_id = p.id
-    WHERE al.deleted_at IS NULL
+    WHERE $where
     ORDER BY al.change_time DESC
     LIMIT $limit OFFSET $offset
 ";
@@ -46,7 +59,6 @@ $result = mysqli_query($con, $query);
 $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -67,6 +79,12 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <i class="fas fa-download"></i> Baixar Relatório
                         </a>
                     </div>
+                    <form method="GET" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="Buscar por Tabela ou Planta" value="<?php echo htmlspecialchars($search); ?>">
+                            <button class="btn btn-primary" type="submit">Buscar</button>
+                        </div>
+                    </form>
                     <div class="card mb-4">
                         <div class="card-body">
                             <table id="logsTable" class="table table-bordered">
@@ -119,7 +137,10 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <?php endif; ?>
                                 </tbody>
                             </table>
-                            <?php include('includes/pagination.php'); ?>
+                            <?php 
+                            $_GET['search'] = $search;
+                            include('includes/pagination.php'); 
+                            ?>
                         </div>
                     </div>
                 </div>
