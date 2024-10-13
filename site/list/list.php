@@ -103,7 +103,6 @@
         .header-container {
             display: flex;
             margin-top: 30px;
-            min-width: 1200px;
         }
 
         .icon-container {
@@ -119,7 +118,7 @@
             margin-right: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         .icon-container:hover {
             background-color: #18392B;
         }
@@ -161,7 +160,8 @@
             z-index: 1;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             align-items: center;
-            cursor: pointer; /* Adicionado para indicar que o cartão é clicável */
+            cursor: pointer;
+            /* Adicionado para indicar que o cartão é clicável */
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -270,6 +270,8 @@
             color: white;
             text-align: center;
             z-index: 999;
+            width: 96.9vw;
+            
         }
 
         footer .footer-columns div {
@@ -289,6 +291,54 @@
             width: 30px;
             margin: 0 10px;
         }
+
+
+        @media screen and (max-width: 480px) {
+    .plant-info p {
+        display: none; /* Oculta o parágrafo abaixo de 480px */
+    }
+}
+
+        @media screen and (min-width: 280px) {
+    .plant-container {
+        max-width: 90%; /* Ajusta para ser relativo à tela */
+    }
+    section {
+        width: 90%; /* Tornar responsivo */
+        max-width: 480px; /* Limitar o tamanho máximo */
+    }
+}
+
+@media screen and (min-width: 760px) {
+    .plant-container {
+        max-width: 90%; /* Permite flexibilidade */
+    }
+    section {
+        width: 90%;
+        max-width: 800px;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .plant-container {
+        max-width: 90%; /* Flexível */
+    }
+    section {
+        width: 90%;
+        max-width: 1024px;
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    .plant-container {
+        max-width: 90%; /* Flexível */
+    }
+    section {
+        width: 90%;
+        max-width: 1200px;
+    }
+}
+
     </style>
 </head>
 
@@ -399,7 +449,7 @@
                     plantInfo.classList.add('plant-info');
 
                     const plantName = document.createElement('h3');
-                    plantName.textContent = `Nome: ${plant.name}`;
+                    plantName.textContent = `${plant.name}`;
 
                     const plantDescription = document.createElement('p');
                     plantDescription.textContent = `Descrição: ${plant.description}`;
@@ -423,7 +473,7 @@
                     // Adiciona o listener de clique ao cartão da planta
                     plantCard.addEventListener('click', () => {
                         const plantId = plant.id; // Obtém o ID da planta
-                        
+
                         // Redireciona para a página plant.php com o ID da planta na URL
                         window.location.href = `../plant/plant.php?id=${plantId}`;
                     });

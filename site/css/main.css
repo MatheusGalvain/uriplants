@@ -58,7 +58,6 @@
 
   .button-group {
       display: flex;
-      width: 1000px;
       justify-content: space-around;
   }
 
@@ -209,3 +208,16 @@
       max-height: 80px;
   }
 
+
+  @media (max-width: 1000px) {
+    .button-group {
+        margin-top: 20px;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        align-items: center;
+    }
+    .btn:last-child {
+        margin-bottom: 40px;
+    }
+}

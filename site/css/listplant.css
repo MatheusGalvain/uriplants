@@ -398,7 +398,6 @@ main{
     align-content: flex-start;
     flex-direction: column;
     flex-wrap: wrap;
-    width: 100%;
     gap: 15px;
 }
 .otherphotodiv{
@@ -621,9 +620,6 @@ main{
 .climate-info>.informationsart{
     flex-direction: row;
 }
-.occourrence-text-container{
-    margin-left: 18px;
-}
 .containerimgs-wrapp{
     display: flex;
     justify-content: flex-start;
@@ -635,7 +631,6 @@ main{
     gap: 20px;
 }
 .informationsart{
-    display: flex;
     justify-content: flex-start;
     align-items: flex-start;
     align-content: flex-start;
@@ -655,28 +650,24 @@ main{
     color: #141414;
     font-weight: 200;
 }
-.photos-wrapp{
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-direction: row;
-    white-space: nowrap;
-    overflow-x: auto;
-    gap: 15px;
-}
 .photoproperty-wrapp{
     display: flex;
     justify-content: center;
     align-items: center;
     align-content: center;
-    width: 170px;
-    height: 150px!important;
     border-radius: 8px;
     cursor: pointer;
     scroll-snap-align: start;
     margin-right: 10px;
     overflow: hidden;
     color: #FFF;
+}
+.photos-wrapp {
+    width: 560px;
+}
+.slick-slide img {
+    display: block;
+    height: 160px;
 }
 .lightbox-title {
     position: absolute;
@@ -687,6 +678,7 @@ main{
     font-weight: 400;
     padding: 5px 5px 5px 2px;
     box-sizing: border-box;
+    width: 100px;
 }
 .lightbox-source{
     position: absolute;
@@ -726,6 +718,7 @@ main{
     flex-wrap: nowrap;
     cursor: pointer;
     text-align: center;
+    justify-content: space-evenly;
 }
 .otherplant {
     display: flex;

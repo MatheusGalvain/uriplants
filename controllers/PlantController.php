@@ -127,7 +127,8 @@ class PlantController {
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE properties.name = 'planta'
+                -- WHERE properties.name = 'planta'
+                WHERE plants.deleted_at IS NULL
                 GROUP BY plants.id
                 ORDER BY images.sort_order ASC, plants.id ASC
                 LIMIT ? OFFSET ?"; // Adiciona ordenação
@@ -197,7 +198,7 @@ class PlantController {
                 FROM plants
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE plants.id != ? 
+                WHERE plants.id != ? AND plants.deleted_at IS NULL -- COLOQUEI AQUI YN AND plants.deleted_at IS NULL pra nao puxar as excluidas
                 ORDER BY images.sort_order ASC, RAND() LIMIT ?"; // Adiciona ordenação
         
         $stmt = $conn->prepare($sql);
