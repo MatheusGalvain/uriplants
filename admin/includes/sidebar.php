@@ -26,13 +26,18 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="dropdown-item text-white ps-5" href="divisions.php">
+                                    Divisões
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="dropdown-item text-white ps-5" href="classes.php">
                                     Classes
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="dropdown-item text-white ps-5" href="divisions.php">
-                                    Divisões
+                                <a class="dropdown-item text-white ps-5" href="orders.php">
+                                    Ordem
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -43,11 +48,6 @@
                             <li class="nav-item">
                                 <a class="dropdown-item text-white ps-5" href="genus.php">
                                     Gênero
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="dropdown-item text-white ps-5" href="orders.php">
-                                    Ordem
                                 </a>
                             </li>
                             <li class="nav-item">

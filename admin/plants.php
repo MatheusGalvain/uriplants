@@ -560,7 +560,7 @@ if (isset($_POST['edit_plant'])) {
 }
 
 // Configuração de Paginação
-$items_per_page = 10; 
+$items_per_page = 20; 
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? intval($_GET['page']) : 1;
 if ($page < 1) $page = 1;
 
@@ -948,9 +948,8 @@ $qrcode_base_url = get_qrcode_url($con);
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Nome da Planta</th>
-                                        <th>Divisão</th>
-                                        <th>Classe</th>
+                                        <th>Nome científico</th>
+                                        <th>Nomes populares</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
@@ -962,9 +961,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['division_name']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['class_name']); ?></td>
-
+                                            <td><?php echo htmlspecialchars($row['common_names']); ?></td>
                                             <td>
                                                 <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-sm">Editar</a>
                                                 <button type="button" class="btn btn-primary btn-sm qrcode-button" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">QR Code</button>
@@ -1103,44 +1100,44 @@ $qrcode_base_url = get_qrcode_url($con);
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Base URL para o QR Code
-        var qrcodeBaseUrl = "<?php echo htmlspecialchars($qrcode_base_url); ?>";
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Base URL para o QR Code
+            var qrcodeBaseUrl = "<?php echo htmlspecialchars($qrcode_base_url); ?>";
 
-        // Elementos do Modal de QR Code
-        var qrcodeModal = new bootstrap.Modal(document.getElementById('qrcodeModal'));
-        var qrcodeImage = document.getElementById('qrcodeImage');
-        var downloadQrcode = document.getElementById('downloadQrcode');
+            // Elementos do Modal de QR Code
+            var qrcodeModal = new bootstrap.Modal(document.getElementById('qrcodeModal'));
+            var qrcodeImage = document.getElementById('qrcodeImage');
+            var downloadQrcode = document.getElementById('downloadQrcode');
 
-        // Elementos para exibir informações da planta
-        var plantNameSpan = document.getElementById('plantName');
-        var plantIdSpan = document.getElementById('plantId');
-        var currentQrcodeUrlInput = document.getElementById('currentQrcodeUrl');
+            // Elementos para exibir informações da planta
+            var plantNameSpan = document.getElementById('plantName');
+            var plantIdSpan = document.getElementById('plantId');
+            var currentQrcodeUrlInput = document.getElementById('currentQrcodeUrl');
 
-        // Adiciona eventos aos botões de QR Code
-        document.querySelectorAll('.qrcode-button').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var plantId = this.getAttribute('data-id');
-                var plantName = this.getAttribute('data-name');
+            // Adiciona eventos aos botões de QR Code
+            document.querySelectorAll('.qrcode-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var plantId = this.getAttribute('data-id');
+                    var plantName = this.getAttribute('data-name');
 
-                var separator = qrcodeBaseUrl.includes('?') ? '&' : '?';
-                var qrContent = qrcodeBaseUrl + separator + "id=" + encodeURIComponent(plantId);
-                var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(qrContent);
+                    var separator = qrcodeBaseUrl.includes('?') ? '&' : '?';
+                    var qrContent = qrcodeBaseUrl + separator + "id=" + encodeURIComponent(plantId);
+                    var qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(qrContent);
 
-                // Atualiza o conteúdo do Modal
-                plantNameSpan.textContent = plantName;
-                plantIdSpan.textContent = plantId;
-                currentQrcodeUrlInput.value = qrContent;
-                qrcodeImage.src = qrCodeUrl;
-                downloadQrcode.href = qrCodeUrl;
+                    // Atualiza o conteúdo do Modal
+                    plantNameSpan.textContent = plantName;
+                    plantIdSpan.textContent = plantId;
+                    currentQrcodeUrlInput.value = qrContent;
+                    qrcodeImage.src = qrCodeUrl;
+                    downloadQrcode.href = qrCodeUrl;
 
-                // Exibe o Modal
-                qrcodeModal.show();
+                    // Exibe o Modal
+                    qrcodeModal.show();
+                });
             });
         });
-    });
-</script>
+    </script>
 
     <!-- Imagens -->
     <script>
