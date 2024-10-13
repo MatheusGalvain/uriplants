@@ -129,15 +129,15 @@
         </div>
     </header>
     <div class="button-group">
-        <div style="width: 300px">
+        <div class="uriplantas-btn-start" style="width: 300px">
             <div class="button-title">URI Plantas</div>
             <button onclick="window.location.href='list/list.php'" class="btn">Plantas Cadastradas</button>
         </div>
-        <div style="width: 300px">
+        <div class="uriplantas-btn-start" style="width: 300px">
             <div class="button-title">URI Quiz</div>
             <button onclick="window.location.href='/uriplants/quiz/quiz.php'" class="btn">Quiz Universitário</button>
         </div>
-        <div style="width: 300px">
+        <div class="uriplantas-btn-start" style="width: 300px">
             <div class="button-title">URI Admin</div>
             <button onclick="window.location.href='/uriplants/admin'" class="btn">Painel Administrador</button>
         </div>

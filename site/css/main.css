@@ -51,6 +51,7 @@
       overflow-x: hidden;
   }
 
+
   h1 {
       margin-bottom: 40px;
       color: #333;
@@ -59,6 +60,7 @@
   .button-group {
       display: flex;
       justify-content: space-around;
+      gap: 60px;
   }
 
   .btn {
@@ -72,7 +74,7 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
       text-align: center;
-      width: 90%;
+      min-width: 227px;
       display: inline-block;
   }
 
@@ -92,6 +94,7 @@
       font-size: 1.4em;
       transform: translateY(8px);
       color: black;
+      max-width: 200px;
   }
 
   .subtitle {
@@ -216,6 +219,7 @@
         width: 100%;
         max-width: 100%;
         align-items: center;
+        gap: 0px;
     }
     .btn:last-child {
         margin-bottom: 40px;
