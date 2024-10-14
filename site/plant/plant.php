@@ -106,11 +106,11 @@ if (isset($_GET['id'])) {
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/lightbox.css">
+    <link rel="stylesheet" href="../css/header.css">
     <link rel="stylesheet" href="../css/footer.css">
     <link rel="stylesheet" href="../css/listplant.css">
     <link rel="stylesheet" href="../css/listplant_responsive.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
     <script src="../js/lightbox.js"></script>
 </head>
@@ -134,7 +134,7 @@ if (isset($_GET['id'])) {
     </div>
     <div class="bottomheader">
         <div class="boxheader">
-            <a href="#" alt="Logo da uri" class="logoheader"><img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim"></a>
+            <a href="../" alt="Logo da uri" class="logoheader"><img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim"></a>
             <ul class="ulheader">
                 <li class="liheaderhover"><a href="#">URI Quiz</a></li>
                 <li class="liheaderhover"><a href="#">URI Plantas</a></li>
@@ -162,6 +162,9 @@ if (isset($_GET['id'])) {
                     <div class="bar"></div>
                 </div>
             </div>
+            <li class="item-menu">
+                <a alt="Uri Plants" href="../" class="menu-mobile-link ">Home</a>
+            </li>
             <li class="item-menu">
                 <a alt="Uri Plants" href="#" class="menu-mobile-link ">URI Plants</a>
             </li>
