@@ -120,7 +120,8 @@ class PlantController {
         // Consulta para obter as plantas com limite e offset
         $sql = "SELECT 
                     plants.id,
-                    plants.name, 
+                    plants.name,
+                    plants.common_names, 
                     plants.ecology AS description, 
                     images.imagem AS image_blob
                 FROM plants
@@ -199,9 +200,8 @@ class PlantController {
         LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
         LEFT JOIN images ON plantsproperties.id = images.plants_property_id
         WHERE plants.id != ? 
-        AND plants.deleted_at IS NULL -- Mantém as deletadas fora do resultado
+        AND plants.deleted_at IS NULL
         ORDER BY images.sort_order ASC, RAND() LIMIT ?"; 
-
         
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -209,15 +209,20 @@ class PlantController {
         }
     
         $stmt->bind_param("ii", $currentPlantId, $limit);
-    
+
         if ($stmt->execute()) {
             $result = $stmt->get_result();
+
             $otherPlants = [];
+            $ids = [];
             while ($row = $result->fetch_assoc()) {
                 if (!empty($row['image_blob'])) {
                     $row['image_blob'] = base64_encode($row['image_blob']);
                 }
-                $otherPlants[] = $row;
+                if(!in_array($row['id'], $ids)) {
+                    $otherPlants[] = $row;
+                    array_push($ids, $row['id']);
+                }
             }
     
             $stmt->close();

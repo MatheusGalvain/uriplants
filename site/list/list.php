@@ -452,7 +452,7 @@
                     plantName.textContent = `${plant.name}`;
 
                     const plantDescription = document.createElement('p');
-                    plantDescription.textContent = `Descrição: ${plant.description}`;
+                    plantDescription.textContent = `${plant.common_names}`;
 
                     plantInfo.appendChild(plantName);
                     plantInfo.appendChild(plantDescription);
