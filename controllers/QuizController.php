@@ -94,7 +94,7 @@ class quizController {
             // Resposta final do quiz
             $response = [
                 "images" => $images,
-                "question" => "Quem é esse pokémon?",
+                "question" => "Qual o nome dessa planta?",
                 "options" => $options,
                 "correct_answer" => $correctPlantName
             ];

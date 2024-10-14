@@ -3,219 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <title>Quiz de Plantas</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            padding: 20px;
-            text-align: center;
-        }
-
-        #quiz-container {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 30px;
-            max-width: 800px;
-            margin: 0 auto;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-        
-        #scoreboard {
-            display: flex;
-            gap: 10px;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-
-        .score-block {
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 1em;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            min-width: 120px;
-            text-align: center;
-        }
-
-        .score-acertos {
-            background-color: #28a745;
-        }
-
-        .score-erros {
-            background-color: #dc3545;
-        }
-
-        .score-total {
-            background-color: #007bff;
-        }
-
-        #question {
-            font-size: 1.5em;
-            margin: 20px 0;
-        }
-
-        .option-button {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            font-size: 1.1em;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .option-button:hover {
-            background-color: #ddd;
-        }
-
-        .correct {
-            background-color: #28a745 !important;
-            color: #fff;
-            animation: fadeIn 0.5s;
-            border-color: #28a745 !important;
-        }
-
-        .incorrect {
-            background-color: #dc3545 !important;
-            color: #fff;
-            animation: fadeIn 0.5s;
-            border-color: #dc3545 !important;
-        }
-
-        #next-button {
-            padding: 10px 20px;
-            font-size: 1.1em;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-            display: none;
-            transition: background-color 0.3s ease;
-        }
-
-        #next-button:hover {
-            background-color: #0056b3;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @media (max-width: 800px) {
-            #quiz-container {
-                padding: 20px;
-            }
-
-            .option-button {
-                font-size: 1em;
-            }
-
-            #next-button {
-                width: 100%;
-            }
-
-            #scoreboard {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .score-block {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-
-        .carousel-item img {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto; 
-        }
-
-        .carousel-control-prev-icon,
-        .carousel-control-next-icon {
-            display: none; 
-        }
-
-        .custom-carousel-control-prev,
-        .custom-carousel-control-next {
-            background-color: rgba(0, 0, 0, 0.5);
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #fff;
-            transition: background-color 0.3s ease;
-        }
-
-        .custom-carousel-control-prev:hover,
-        .custom-carousel-control-next:hover {
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        .custom-carousel-control-prev {
-            left: 10px;
-        }
-
-        .custom-carousel-control-next {
-            right: 10px;
-        }
-
-        .custom-carousel-control-prev i,
-        .custom-carousel-control-next i {
-            font-size: 1.5em;
-        }
-    </style>
+    <link rel="stylesheet" href="../site/css/reset.css">
+    <link rel="stylesheet" href="../site/css/quiz.css">
+    <link rel="stylesheet" href="../site/css/header.css">
+    <link rel="stylesheet" href="../site/css/listplant_responsive.css">
 </head>
-<body>
-    <div id="quiz-container">
-        <div id="scoreboard">
-            <div id="acertos" class="score-block score-acertos">
-                Acertos: <span id="correct-count">0</span>
-            </div>
-            <div id="erros" class="score-block score-erros">
-                Erros: <span id="incorrect-count">0</span>
-            </div>
-            <div id="total" class="score-block score-total">
-                Total: <span id="total-count">0</span>
-            </div>
+<header id="header" class="header">
+    <div class="topheader">
+        <div class="boxheader">
+            <ul class="topheaderul">
+                <li><a class="reficon" href="https://www.instagram.com/urierechim/" target="_BLANK" aria-label="Acesso ao instagram"><img src="../site/images/instagram-icon.png" alt="instagram"></a></li>
+                <li><a class="reficon" href="https://www.youtube.com/user/urierechim/videos" target="_BLANK" aria-label="Acesso ao youtube"><img src="../site/images/youtube-icon.png" alt="youtube"></a></li>
+                <li><a class="reficon" href="https://www.facebook.com/uricampuserechim/?locale=pt_BR" target="_BLANK" aria-label="Acesso ao facebook"><img src="../site/images/facebook-icon.png" alt="facebook"></a></li>
+                <li class="lifont">+55 (54) 3520-9000</li>
+            </ul>
+            <ul class="topheaderullinks">
+                <li class="lifont">@ 2024 URI Câmpus de Erechim</li>
+                <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a politica de privacidade">Política de privacidade</a></li>
+                <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a reitoria">Reitoria</a></li>
+                <li class="lihover"><a class="acesslink" href="https://www.uricer.edu.br/site/informacao?uri=000139000000000000000000000" target="_BLANK" alt="acesso a URI sustentabilidade">URI Sustentabilidade</a></li>
+            </ul>
         </div>
-
-        <div id="quizCarousel" class="carousel slide" data-bs-interval="false">
-            <div class="carousel-inner" id="carousel-inner">
-            </div>
-            <button class="custom-carousel-control-prev" type="button" data-bs-target="#quizCarousel" data-bs-slide="prev">
-                <i class="fa-solid fa-angles-left"></i>
-                <span class="visually-hidden">Anterior</span>
-            </button>
-            <button class="custom-carousel-control-next" type="button" data-bs-target="#quizCarousel" data-bs-slide="next">
-                <i class="fa-solid fa-angles-right"></i>
-                <span class="visually-hidden">Próximo</span>
-            </button>
-        </div>
-
-        <div id="question">Carregando pergunta...</div>
-
-        <div id="options">
-        </div>
-
-        <button id="next-button" class="btn btn-primary">Próxima Pergunta</button>
     </div>
+    <div class="bottomheader">
+        <div class="boxheader">
+            <a href="../site" alt="Logo da uri" class="logoheader"><img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim"></a>
+            <ul class="ulheader">
+                <li class="liheaderhover"><a href="#">URI Quiz</a></li>
+                <li class="liheaderhover"><a href="#">URI Plantas</a></li>
+                <li>
+                    <form action="../list/list.php" method="GET" class="search-form">
+                        <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
+                        <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <nav id="main-menu-mobile">
+        <div id="button-menu" class="button-menu">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <ul id="main-menu-mobile-items">
+            <div class="hamburguer-wrapp">
+                <h1>Fechar menu...</h1>
+                <div id="button-menu" class="button-menu">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+            <li class="item-menu">
+                <a alt="Uri Plants" href="../site" class="menu-mobile-link ">Home</a>
+            </li>
+            <li class="item-menu">
+                <a alt="Uri Plants" href="#" class="menu-mobile-link ">URI Plants</a>
+            </li>
+            <li class="item-menu">
+                <a alt="Uri Quiz" href="#" class="menu-mobile-link">URI Quiz</a>
+            </li>
+        </ul>
 
+    </nav>
+</header> 
+<body>
+    <main class="box-content">
+        <div id="quiz-container">
+            <h1 class="titlequiz">Bem Vindos ao <strong>URI Quiz</strong></h1>
+            <h2 class="subtitlequiz">Prepare-se para um desafio épico! Lembre-se, seu maior objetivo é alcançar uma pontuação inigualável sem cometer erros e se tornar o verdadeiro Deus das plantas!</h2>
+            <div id="quizCarousel" class="carousel slide" data-bs-interval="false">
+                <div class="carousel-inner" id="carousel-inner"></div>
+                <button class="custom-carousel-control-prev" type="button" data-bs-target="#quizCarousel" data-bs-slide="prev">
+                    <i class="fa-solid fa-angles-left"></i>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="custom-carousel-control-next" type="button" data-bs-target="#quizCarousel" data-bs-slide="next">
+                    <i class="fa-solid fa-angles-right"></i>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            </div>
+            <div class="title">
+                <h1 class="title-points">Quadro de pontuações:</h1>
+            </div>
+            <div id="scoreboard">
+                <div id="acertos" class="score-block score-acertos">
+                    Acertos: <span id="correct-count">0</span>
+                </div>
+                <div id="erros" class="score-block score-erros">
+                    Erros: <span id="incorrect-count">0</span>
+                </div>
+                <div id="total" class="score-block score-total">
+                    Total: <span id="total-count">0</span>
+                </div>
+            </div>
+            <div id="question">Carregando pergunta...</div>
+
+            <div id="options">
+            </div>
+
+            <button id="next-button" class="btn btn-primary">Próxima Pergunta</button>
+        </div>
+    </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const QUIZ_URL = '/uriplants/public/quiz';
@@ -234,6 +127,18 @@
         let totalCount = 0;
 
         let correctOption = '';
+
+        $('.button-menu').click(function() {
+            $(this).toggleClass('button-menu-close');
+            $('#main-menu-mobile-items').toggleClass('main-menu-mobile-items-open');
+        });
+
+        $('.item-menu').click(function() {
+            // Desativar todos os menus ativos quando clicar em um novo menu
+            $('.menu-link').removeClass('activeheader');
+            // Ativar o menu sublinhado quando for clicado
+            $(this).children().addClass('activeheader');
+        });
 
         function updateCarouselControls(carousel) {
             const prevButton = document.querySelector('.custom-carousel-control-prev');
