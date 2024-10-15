@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/footer.css">
     <style>
@@ -53,6 +54,7 @@
             display: flex;
             flex-direction: column;
             min-height: 700px;
+            min-width: 800px;
         }
 
         .header {
@@ -99,11 +101,119 @@
         nav a.active {
             border-bottom: 2px solid #006838;
         }
+        .container-wrapp{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            align-content: center;
+            flex-wrap: wrap;
+            padding-top: 50px;
+            padding-bottom: 30px;
+        }
+        .container-infos{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            align-content: center;
+            flex-wrap: wrap;
+        }
+        .containerbtns{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+        #search-result{
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .searchspan{
+            font-size: 13px;
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .searchhref{
+            box-sizing: border-box;
+            padding: 5px;
+            font-size: 10px;
+        }
+        .search-form {
+            display: inline-flex;
+            align-items: center;
+        }
+        .search-form input[type="text"] {
+            padding: 10px;
+            border-radius: 2px;
+            background-color: #f9f9f9;
+            border: 1px solid #0F5332;
+            padding-right: 105px;
+        }
+        .search-form input[type="text"]:focus {
+            outline: none;
+            border: none;
+        }
+        .search-form input::placeholder {
+            color: #161616;
+        }
+        .search-form input[type="text"]:focus-visible {
+            outline: 2px solid #00597d;
+        }
+        .search-form button {
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 9px 10px;
+            cursor: pointer;
+            margin-left: -35px;
+        }
+        .search-form button:hover {
+            background-color: #218db8;
+        }
+
+        .search-form-mobile {
+            display: inline-flex;
+            align-items: center;
+        }
+        .search-form-mobile input::placeholder {
+            color: rgb(255, 255, 255);
+        }
+        .search-form-mobile input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #6e6e6e;
+            color: #FFF;
+            padding-right: 35px;
+        }
+        .search-form-mobile input[type="text"]:focus {
+            outline: none;
+        }
+        .search-form-mobile input[type="text"]:focus-visible {
+            outline: 2px solid #00597d;
+        }
+        .search-form-mobile button {
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 11px 10px;
+            cursor: pointer;
+            margin-left: -35px;
+        }
+        .search-form-mobile button:hover {
+            background-color: #218db8;
+        }
 
         .header-container {
             display: flex;
-            margin-top: 30px;
-            min-width: 1200px;
+            margin-top: 0;
         }
 
         .icon-container {
@@ -161,7 +271,7 @@
             z-index: 1;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             align-items: center;
-            cursor: pointer; /* Adicionado para indicar que o cartão é clicável */
+            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -310,18 +420,29 @@
     </header>
 
     <section>
-        <div>
-            <div class="header-container">
-                <a href="../" class="icon-container">
-                    <i class="fas fa-angle-left"></i>
-                </a>
-                <div class="text-container">
-                    <span>Você está em</span>
-                    <h1>URI Plantas</h1>
+        <div class="container-wrapp">
+            <div class="container-infos">
+                <div class="header-container">
+                    <a href="../" class="icon-container">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                    <div class="text-container">
+                        <span>Você está em</span>
+                        <h1>URI Plantas</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="containerbtns">
+                <form action="../list/list.php" method="GET" class="search-form">
+                    <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #141414;"></i></button>
+                </form>
+                <div id="search-result" style="display: none;">
+                    <span class="searchspan" id="search-text"></span>
+                    <a class="searchhref" href="../list/list.php" stylgin-lefe="mart: 10px;">Limpar Filtro</a>
                 </div>
             </div>
         </div>
-
         <div>
             <div class="plant-container">
                 <div id="plants"></div>
@@ -358,137 +479,146 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const plantsContainer = document.getElementById('plants');
-            const paginationContainer = document.getElementById('pagination');
+    document.addEventListener('DOMContentLoaded', () => {
+        const plantsContainer = document.getElementById('plants');
+        const paginationContainer = document.getElementById('pagination');
+        const searchResult = document.getElementById('search-result');
+        const searchText = document.getElementById('search-text');
 
-            let currentPage = 1;
-            const limit = 10;
-            let totalPages = 1;
+        let currentPage = 1;
+        const limit = 10;
+        let totalPages = 1;
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const query = urlParams.get('query') || '';
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query') || '';
 
-            async function fetchPlants(page, limit, query) {
-                try {
-                    // Adição por query na pesquisa da URL
-                    const response = await fetch(`http://localhost/uriplants/public/plants?limit=${limit}&page=${page}&query=${encodeURIComponent(query)}`);
-                    if (!response.ok) {
-                        throw new Error('Erro na requisição');
-                    }
-                    const data = await response.json();
-                    return data;
-                } catch (error) {
-                    console.error(error);
-                    plantsContainer.innerHTML = '<p>Ocorreu um erro ao carregar as plantas.</p>';
+        if (query) {
+            searchText.textContent = `Você pesquisou por: "${query}"`;
+            searchResult.style.display = 'flex';
+        } else {
+            searchResult.style.display = 'none';
+        }
+
+        async function fetchPlants(page, limit, query) {
+            try {
+                const response = await fetch(`http://localhost/uriplants/public/plants?limit=${limit}&page=${page}&query=${encodeURIComponent(query)}`);
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
                 }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(error);
+                plantsContainer.innerHTML = '<p>Ocorreu um erro ao carregar as plantas.</p>';
+            }
+        }
+
+        function renderPlants(plants) {
+            plantsContainer.innerHTML = '';
+            if (!plants || plants.length === 0) {
+                plantsContainer.innerHTML = '<p>Nenhuma planta encontrada.</p>';
+                return;
             }
 
-            function renderPlants(plants) {
-                plantsContainer.innerHTML = '';
-                if (!plants || plants.length === 0) {
-                    plantsContainer.innerHTML = '<p>Nenhuma planta encontrada.</p>';
-                    return;
-                }
+            plants.forEach(plant => {
+                const plantCard = document.createElement('div');
+                plantCard.classList.add('plant-card');
+                plantCard.setAttribute('data-id', plant.id);
 
-                plants.forEach(plant => {
-                    const plantCard = document.createElement('div');
-                    plantCard.classList.add('plant-card');
-                    plantCard.setAttribute('data-id', plant.id);
+                const plantInfo = document.createElement('div');
+                plantInfo.classList.add('plant-info');
 
-                    const plantInfo = document.createElement('div');
-                    plantInfo.classList.add('plant-info');
+                const plantName = document.createElement('h3');
+                plantName.textContent = `Nome: ${plant.name}`;
 
-                    const plantName = document.createElement('h3');
-                    plantName.textContent = `Nome: ${plant.name}`;
+                const plantDescription = document.createElement('p');
+                plantDescription.textContent = `Descrição: ${plant.description}`;
 
-                    const plantDescription = document.createElement('p');
-                    plantDescription.textContent = `Descrição: ${plant.description}`;
+                plantInfo.appendChild(plantName);
+                plantInfo.appendChild(plantDescription);
 
-                    plantInfo.appendChild(plantName);
-                    plantInfo.appendChild(plantDescription);
+                const plantImage = document.createElement('img');
+                plantImage.src = plant.image_blob ? `data:image/jpeg;base64,${plant.image_blob}` : 'plant-placeholder.png';
+                plantImage.alt = `Imagem de ${plant.name}`;
 
-                    const plantImage = document.createElement('img');
-                    plantImage.src = plant.image_blob ? `data:image/jpeg;base64,${plant.image_blob}` : 'plant-placeholder.png';
-                    plantImage.alt = `Imagem de ${plant.name}`;
+                plantCard.appendChild(plantInfo);
+                plantCard.appendChild(plantImage);
 
-                    plantCard.appendChild(plantInfo);
-                    plantCard.appendChild(plantImage);
-
-                    plantCard.addEventListener('click', () => {
-                        window.location.href = `../plant/plant.php?id=${plant.id}`;
-                    });
-
-                    plantsContainer.appendChild(plantCard);
+                plantCard.addEventListener('click', () => {
+                    window.location.href = `../plant/plant.php?id=${plant.id}`;
                 });
-            }
 
-            function renderPagination() {
-                paginationContainer.innerHTML = '';
+                plantsContainer.appendChild(plantCard);
+            });
+        }
 
-                if (currentPage > 1) {
-                    const prevLink = document.createElement('a');
-                    prevLink.innerHTML = '<i class="fas fa-angle-double-left"></i>';
-                    prevLink.href = '#';
-                    prevLink.classList.add('arrow');
-                    prevLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) {
-                            currentPage--;
-                            loadPlants();
-                        }
-                    });
-                    paginationContainer.appendChild(prevLink);
-                }
+        function renderPagination() {
+            paginationContainer.innerHTML = '';
 
-                for (let i = 1; i <= totalPages; i++) {
-                    const pageLink = document.createElement('a');
-                    pageLink.textContent = i;
-                    pageLink.href = '#';
-                    if (i === currentPage) {
-                        pageLink.classList.add('active');
+            if (currentPage > 1) {
+                const prevLink = document.createElement('a');
+                prevLink.innerHTML = '<i class="fas fa-angle-double-left"></i>';
+                prevLink.href = '#';
+                prevLink.classList.add('arrow');
+                prevLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                        currentPage--;
+                        loadPlants();
                     }
-                    pageLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        if (i !== currentPage) {
-                            currentPage = i;
-                            loadPlants();
-                        }
-                    });
-                    paginationContainer.appendChild(pageLink);
-                }
-
-                if (currentPage < totalPages) {
-                    const nextLink = document.createElement('a');
-                    nextLink.innerHTML = '<i class="fas fa-angle-double-right"></i>';
-                    nextLink.href = '#';
-                    nextLink.classList.add('arrow');
-                    nextLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        if (currentPage < totalPages) {
-                            currentPage++;
-                            loadPlants();
-                        }
-                    });
-                    paginationContainer.appendChild(nextLink);
-                }
+                });
+                paginationContainer.appendChild(prevLink);
             }
 
-            async function loadPlants() {
-                const data = await fetchPlants(currentPage, limit, query);
-                if (!data) return;
-
-                renderPlants(data.plants);
-
-                totalPages = data.totalPages || 1;
-                currentPage = data.currentPage || 1;
-
-                renderPagination();
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.textContent = i;
+                pageLink.href = '#';
+                if (i === currentPage) {
+                    pageLink.classList.add('active');
+                }
+                pageLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (i !== currentPage) {
+                        currentPage = i;
+                        loadPlants();
+                    }
+                });
+                paginationContainer.appendChild(pageLink);
             }
 
-            loadPlants();
-        });
-    </script>
+            if (currentPage < totalPages) {
+                const nextLink = document.createElement('a');
+                nextLink.innerHTML = '<i class="fas fa-angle-double-right"></i>';
+                nextLink.href = '#';
+                nextLink.classList.add('arrow');
+                nextLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        loadPlants();
+                    }
+                });
+                paginationContainer.appendChild(nextLink);
+            }
+        }
+
+        async function loadPlants() {
+            const data = await fetchPlants(currentPage, limit, query);
+            if (!data) return;
+
+            renderPlants(data.plants);
+
+            totalPages = data.totalPages || 1;
+            currentPage = data.currentPage || 1;
+
+            renderPagination();
+        }
+
+        loadPlants();
+    });
+</script>
+
 </body>
 
 </html>
