@@ -80,81 +80,94 @@ class PlantController {
      * @param int $page
      * @return array
      */
-    public function getPlants($limit = 10, $page = 1) {
+    public function getPlants($limit = 10, $page = 1, $query = '') {
         if ($limit <= 0) $limit = 10;
         if ($page <= 0) $page = 1;
-
+    
         $offset = ($page - 1) * $limit;
-
+    
         $conn = getConnection();
-
-        // Consulta para obter o total de plantas
-        $countSql = "SELECT COUNT(DISTINCT plants.id) as total 
-                     FROM plants
+    
+        // Consulta com query
+        $countSql = "SELECT COUNT(DISTINCT plants.id) as total FROM plants
                      LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                      LEFT JOIN properties ON plantsproperties.property_id = properties.id
                      LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                      WHERE plants.deleted_at IS NULL";
-
+    
+        if (!empty($query)) {
+            $countSql .= " AND plants.name LIKE ?";
+            $query = "%" . $query . "%";
+        }
+    
         $countStmt = $conn->prepare($countSql);
         if (!$countStmt) {
             return ["message" => "Erro na preparação da consulta de contagem", "error" => $conn->error];
         }
-
+    
+        if (!empty($query)) {
+            $countStmt->bind_param("s", $query);
+        }
+    
         if (!$countStmt->execute()) {
             $error = ["message" => "Erro ao contar plantas", "error" => $countStmt->error];
             $countStmt->close();
             $conn->close();
             return $error;
         }
-
+    
         $countResult = $countStmt->get_result();
         $totalPlants = 0;
         if ($row = $countResult->fetch_assoc()) {
             $totalPlants = intval($row['total']);
         }
         $totalPages = ceil($totalPlants / $limit);
-
+    
         $countStmt->close();
-
-        // Consulta para obter as plantas com limite e offset
-        $sql = "SELECT 
-                    plants.id,
-                    plants.name, 
-                    plants.ecology AS description, 
-                    images.imagem AS image_blob
+    
+        // Consulta para obter as plantas com limite
+        $sql = "SELECT plants.id,plants.name, plants.ecology AS description, images.imagem AS image_blob
                 FROM plants
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE plants.deleted_at IS NULL
-                GROUP BY plants.id
-                ORDER BY images.sort_order ASC, plants.id ASC
-                LIMIT ? OFFSET ?"; 
-
+                WHERE plants.deleted_at IS NULL";
+    
+        if (!empty($query)) {
+            $sql .= " AND plants.name LIKE ?";
+        }
+    
+        $sql .= " GROUP BY plants.id
+                  ORDER BY images.sort_order ASC, plants.id ASC
+                  LIMIT ? OFFSET ?"; 
+    
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             $conn->close();
             return ["message" => "Erro na preparação da consulta padrão", "error" => $conn->error];
         }
-
-        $stmt->bind_param("ii", $limit, $offset);
-
+    
+        if (!empty($query)) {
+            $stmt->bind_param("sii", $query, $limit, $offset);
+        } else {
+            $stmt->bind_param("ii", $limit, $offset);
+        }
+    
         if ($stmt->execute()) {
             $result = $stmt->get_result();
             $plants = [];
             if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
+                while ($row = $result->fetch_assoc()) {
                     if (!empty($row['image_blob'])) {
                         $row['image_blob'] = base64_encode($row['image_blob']);
                     }
                     $plants[] = $row;
                 }
             }
-
+    
             $stmt->close();
             $conn->close();
-
+    
             return [
                 "plants" => $plants,
                 "totalPlants" => $totalPlants,
@@ -168,10 +181,10 @@ class PlantController {
             return $error;
         }
     }
-
+    
     public function get() {
         header('Content-Type: application/json; charset=utf-8');
-
+    
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (isset($_GET['id'])) {
                 $id = intval($_GET['id']);
@@ -179,11 +192,12 @@ class PlantController {
                 echo json_encode($plant, JSON_UNESCAPED_UNICODE);
                 return;
             }
-
+    
             $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
             $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-
-            $plantsData = $this->getPlants($limit, $page);
+    
+            $plantsData = $this->getPlants($limit, $page, isset($_GET['query']) ? $_GET['query'] : '');
+    
             echo json_encode($plantsData, JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode(["message" => "Método não suportado"], JSON_UNESCAPED_UNICODE);

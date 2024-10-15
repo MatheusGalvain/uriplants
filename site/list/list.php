@@ -366,14 +366,17 @@
             const limit = 10;
             let totalPages = 1;
 
-            async function fetchPlants(page, limit) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('query') || '';
+
+            async function fetchPlants(page, limit, query) {
                 try {
-                    const response = await fetch(`http://localhost/uriplants/public/plants?limit=${limit}&page=${page}`);
+                    // Adição por query na pesquisa da URL
+                    const response = await fetch(`http://localhost/uriplants/public/plants?limit=${limit}&page=${page}&query=${encodeURIComponent(query)}`);
                     if (!response.ok) {
                         throw new Error('Erro na requisição');
                     }
                     const data = await response.json();
-                    console.log('Dados recebidos:', data);
                     return data;
                 } catch (error) {
                     console.error(error);
@@ -391,8 +394,6 @@
                 plants.forEach(plant => {
                     const plantCard = document.createElement('div');
                     plantCard.classList.add('plant-card');
-
-                    // Adiciona um atributo data-id para armazenar o ID da planta
                     plantCard.setAttribute('data-id', plant.id);
 
                     const plantInfo = document.createElement('div');
@@ -408,24 +409,14 @@
                     plantInfo.appendChild(plantDescription);
 
                     const plantImage = document.createElement('img');
-
-                    if (plant.image_blob) {
-                        plantImage.src = `data:image/jpeg;base64,${plant.image_blob}`;
-                    } else {
-                        plantImage.src = 'plant-placeholder.png';
-                    }
-
+                    plantImage.src = plant.image_blob ? `data:image/jpeg;base64,${plant.image_blob}` : 'plant-placeholder.png';
                     plantImage.alt = `Imagem de ${plant.name}`;
 
                     plantCard.appendChild(plantInfo);
                     plantCard.appendChild(plantImage);
 
-                    // Adiciona o listener de clique ao cartão da planta
                     plantCard.addEventListener('click', () => {
-                        const plantId = plant.id; // Obtém o ID da planta
-                        
-                        // Redireciona para a página plant.php com o ID da planta na URL
-                        window.location.href = `../plant/plant.php?id=${plantId}`;
+                        window.location.href = `../plant/plant.php?id=${plant.id}`;
                     });
 
                     plantsContainer.appendChild(plantCard);
@@ -439,7 +430,6 @@
                     const prevLink = document.createElement('a');
                     prevLink.innerHTML = '<i class="fas fa-angle-double-left"></i>';
                     prevLink.href = '#';
-                    prevLink.setAttribute('aria-label', 'Página Anterior');
                     prevLink.classList.add('arrow');
                     prevLink.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -457,7 +447,6 @@
                     pageLink.href = '#';
                     if (i === currentPage) {
                         pageLink.classList.add('active');
-                        pageLink.setAttribute('aria-current', 'page');
                     }
                     pageLink.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -473,7 +462,6 @@
                     const nextLink = document.createElement('a');
                     nextLink.innerHTML = '<i class="fas fa-angle-double-right"></i>';
                     nextLink.href = '#';
-                    nextLink.setAttribute('aria-label', 'Próxima Página');
                     nextLink.classList.add('arrow');
                     nextLink.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -487,7 +475,7 @@
             }
 
             async function loadPlants() {
-                const data = await fetchPlants(currentPage, limit);
+                const data = await fetchPlants(currentPage, limit, query);
                 if (!data) return;
 
                 renderPlants(data.plants);

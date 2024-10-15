@@ -139,10 +139,12 @@ if (isset($_GET['id'])) {
                 <li class="liheaderhover"><a href="#">URI Quiz</a></li>
                 <li class="liheaderhover"><a href="#">URI Plantas</a></li>
                 <li>
-                    <form action="../list/list.php" method="GET" class="search-form">
-                        <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
-                        <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
-                    </form>
+                    
+                <!-- Botão pra pesquisar por ?Query -->
+                <form action="../list/list.php" method="GET" class="search-form">
+                    <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
+                </form>
                 </li>
             </ul>
         </div>
