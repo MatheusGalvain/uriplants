@@ -196,12 +196,12 @@ class PlantController {
         $conn = getConnection();
         
         $sql = "SELECT plants.id, plants.name, images.imagem AS image_blob
-        FROM plants
-        LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-        LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-        WHERE plants.id != ? 
-        AND plants.deleted_at IS NULL
-        ORDER BY images.sort_order ASC, RAND() LIMIT ?"; 
+                FROM plants
+                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+                LEFT JOIN properties ON plantsproperties.property_id = properties.id
+                LEFT JOIN images ON plantsproperties.id = images.plants_property_id
+                WHERE plants.id != ? AND properties.id = 1
+                ORDER BY images.sort_order ASC, RAND() LIMIT ?"; 
         
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -209,20 +209,15 @@ class PlantController {
         }
     
         $stmt->bind_param("ii", $currentPlantId, $limit);
-
+    
         if ($stmt->execute()) {
             $result = $stmt->get_result();
-
             $otherPlants = [];
-            $ids = [];
             while ($row = $result->fetch_assoc()) {
                 if (!empty($row['image_blob'])) {
                     $row['image_blob'] = base64_encode($row['image_blob']);
                 }
-                if(!in_array($row['id'], $ids)) {
-                    $otherPlants[] = $row;
-                    array_push($ids, $row['id']);
-                }
+                $otherPlants[] = $row;
             }
     
             $stmt->close();

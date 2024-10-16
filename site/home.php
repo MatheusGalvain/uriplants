@@ -80,6 +80,36 @@
             startSlideShow();
         });
     </script>
+
+        <style>
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(150deg, rgb(45 175 76 / 20%) 10%, rgba(34, 49, 36, 0) 40%);
+    z-index: 1;
+}
+
+body::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/logoURIsus.png');
+    background-size: contain;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    opacity: 0.15;
+    z-index: 0;
+    pointer-events: none;
+}</style>
+
 </head>
 
 <body>

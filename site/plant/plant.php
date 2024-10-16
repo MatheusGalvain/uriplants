@@ -364,8 +364,8 @@ if (isset($_GET['id'])) {
                         <?php foreach ($plantImages as $image): ?>
                             <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                 <a 
-                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    data-title="<div class='lightbox-title'> <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
                                     class="photoproperty-wrapp" 
                                     href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
                                     data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -392,8 +392,8 @@ if (isset($_GET['id'])) {
                         <?php foreach ($plantImages as $image): ?>
                             <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                 <a 
-                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
                                     class="photoproperty-wrapp" 
                                     href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
                                     data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -420,8 +420,8 @@ if (isset($_GET['id'])) {
                         <?php foreach ($plantImages as $image): ?>
                             <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                 <a 
-                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
                                     class="photoproperty-wrapp" 
                                     href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
                                     data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -448,8 +448,8 @@ if (isset($_GET['id'])) {
                         <?php foreach ($plantImages as $image): ?>
                             <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                 <a 
-                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
                                     class="photoproperty-wrapp" 
                                     href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
                                     data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -476,8 +476,8 @@ if (isset($_GET['id'])) {
                         <?php foreach ($plantImages as $image): ?>
                             <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                 <a 
-                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
                                     class="photoproperty-wrapp" 
                                     href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
                                     data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -504,8 +504,8 @@ if (isset($_GET['id'])) {
                         <?php foreach ($plantImages as $image): ?>
                             <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                 <a 
-                                    data-title="<div class='lightbox-title'>Propriedade: <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK' href='<?php echo htmlspecialchars($image['image_source']); ?>'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
+                                    data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>" 
                                     class="photoproperty-wrapp" 
                                     href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" 
                                     data-lightbox="<?php echo sanitize_input($plantName); ?>">

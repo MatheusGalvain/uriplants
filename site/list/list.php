@@ -26,7 +26,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(150deg, rgb(14 75 22 / 80%) 0%, rgba(57, 91, 65, 0.4) 10%, rgba(34, 49, 36, 0) 40%);
+            background: linear-gradient(150deg, rgb(45 175 76 / 20%) 10%, rgba(34, 49, 36, 0) 40%);
             z-index: 1;
         }
 
@@ -166,7 +166,6 @@
         }
 
         .plant-card:hover {
-            transform: translateY(-5px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 

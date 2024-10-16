@@ -51,7 +51,6 @@
       overflow-x: hidden;
   }
 
-
   h1 {
       margin-bottom: 40px;
       color: #333;
@@ -61,6 +60,7 @@
       display: flex;
       justify-content: space-around;
       gap: 60px;
+      z-index: 99;
   }
 
   .btn {
