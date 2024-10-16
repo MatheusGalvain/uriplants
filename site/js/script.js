@@ -3,7 +3,7 @@ $(document).ready(function(){
     $('.photos-wrapp').slick({
         infinite: true,
         slidesToShow: 6,
-        slidesToScroll: 3,
+        slidesToScroll: 4,
         dots: false,
         arrows: true,
         autoplaySpeed: 2000,
@@ -26,7 +26,7 @@ $(document).ready(function(){
               breakpoint: 480,
               settings: {
                 slidesToShow: 2,
-                slidesToScroll: 6
+                slidesToScroll: 2
               }
             }
             // You can unslick at a given breakpoint now by adding:
