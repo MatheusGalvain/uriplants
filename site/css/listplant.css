@@ -382,16 +382,31 @@ main{
     justify-content: flex-start;
     align-items: flex-start;
     align-content: flex-start;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: nowrap;
 }
 .photocentral{
-    display: block;
     width: 1000px;
     height: 650px;
     overflow: hidden;
     border-radius: 8px;
+    display: block;
 }
+
+.photocentral-wrapp span {
+    color: black;
+    display: block;
+    margin: 4px 0 0 0;
+    font-size: 0.8em;
+}
+
+.imgfont {
+    color: black;
+    display: block;
+    margin: 4px 0 0 0;
+    font-size: 0.8em;
+}
+
 .photoImg{
     border-radius: 8px;
     min-width: 100%;
@@ -614,12 +629,13 @@ main{
     flex-wrap: nowrap;
     padding: 30px;
 }
-.map-info{
+.map-photo{
     margin: 26px;
-    padding-left: 4px;
-    border-left: 2px solid #2C483C;
 }
-.map-info .informationsart img{
+.map-photo .informationsart{
+    overflow: unset;
+}
+.map-photo .informationsart img{
     max-width: 100%;
     height: auto;
     border-radius: 10px;
@@ -668,7 +684,7 @@ main{
     color: #FFF;
 }
 .photos-wrapp {
-    width: 80%;
+    width: calc(100% - 40px);
     padding-left: 28px;
 }
 .slick-slide img {

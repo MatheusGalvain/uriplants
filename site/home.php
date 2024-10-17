@@ -11,7 +11,8 @@
     <link rel="stylesheet" href="./css/reset.css">
     <link rel="stylesheet" href="./css/footer.css">
     <link rel="stylesheet" href="./css/main.css">
-    <!-- TODO: MUDAR LINK FONTAWESOME -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="./js/uri.js"></script>
     <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -114,6 +115,8 @@ body::after {
 
 <body>
     <header class="background-div">
+    <!-- HEADER URI -->
+    <!-- <div id ="resultH"></div> -->
         <div class="header">
             <div class="top-bar">
                 <div class="social-icons">
@@ -172,6 +175,9 @@ body::after {
             <button onclick="window.location.href='/uriplants/admin'" class="btn">Painel Administrador</button>
         </div>
     </div>
+
+    <!-- FOOTER URI -->
+    <!-- <div id ="resultR"></div> -->
     <footer>
         <div class="footer-left">
             <div class="redes-sociais">
@@ -198,5 +204,6 @@ body::after {
             <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" /></a>
         </div>
     </footer>
+    
 </body>
 </html>

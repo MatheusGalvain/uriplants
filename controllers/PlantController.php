@@ -23,6 +23,7 @@ class PlantController {
                 divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
                 regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
                 regionmap.description AS region_map_description, regionmap.imagem AS region_map_image,
+                regionmap.name AS region_map_name,
                 properties.name AS property_name,
                 images.id AS image_id, images.imagem AS image_blob, images.source AS image_source
                 FROM plants
