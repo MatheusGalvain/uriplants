@@ -410,6 +410,8 @@ main{
 .photoImg{
     border-radius: 8px;
     min-width: 100%;
+    object-fit: cover;
+    min-height: 100%;
 }
 .otherphotos-wrapp{
     display: flex;
@@ -418,19 +420,20 @@ main{
     align-content: flex-start;
     flex-direction: column;
     flex-wrap: wrap;
-    gap: 15px;
+    max-width: 100%;
+    gap: 10px;
 }
 .otherphotodiv{
     display: block;
-    width: 170px;
     height: 150px;
     border-radius: 8px;
     cursor: pointer;
 }
 .otherphoto{
     border-radius: 8px;
-    width: 100%;
     height: 100%;
+    max-width: 170px;
+    width: 100%;
 }
 .navigator{
     flex-direction: column;
