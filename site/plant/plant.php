@@ -273,9 +273,16 @@ if (isset($_GET['id'])) {
                         </div>
                         <h2><?php echo $plant["region_map_description"]; ?></h2>
                     </article>
+                    <?php $u_links = $plantController->getUsefullLinks($id);?>
                     <article class="informationsart">
                         <h1>Links úteis</h1>
-                        <h2><?php echo 'LINKS UTEIS AQUI'; ?></h2>
+                        <div class="content-ulinks">
+                            <?php foreach($u_links as $link){ ?>
+                                <div>
+                                    <a class="usefullinks" target="_blank" href="<?php echo $link['link']; ?>"><?php echo $link['name']; ?></a> 
+                                </div>
+                            <?php } ?>
+                        </div>
                     </article>
                 <?php endif; ?>
             </div>

@@ -674,6 +674,20 @@ main{
     color: #141414;
     font-weight: 200;
 }
+
+.informationsart a.usefullinks{
+    text-decoration: underline;
+}
+
+.content-ulinks{
+    display: flex;
+    flex-direction: column;
+}
+
+.content-ulinks div{
+    margin-bottom: 4px;
+}
+
 .photoproperty-wrapp{
     display: flex;
     justify-content: center;

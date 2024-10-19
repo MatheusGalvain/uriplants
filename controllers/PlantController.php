@@ -269,5 +269,38 @@ class PlantController {
             return $error;
         }
     }
+
+    public function getUsefullLinks($plantId) {
+        $conn = getConnection();
+        
+        $sql = "SELECT name, link
+                FROM usefullinks
+                WHERE plant_id = ?
+                AND deleted_at IS NULL;";
+        
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
+        }
+    
+        $stmt->bind_param("i", $plantId);
+    
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            $u_links = [];
+            while ($row = $result->fetch_assoc()) {
+                $u_links[] = $row;
+            }
+    
+            $stmt->close();
+            $conn->close();
+            return $u_links;
+        } else {
+            $error = ["message" => "Erro ao buscar imagens da planta", "error" => $stmt->error];
+            $stmt->close();
+            $conn->close();
+            return $error;
+        }
+    }
 }
 ?>
