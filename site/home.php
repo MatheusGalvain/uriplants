@@ -139,7 +139,7 @@ body::after {
                 <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%), url('images/bg1.jpg'); ">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
-                        <p>Uri Plantas oferece uma diversidade<br> gigante sobre as plantas</p>
+                        <p>URI Plantas oferece uma diversidade<br> gigante sobre as plantas</p>
                     </div>
                 </div>
                 <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('images/bg2.jpg'); ">

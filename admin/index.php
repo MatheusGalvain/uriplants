@@ -1,21 +1,15 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 include_once('includes/config.php');
 
 if (isset($_POST['login'])) {
     $password = $_POST['password'];
     $useremail = $_POST['uemail'];
 
-    // Consulta o banco de dados para obter as informações do usuário
     $ret = mysqli_query($con, "SELECT id, fname, password FROM users WHERE email='$useremail'");
     $num = mysqli_fetch_array($ret);
 
     if ($num > 0) {
-        // Verifica se a senha inserida corresponde ao hash armazenado
         if (password_verify($password, $num['password'])) {
-            // Se a senha estiver correta, inicia a sessão
             $_SESSION['id'] = $num['id'];
             $_SESSION['name'] = $num['fname'];
             header("location:welcome.php");
@@ -38,7 +32,6 @@ if (isset($_POST['login'])) {
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>Admin | Lobby</title>
-    <!-- Includes -->
     <link href="css/reset.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <link href="css/index.css" rel="stylesheet" />
@@ -51,7 +44,7 @@ if (isset($_POST['login'])) {
         <section id="main-admin">
             <div class="container">
                 <article class="title-admin">
-                    <!-- Ajustar href -->
+                    <!-- TODO:  Ajustar href -->
                     <a class="returnbtn" href="#" alt="Link do Site"> 
                     <i class="fas fa-angle-left"></i>
                     Voltar ao site</a>
@@ -63,10 +56,8 @@ if (isset($_POST['login'])) {
                 <form class="custom-form" method="post">
                     <div class="form-group">
                         <input class="form-input" placeholder="E-mail" name="uemail" id="inputEmail" required/>
-                        <!-- <label class="form-label" for="inputEmail">Endereço de E-mail:</label> -->
                     </div>
                     <div class="form-group">
-                        <!-- <label class="form-label" for="inputPassword">Senha:</label> -->
                         <input class="form-input" placeholder="Senha" name="password" type="password" id="inputPassword" required />
                     </div>
                     <div class="form-actions">
@@ -76,7 +67,7 @@ if (isset($_POST['login'])) {
                 </form>
                 <div class="logo-wrapp">
                     <div class="logocontainer">
-                        <!-- Ajustar href para ir pro site-->
+                        <!-- TODO: Ajustar href para ir pro site-->
                         <img href="#" class="logoadmin" src="images/logouri.png" alt="Logo da URI">
                     </div>
                 </div>
