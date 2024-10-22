@@ -213,7 +213,7 @@
 
         .header-container {
             display: flex;
-            margin-top: 0;
+            margin-top: 30px;
         }
 
         .icon-container {
@@ -578,42 +578,23 @@
                 plantInfo.classList.add('plant-info');
 
                 const plantName = document.createElement('h3');
-                plantName.textContent = `Nome: ${plant.name}`;
-
-                const plantDescription = document.createElement('p');
-                plantDescription.textContent = `Descrição: ${plant.description}`;
-
-                const plantName = document.createElement('h3');
                 plantName.textContent = `${plant.name}`;
 
                 const plantDescription = document.createElement('p');
-                plantDescription.textContent = `${plant.common_names}`;
+                plantDescription.textContent = `${plant.common_names}` + ` ${plant.description}` ;
+
+                plantInfo.appendChild(plantName);
+                plantInfo.appendChild(plantDescription);
+
+                const plantImage = document.createElement('img');
+                plantImage.src = plant.image_blob ? `data:image/jpeg;base64,${plant.image_blob}` : 'plant-placeholder.png';
+                plantImage.alt = `Imagem de ${plant.name}`;
 
                 plantCard.appendChild(plantInfo);
                 plantCard.appendChild(plantImage);
 
-                    const plantImage = document.createElement('img');
-
-                    if (plant.image_blob) {
-                        plantImage.src = `data:image/jpeg;base64,${plant.image_blob}`;
-                    } else {
-                        plantImage.src = 'plant-placeholder.png';
-                    }
-
-                    plantImage.alt = `Imagem de ${plant.name}`;
-
-                    plantCard.appendChild(plantInfo);
-                    plantCard.appendChild(plantImage);
-
-                    // Adiciona o listener de clique ao cartão da planta
-                    plantCard.addEventListener('click', () => {
-                        const plantId = plant.id; // Obtém o ID da planta
-
-                        // Redireciona para a página plant.php com o ID da planta na URL
-                        window.location.href = `../plant/plant.php?id=${plantId}`;
-                    });
-
-                    plantsContainer.appendChild(plantCard);
+                plantCard.addEventListener('click', () => {
+                    window.location.href = `../plant/plant.php?id=${plant.id}`;
                 });
 
                 plantsContainer.appendChild(plantCard);
