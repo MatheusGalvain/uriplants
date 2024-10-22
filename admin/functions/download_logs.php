@@ -1,12 +1,5 @@
 <?php
-session_start();
 include_once('includes/config.php');
-
-// Verificar se o usuário está autenticado
-if (!isset($_SESSION['id']) || strlen($_SESSION['id']) == 0) {
-    header('location:logout.php');
-    exit();
-}
 
 // Definir cabeçalhos para download de arquivo CSV
 header('Content-Type: text/csv; charset=utf-8');
@@ -21,7 +14,6 @@ fwrite($output, "\xEF\xBB\xBF");
 // Definir os cabeçalhos das colunas no CSV
 fputcsv($output, ['ID', 'Tabela', 'Planta', 'Ação', 'Alterado Por', 'Email', 'Hora da Alteração', 'Valor Antigo', 'Valor Novo']);
 
-// Consulta para obter todos os logs
 $query = "
     SELECT 
         al.id, 
@@ -44,10 +36,8 @@ $query = "
     ORDER BY al.change_time DESC
 ";
 
-// Executar a consulta
 $result = mysqli_query($con, $query);
 
-// Verificar se a consulta foi bem-sucedida
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
         // Preparar os dados para o CSV
@@ -67,13 +57,10 @@ if ($result) {
         fputcsv($output, $data);
     }
 } else {
-    // Se a consulta falhar, registrar o erro e informar o usuário
     error_log("Erro ao gerar relatório de logs: " . mysqli_error($con));
-    // Escrever uma linha indicando a falha
     fputcsv($output, ['Erro ao gerar relatório de logs. Por favor, tente novamente mais tarde.']);
 }
 
-// Fechar o arquivo de saída
 fclose($output);
 exit();
 ?>

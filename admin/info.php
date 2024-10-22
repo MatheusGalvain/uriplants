@@ -1,6 +1,0 @@
-<?php
-
-//Info PHP
-phpinfo();
-
-?>
