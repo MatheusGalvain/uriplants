@@ -107,10 +107,9 @@ if (isset($_GET['id'])) {
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/lightbox.css">
+    <link rel="stylesheet" href="../css/plant.css">
     <link rel="stylesheet" href="../css/header.css">
     <link rel="stylesheet" href="../css/footer.css">
-    <link rel="stylesheet" href="../css/listplant.css">
-    <link rel="stylesheet" href="../css/listplant_responsive.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css" />
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
@@ -222,7 +221,7 @@ if (isset($_GET['id'])) {
                             <img id="mainImage" class="photoImg" src="<?php echo $mainImageSrc; ?>"
                                 alt="<?php echo sanitize_input($plantImageAlt); ?>">
                         </div>
-                        <span>Fonte: <?php echo htmlspecialchars($plant['image_source']); ?></span>
+                        <span style="font-style: italic;"><?php echo htmlspecialchars($plant['image_source']); ?></span>
                     </div>
                     <div class="otherphotos-wrapp">
                         <?php
@@ -274,7 +273,7 @@ if (isset($_GET['id'])) {
                         <div class="map-photo">
                             <article class="informationsart">
                                 <img src="data:image/jpeg;base64,<?php echo $plant['region_map_image']; ?>" alt="<?php echo $plant["region_map_name"]; ?>">
-                                <span class="imgfont">Fonte: <?php echo $plant['region_map_source']; ?></span>
+                                <span style="font-style: italic;" class="imgfont"><?php echo $plant['region_map_source']; ?></span>
                             </article>
                         </div>
                         <h2><?php echo $plant["region_map_description"]; ?></h2>
@@ -393,7 +392,7 @@ if (isset($_GET['id'])) {
                                     <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                         <a
                                             data-title="<div class='lightbox-title'> <?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>"
+                                    <a style='color:white; font-style: italic;' target='_BLANK'><?php echo htmlspecialchars($image['image_source']); ?></div>"
                                             class="photoproperty-wrapp"
                                             href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
                                             data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -421,7 +420,7 @@ if (isset($_GET['id'])) {
                                     <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                         <a
                                             data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>"
+                                    <a style='color:white; font-style: italic;' target='_BLANK'><?php echo htmlspecialchars($image['image_source']); ?></div>"
                                             class="photoproperty-wrapp"
                                             href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
                                             data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -449,7 +448,7 @@ if (isset($_GET['id'])) {
                                     <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                         <a
                                             data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>"
+                                    <a style='color:white; font-style: italic;' target='_BLANK'><?php echo htmlspecialchars($image['image_source']); ?></div>"
                                             class="photoproperty-wrapp"
                                             href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
                                             data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -477,7 +476,7 @@ if (isset($_GET['id'])) {
                                     <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                         <a
                                             data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>"
+                                    <a style='color:white; font-style: italic;' target='_BLANK'><?php echo htmlspecialchars($image['image_source']); ?></div>"
                                             class="photoproperty-wrapp"
                                             href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
                                             data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -505,7 +504,7 @@ if (isset($_GET['id'])) {
                                     <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                         <a
                                             data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>"
+                                    <a style='color:white; font-style: italic;' target='_BLANK'><?php echo htmlspecialchars($image['image_source']); ?></div>"
                                             class="photoproperty-wrapp"
                                             href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
                                             data-lightbox="<?php echo sanitize_input($plantName); ?>">
@@ -533,7 +532,7 @@ if (isset($_GET['id'])) {
                                     <?php if ($image['image_blob'] !== base64_encode($mainImageSrc)): ?>
                                         <a
                                             data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
-                                    <a style='color:white;' target='_BLANK'>Fonte: <?php echo htmlspecialchars($image['image_source']); ?></div>"
+                                    <a style='color:white; font-style: italic;' target='_BLANK'><?php echo htmlspecialchars($image['image_source']); ?></div>"
                                             class="photoproperty-wrapp"
                                             href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
                                             data-lightbox="<?php echo sanitize_input($plantName); ?>">
