@@ -73,6 +73,19 @@
 </header> 
 <body>
     <main class="box-content">
+        <div class="container-wrapp">
+                    <div class="container-infos">
+                        <div class="header-container">
+                            <a href="../site/home.php" class="icon-container">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                            <div class="text-container">
+                                <span>Você está em</span>
+                                <h1>URI Plantas</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         <div id="quiz-container">
             <h1 class="titlequiz">Bem Vindos ao <strong>URI Quiz</strong></h1>
             <h2 class="subtitlequiz">Prepare-se para um desafio épico! Lembre-se, seu maior objetivo é alcançar uma pontuação inigualável sem cometer erros e se tornar o verdadeiro Deus das plantas!</h2>
