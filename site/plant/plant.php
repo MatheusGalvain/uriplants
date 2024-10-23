@@ -168,7 +168,7 @@ if (isset($_GET['id'])) {
                             <img id="mainImage" class="photoImg" src="<?php echo $mainImageSrc; ?>"
                                 alt="<?php echo sanitize_input($plantImageAlt); ?>">
                         </div>
-                        <span style="font-style: italic;"><?php echo htmlspecialchars($plant['image_source']); ?></span>
+                        <span style="font-style: italic; margin-left: 5px;"><?php echo htmlspecialchars($plant['image_source']); ?></span>
                     </div>
                     <div class="otherphotos-wrapp">
                         <?php

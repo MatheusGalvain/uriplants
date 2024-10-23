@@ -747,5 +747,6 @@ main{
     .photos-wrapp {
         width: 320px;
     }
+    main{ margin-top: 0;}
 }
 
