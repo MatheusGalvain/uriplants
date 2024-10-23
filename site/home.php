@@ -16,16 +16,16 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
     crossorigin="anonymous"></script>
     <script>
+    $(document).ready(function() {
         $.ajax({
             type: 'post',
             url: 'https://uricer.edu.br/requisicoes/cabecalho.php',
             data: 'req=' + true,
             dataType: 'html'
         }).then((result) => {
-        
             $('#resultH').html(result);
-        })
-        
+        });
+
         $.ajax({
             type: 'post',
             url: 'https://uricer.edu.br/requisicoes/rodape.php',
@@ -33,8 +33,9 @@
             dataType: 'html'
         }).then((result) => {
             $('#resultR').html(result);
-        })
-    </script>
+        });
+    });
+</script>
 
     <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
     <script>

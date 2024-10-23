@@ -71,7 +71,7 @@
             <div id="options">
             </div>
 
-            <button id="next-button" class="btn btn-primary">Próxima Pergunta</button>
+            <button id="next-button" class="btn btn-secondary">Próxima Pergunta</button>
             <div class="title">
                 <h1 class="title-points">Quadro de pontuações:</h1>
             </div>

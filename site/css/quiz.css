@@ -267,8 +267,8 @@ body::after {
     margin-top: 20px;
     border: none;
     border-radius: 5px;
-    background-color: #066c94;
-    color: #fff;
+    background-color: #066c94!important;
+    color: #fff!important;
     cursor: pointer;
     display: none;
     transition: background-color 0.3s ease;
