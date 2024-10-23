@@ -191,7 +191,7 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
         </div>
     </div>
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -212,7 +212,7 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
         </div>
     </div>
 
-    <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

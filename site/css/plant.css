@@ -1,4 +1,8 @@
 
+
+.h1, h1 {font-size: 20px!important;}
+.h2, h2 {font-size: 25px!important; font-weight: 300!important;}
+
 main{
     display: flex;
     justify-content: center;
@@ -8,6 +12,7 @@ main{
     flex-wrap: wrap;
     z-index: 999;
     width: 100%;
+    margin-top: 120px;
 }
 
 .navigatorcontainer{
@@ -59,6 +64,11 @@ main{
 }
 .box {
     width: 1250px;
+    height: max-content!important;
+    background-color: transparent!important;
+    border: none!important;
+    color: black!important;
+    text-align: left!important;
 }
 .boximage{
     width: 1250px;
@@ -91,18 +101,18 @@ main{
     flex-direction: column;
     flex-wrap: wrap;
 }
-.articletitle h1{
+.articletitleh1{
     font-size: 60px;
-    font-weight: 400;
-    font-style: normal;
-    color: #141414;
+    font-weight: 400!important;
+    font-style: normal!important;
+    color: black!important;
     margin: 0;
 }
-.articletitle h2{
+.articletitleh2{
     font-size: 20px;
-    font-weight: 200;
-    font-style: normal;
-    color: #141414;
+    font-weight: 400!important;
+    font-style: normal!important;
+    color: black!important;
     margin: 0;
 }
 .photosplant{
@@ -281,16 +291,17 @@ main{
     width: 100%;
     overflow: hidden;
 }
-.informationsart h1{
-    font-size: 20px;
-    color: #141414;
-    font-weight: 600;
+.informationsarth1{
+    font-size: 20px!important;
+    color: #141414!important;
+    font-weight: 300!important;
     margin: 0;
 }
-.informationsart h2{
-    font-size: 25px;
-    color: #141414;
-    font-weight: 200;
+
+.informationsarth2{
+    font-size: 25px!important;
+    color: #141414!important;
+    font-weight: 300!important;
 }
 
 .informationsart a.usefullinks{
@@ -319,12 +330,17 @@ main{
     color: #FFF;
     height: 120px;
     width: 120px;
+    min-height: 120px;
+    min-width: 120px;
     max-width: 120px;
     max-height: 120px;
 }
 
 .photos-wrapp {
     min-width: 120px;
+    width: 1250px;
+    display: flex;
+    overflow: auto;
     /* padding-left: 28px */
 }
 /* .slick-slide img {
@@ -479,6 +495,28 @@ main{
 
 }
 
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 6px;
+    border: 3px solid #fff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+
+.scroll-container {
+    scrollbar-color: #1d4535 #fff;
+}
 
 @media screen and (min-width: 1850px){
     .otherphotos-wrapp{gap:15px;}
@@ -705,4 +743,9 @@ main{
     }
 
     .otherplants-wrapp h1 { font-size: 18px;}
+
+    .photos-wrapp {
+        width: 320px;
+    }
 }
+

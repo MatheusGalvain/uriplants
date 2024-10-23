@@ -185,7 +185,7 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
         </div>
     </div>
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -206,7 +206,7 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
         </div>
     </div>
 
-    <div class="modal fade" id="editGenusModal" tabindex="-1" aria-labelledby="editGenusModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editGenusModal" tabindex="-1" aria-labelledby="editGenusModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

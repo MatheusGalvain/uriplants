@@ -128,7 +128,7 @@ if (isset($_POST['submit'])) {
     </div>
 
      <!-- Modal -->
-     <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+     <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

@@ -14,25 +14,34 @@
     <link rel="stylesheet" href="../css/footer.css">
     <link rel="stylesheet" href="../css/listplant.css">
     <link rel="stylesheet" href="../css/listplant_responsive.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+  crossorigin="anonymous"></script>
+<script>
+	$.ajax({
+		type: 'post',
+		url: 'https://uricer.edu.br/requisicoes/cabecalho.php',
+		data: 'req=' + true,
+		dataType: 'html'
+	}).then((result) => {
+	
+		$('#resultH').html(result);
+	})
+	
+	$.ajax({
+		type: 'post',
+		url: 'https://uricer.edu.br/requisicoes/rodape.php',
+		data: 'req=' + true,
+		dataType: 'html'
+	}).then((result) => {
+		$('#resultR').html(result);
+	})
+</script>
    
 </head>
 <body>
-    <header class="header">
-        <div class="top-bar">
-            <div class="social-icons">
-                <a href="#"><img src="linkedin-placeholder.png" alt="LinkedIn"></a>
-                <a href="#"><img src="instagram-placeholder.png" alt="Instagram"></a>
-                <a href="#"><img src="facebook-placeholder.png" alt="Facebook"></a>
-            </div>
-            <div class="contact-info">
-                <span>+55 (54) 3520-9000</span>
-            </div>
-        </div>
-        <div class="logo-slider">
-            <img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim">
-        </div>
-    </header>
-
+    
+    <div id ="resultH"></div>
     <section>
         <div class="container-wrapp">
             <div class="container-infos">
@@ -65,32 +74,7 @@
         </div>
     </section>
 
-    <footer>
-        <div class="footer-left">
-            <div class="redes-sociais">
-                <span>Redes Sociais</span>
-                <div class="display-icons">
-                    <a href="https://www.facebook.com/uricampuserechim"><img src="images/facebook-icon.png" alt="Facebook" /></a>
-                    <a href="https://www.instagram.com/urierechim/"><img src="images/instagram-icon.png" alt="Instagram" /></a>
-                    <a href="https://twitter.com/urierechim"><img src="images/x-icon.png" alt="Twitter" /></a>
-                    <a href="https://www.youtube.com/urierechim"><img src="images/youtube-icon.png" alt="YouTube" /></a>
-                </div>
-            </div>
-            <div class="telefones">
-                <span>Telefones</span>
-                <a href="tel:+555435209000">+55 (54) 3520-9000</a>
-            </div>
-            <div class="localizacoes">
-                <span>Localizações</span>
-                <a href="https://maps.google.com/?q=Avenida+Sete+de+Setembro,+1621" target="_blank">
-                    Avenida Sete de Setembro, 1621
-                </a>
-            </div>
-        </div>
-        <div class="logo">
-            <a href="https://www.uricer.edu.br/"><img src="images/uri-logo.png" alt="Logo URI" /></a>
-        </div>
-    </footer>
+    <div id ="resultR"></div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -236,8 +220,3 @@
 
 </html>
 
-
-
-<a class="photoproperty-wrapp slick-slide slick-current slick-active" data-lightbox="Hymenaea courbaril" style="width: 88px;" tabindex="0" data-slick-index="0" aria-hidden="false">
-    <img class="photopropertyImg">
-</a>

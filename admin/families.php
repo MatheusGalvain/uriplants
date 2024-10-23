@@ -193,7 +193,7 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
     </div>
     
 <!-- Modal para excluir -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -215,7 +215,7 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
     </div>
 
 <!-- Modal para editar -->
-    <div class="modal fade" id="editFamilyModal" tabindex="-1" aria-labelledby="editFamilyModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editFamilyModal" tabindex="-1" aria-labelledby="editFamilyModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

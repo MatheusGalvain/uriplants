@@ -94,7 +94,6 @@ if (isset($_GET['id'])) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../css/plant.css">
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/lightbox.css">
@@ -106,76 +105,34 @@ if (isset($_GET['id'])) {
     <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
     <script src="../js/lightbox.js"></script>
     <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/plant.css">
+    <script>
+    $(document).ready(function() {
+        $.ajax({
+            type: 'post',
+            url: 'https://uricer.edu.br/requisicoes/cabecalho.php',
+            data: 'req=' + true,
+            dataType: 'html'
+        }).then((result) => {
+            $('#resultH').html(result);
+        });
+
+        $.ajax({
+            type: 'post',
+            url: 'https://uricer.edu.br/requisicoes/rodape.php',
+            data: 'req=' + true,
+            dataType: 'html'
+        }).then((result) => {
+            $('#resultR').html(result);
+        });
+    });
+</script>
+
 </head>
 
-<header id="header" class="header">
-    <div class="topheader">
-        <div class="boxheader">
-            <ul class="topheaderul">
-                <li><a class="reficon" href="https://www.instagram.com/urierechim/" target="_BLANK" aria-label="Acesso ao instagram"><img src="../images/instagram-icon.png" alt="instagram"></a></li>
-                <li><a class="reficon" href="https://www.youtube.com/user/urierechim/videos" target="_BLANK" aria-label="Acesso ao youtube"><img src="../images/youtube-icon.png" alt="youtube"></a></li>
-                <li><a class="reficon" href="https://www.facebook.com/uricampuserechim/?locale=pt_BR" target="_BLANK" aria-label="Acesso ao facebook"><img src="../images/facebook-icon.png" alt="facebook"></a></li>
-                <li class="lifont">+55 (54) 3520-9000</li>
-            </ul>
-            <ul class="topheaderullinks">
-                <li class="lifont">@ 2024 URI Câmpus de Erechim</li>
-                <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a politica de privacidade">Política de privacidade</a></li>
-                <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a reitoria">Reitoria</a></li>
-                <li class="lihover"><a class="acesslink" href="https://www.uricer.edu.br/site/informacao?uri=000139000000000000000000000" target="_BLANK" alt="acesso a URI sustentabilidade">URI Sustentabilidade</a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="bottomheader">
-        <div class="boxheader">
-            <a href="../" alt="Logo da uri" class="logoheader"><img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim"></a>
-            <ul class="ulheader">
-                <li class="liheaderhover"><a href="#">URI Quiz</a></li>
-                <li class="liheaderhover"><a href="#">URI Plantas</a></li>
-                <li>
-                    
-                <!-- Botão pra pesquisar por ?Query -->
-                <form action="../list/list.php" method="GET" class="search-form">
-                    <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
-                    <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
-                </form>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <nav id="main-menu-mobile">
-        <div id="button-menu" class="button-menu">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
-        <ul id="main-menu-mobile-items">
-            <div class="hamburguer-wrapp">
-                <h1>Fechar menu...</h1>
-                <div id="button-menu" class="button-menu">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </div>
-            </div>
-            <li class="item-menu">
-                <a alt="Uri Plants" href="../" class="menu-mobile-link ">Home</a>
-            </li>
-            <li class="item-menu">
-                <a alt="Uri Plants" href="#" class="menu-mobile-link ">URI Plants</a>
-            </li>
-            <li class="item-menu">
-                <a alt="Uri Quiz" href="#" class="menu-mobile-link">URI Quiz</a>
-            </li>
-        </ul>
-        <form action="../list/list.php" method="GET" class="search-form-mobile">
-            <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
-            <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
-        </form>
-
-    </nav>
-</header>
 
 <body>
+    <div id ="resultH"></div>
     <main>
         <div class="navigatorcontainer">
             <div class="box">
@@ -194,7 +151,7 @@ if (isset($_GET['id'])) {
         <section id="main-section" class="plantinfo">
             <div class="boximage">
                 <article class="articletitle">
-                    <h1><?php echo $plantName; ?></h1>
+                    <h1 style="font-size: 60px!important "><?php echo $plantName; ?></h1>
                     <h2>Conheça mais sobre a planta!</h2>
                 </article>
                 <section class="photosplant">
@@ -372,7 +329,7 @@ if (isset($_GET['id'])) {
                     <article class="informationsart">
                         <h1>Tronco</h1>
                         <h2><?php echo $trunkDescription; ?></h2>
-                        <div class="photos-wrapp">
+                        <div class="photos-wrapp scroll-container">
                             <?php
                             $propertyId = 2;
                             $plantImages = $plantController->getPlantImages($id, $propertyId);
@@ -568,34 +525,9 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
         </section>
+        <div id ="resultR"></div>
     </main>
 
-    <footer>
-        <div class="footer-left">
-            <div class="redes-sociais">
-                <span>Redes Sociais</span>
-                <div class="display-icons">
-                    <a href="https://www.facebook.com/uricampuserechim"><img src="../images/facebook-icon.png" alt="Facebook" /></a>
-                    <a href="https://www.instagram.com/urierechim/"><img src="../images/instagram-icon.png" alt="Instagram" /></a>
-                    <a href="https://twitter.com/urierechim"><img src="../images/x-icon.png" alt="Twitter" /></a>
-                    <a href="https://www.youtube.com/urierechim"><img src="../images/youtube-icon.png" alt="YouTube" /></a>
-                </div>
-            </div>
-            <div class="telefones">
-                <span>Telefones</span>
-                <a href="tel:+555435209000">+55 (54) 3520-9000</a>
-            </div>
-            <div class="localizacoes">
-                <span>Localizações</span>
-                <a href="https://maps.google.com/?q=Avenida+Sete+de+Setembro,+1621" target="_blank">
-                    Avenida Sete de Setembro, 1621
-                </a>
-            </div>
-        </div>
-        <div class="logo">
-            <a href="https://www.uricer.edu.br/"><img src="../images/uri-logo.png" alt="Logo URI" /></a>
-        </div>
-    </footer>
 
     <script>
         lightbox.option({
