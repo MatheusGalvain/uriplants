@@ -984,7 +984,7 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                         <li class="page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
                                             <a class="page-link" href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>" aria-label="Anterior">
-                                                <span aria-hidden="true">&laquo;</span>
+                                                <span >&laquo;</span>
                                             </a>
                                         </li>
 
@@ -1002,7 +1002,7 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                         <li class="page-item <?php echo ($page >= $total_pages) ? 'disabled' : ''; ?>">
                                             <a class="page-link" href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>" aria-label="Próximo">
-                                                <span aria-hidden="true">&raquo;</span>
+                                                <span >&raquo;</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -1018,7 +1018,7 @@ $qrcode_base_url = get_qrcode_url($con);
     </div>
 
     <!-- Modal para Adicionar Imagem -->
-    <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel" >
         <div class="modal-dialog">
             <form id="propertyForm">
                 <div class="modal-content">
@@ -1047,7 +1047,7 @@ $qrcode_base_url = get_qrcode_url($con);
     </div>
 
     <!-- Modal para QRCode -->
-    <div class="modal fade" id="qrcodeModal" tabindex="-1" aria-labelledby="qrcodeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="qrcodeModal" tabindex="-1" aria-labelledby="qrcodeModalLabel" >
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1075,7 +1075,7 @@ $qrcode_base_url = get_qrcode_url($con);
 
 
     <!-- Modal de Confirmação de Exclusão -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
         <div class="modal-dialog">
             <form method="POST" action="">
                 <div class="modal-content">

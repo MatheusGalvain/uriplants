@@ -343,7 +343,7 @@ if ($stmt) {
         </div>
 
         <!-- Modal de Confirmação de Exclusão -->
-        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -365,7 +365,7 @@ if ($stmt) {
         </div>
 
         <!-- Modal de Edição de Região -->
-        <div class="modal fade" id="editRegionModal" tabindex="-1" aria-labelledby="editRegionModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editRegionModal" tabindex="-1" aria-labelledby="editRegionModalLabel" >
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form method="POST" action="" enctype="multipart/form-data">

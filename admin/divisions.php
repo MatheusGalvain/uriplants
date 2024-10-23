@@ -190,7 +190,7 @@ $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at I
         </div>
     </div>
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -211,7 +211,7 @@ $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at I
         </div>
     </div>
 
-    <div class="modal fade" id="editDivisionModal" tabindex="-1" aria-labelledby="editDivisionModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editDivisionModal" tabindex="-1" aria-labelledby="editDivisionModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

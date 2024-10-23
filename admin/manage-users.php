@@ -138,7 +138,7 @@ if ($editUserId) {
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                         <a href="#" class="btn btn-danger btn-sm delete-user-btn" data-user-id="<?php echo $row['id']; ?>">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            <i class="fa fa-trash" ></i>
                                                         </a>
                                                     </td>
                                                 <?php endif; ?>
@@ -157,7 +157,7 @@ if ($editUserId) {
     </div>
 
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <form method="post" id="deleteForm">
@@ -179,7 +179,7 @@ if ($editUserId) {
     </div>
 
 
-    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

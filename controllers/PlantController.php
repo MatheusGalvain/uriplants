@@ -23,6 +23,7 @@ class PlantController {
                 divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
                 regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
                 regionmap.description AS region_map_description, regionmap.imagem AS region_map_image,
+                regionmap.name AS region_map_name,
                 properties.name AS property_name,
                 images.id AS image_id, images.imagem AS image_blob, images.source AS image_source
                 FROM plants
@@ -124,9 +125,12 @@ class PlantController {
         $totalPages = ceil($totalPlants / $limit);
     
         $countStmt->close();
-    
-        // Consulta para obter as plantas com limite
-        $sql = "SELECT plants.id,plants.name, plants.ecology AS description, images.imagem AS image_blob
+        $sql = "SELECT 
+                    plants.id,
+                    plants.name,
+                    plants.common_names, 
+                    plants.ecology AS description, 
+                    images.imagem AS image_blob
                 FROM plants
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
@@ -210,8 +214,9 @@ class PlantController {
         $sql = "SELECT plants.id, plants.name, images.imagem AS image_blob
                 FROM plants
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
+                LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE plants.id != ? 
+                WHERE plants.id != ? AND properties.id = 1
                 ORDER BY images.sort_order ASC, RAND() LIMIT ?"; 
         
         $stmt = $conn->prepare($sql);
@@ -272,6 +277,39 @@ class PlantController {
             $stmt->close();
             $conn->close();
             return $images;
+        } else {
+            $error = ["message" => "Erro ao buscar imagens da planta", "error" => $stmt->error];
+            $stmt->close();
+            $conn->close();
+            return $error;
+        }
+    }
+
+    public function getUsefullLinks($plantId) {
+        $conn = getConnection();
+        
+        $sql = "SELECT name, link
+                FROM usefullinks
+                WHERE plant_id = ?
+                AND deleted_at IS NULL;";
+        
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
+        }
+    
+        $stmt->bind_param("i", $plantId);
+    
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            $u_links = [];
+            while ($row = $result->fetch_assoc()) {
+                $u_links[] = $row;
+            }
+    
+            $stmt->close();
+            $conn->close();
+            return $u_links;
         } else {
             $error = ["message" => "Erro ao buscar imagens da planta", "error" => $stmt->error];
             $stmt->close();
