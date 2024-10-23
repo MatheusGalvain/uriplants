@@ -325,7 +325,7 @@ main{
 
 .photos-wrapp {
     min-width: 120px;
-    padding-left: 28px;
+    /* padding-left: 28px */
 }
 /* .slick-slide img {
     display: block;
@@ -688,13 +688,16 @@ main{
 }
 
 @media screen and (max-width: 768px) {
+
+    .photoproperty-wrapp{
+        min-width: 88px!important;
+        min-height: 88px!important;
+        max-width: 88px!important;
+        max-height: 88px!important;
+    }
+
     .slick-slide {
         height: auto!important;
         margin-top: 10px;
-    }
-    .slick-slide img {
-        height: 88px;
-        width: 88px; 
-        object-fit: cover;
     }
 }

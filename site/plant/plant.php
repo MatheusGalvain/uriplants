@@ -1,18 +1,8 @@
 <?php
-// plant.php
-
-// Ativar a exibição de erros (apenas para desenvolvimento)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Incluir o PlantController
 require_once __DIR__ . '/../../controllers/PlantController.php';
 
-// Instanciar o controlador de plantas
 $plantController = new PlantController();
 
-// Função para sanitizar a entrada
 function sanitize_input($data)
 {
     if (is_null($data)) {
@@ -661,7 +651,7 @@ if (isset($_GET['id'])) {
                 activeLink.classList.add('active');
             }
         }
-
+        
         $('.button-menu').click(function() {
             $(this).toggleClass('button-menu-close');
             $('#main-menu-mobile-items').toggleClass('main-menu-mobile-items-open');

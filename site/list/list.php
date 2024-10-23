@@ -16,7 +16,6 @@
     <link rel="stylesheet" href="../css/listplant_responsive.css">
    
 </head>
-
 <body>
     <header class="header">
         <div class="top-bar">
@@ -48,13 +47,13 @@
                 </div>
             </div>
             <div class="containerbtns">
-                <form action="../list/list.php" method="GET" class="search-form">
-                    <input type="text" name="query" placeholder="Buscar..." aria-label="Pesquisar plantas">
-                    <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #141414;"></i></button>
-                </form>
+            <form action="../list/list.php" method="GET" class="search-form">
+                <input type="text" name="query" placeholder="Buscar..." aria-label="Pesquisar plantas" value="<?= htmlspecialchars($_GET['query'] ?? '', ENT_QUOTES) ?>">
+                <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #141414;"></i></button>
+            </form>
                 <div id="search-result" style="display: none;">
                     <span class="searchspan" id="search-text"></span>
-                    <a class="searchhref" href="../list/list.php" stylgin-lefe="mart: 10px;">Limpar Filtro</a>
+                    <a class="searchhref" href="../list/list.php"><i class="far fa-times-circle"></i></a>
                 </div>
             </div>
         </div>
@@ -108,7 +107,6 @@
         const query = urlParams.get('query') || '';
 
         if (query) {
-            searchText.textContent = `Você pesquisou por: "${query}"`;
             searchResult.style.display = 'flex';
         } else {
             searchResult.style.display = 'none';
@@ -237,3 +235,9 @@
 </body>
 
 </html>
+
+
+
+<a class="photoproperty-wrapp slick-slide slick-current slick-active" data-lightbox="Hymenaea courbaril" style="width: 88px;" tabindex="0" data-slick-index="0" aria-hidden="false">
+    <img class="photopropertyImg">
+</a>
