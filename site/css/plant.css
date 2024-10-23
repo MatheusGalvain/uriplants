@@ -134,7 +134,7 @@ main{
 }
 .photocentral{
     width: 1120px;
-    height: 650px;
+    /* height: 650px; */
     overflow: hidden;
     border-radius: 8px;
     display: block;
@@ -304,8 +304,9 @@ main{
     font-weight: 300!important;
 }
 
-.informationsart a.usefullinks{
-    text-decoration: underline;
+.usefullinks{
+    text-decoration: none;
+    color: black;
 }
 
 .content-ulinks{
@@ -615,7 +616,7 @@ main{
     .articletitle{display: none;}
     .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
     .plantinfo{width: 100%;}
-    .photocentral{width: 100%; border-radius: 0; height: 500px;}
+    .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
     .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
@@ -637,7 +638,7 @@ main{
     .articletitle{display: none;}
     .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
     .plantinfo{width: 100%;}
-    .photocentral{width: 100%; border-radius: 0; height: 350px;}
+    .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
     .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
@@ -665,7 +666,7 @@ main{
     .articletitle{display: none;}
     .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
     .plantinfo{width: 100%;}
-    .photocentral{width: 100%; border-radius: 0; height: 300px;}
+    .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
     .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
@@ -699,7 +700,7 @@ main{
     .articletitle{display: none;}
     .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
     .plantinfo{width: 100%;}
-    .photocentral{width: 100%; border-radius: 0; height: 300px;}
+    .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
     .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
