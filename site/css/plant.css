@@ -370,10 +370,11 @@ main{
     padding-bottom: 50px;
 }
 .otherplants-wrapp h1{
-    font-size: 60px;
+    font-size: 40px;
     font-weight: 600;
     color: #141414;
     margin: 0;
+    white-space: nowrap;
 }
 .otherplants{
     display: flex;
@@ -402,6 +403,7 @@ main{
     padding: 35px;
     gap: 10px;
     transition: 0.20s;
+    min-height: 362px;
 }
 .otherplant:hover{
     -webkit-box-shadow: 10px 10px 30px -18px rgba(0,0,0,0.75);
@@ -438,14 +440,11 @@ main{
     flex-wrap: wrap;
 }
 .titleothersplants h1{
-    font-size: 15px;
+    font-size: 20px;
     margin: 0;
     color: #141414;
 }
-.titleothersplants h2{
-    font-size: 20px;
-    color: #141414;
-}
+
 .btnotherplant{
     display: flex;
     justify-content: center;
@@ -454,7 +453,7 @@ main{
     background-color: #18392B;
     width: 100%;
     color: white;
-    font-size: 20px;
+    font-size: 12px;
     min-height: 50px;
     border-radius: 10px;
 }
@@ -700,4 +699,10 @@ main{
         height: auto!important;
         margin-top: 10px;
     }
+
+    .otherplant {
+        min-height: 0;
+    }
+
+    .otherplants-wrapp h1 { font-size: 18px;}
 }

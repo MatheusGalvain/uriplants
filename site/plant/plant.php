@@ -556,8 +556,7 @@ if (isset($_GET['id'])) {
                                         <?php endif; ?>
                                     </div>
                                     <div class="titleothersplants">
-                                        <h1>Nome</h1>
-                                        <h2><?php echo sanitize_input($otherPlant['name']); ?></h2>
+                                        <h1><?php echo sanitize_input($otherPlant['name']); ?></h1>
                                     </div>
                                 </div>
                                 <a class="btnotherplant" href="#">ACESSE</a>
