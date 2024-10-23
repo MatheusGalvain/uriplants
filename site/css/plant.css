@@ -216,6 +216,28 @@ main{
     align-items: center;
     align-content: center;
 }
+
+button {width: 100%;}
+
+.go-to-listing-button {
+    display: none;
+    text-align: center;
+    width: 200px;
+}
+
+.go-to-listing-button button {
+    background-color: #18392B; /* Cor de fundo do botão */
+    color: white; /* Cor do texto */
+    padding: 10px 20px; /* Espaçamento interno */
+    font-size: 16px; /* Tamanho da fonte */
+    border: none; /* Remove a borda */
+    border-radius: 5px; /* Bordas arredondadas */
+    cursor: pointer; /* Cursor de ponteiro ao passar o mouse */
+}
+
+.go-to-listing-button button:hover {
+    background-color: #45a049; /* Cor ao passar o mouse */
+}
 .navigatorref {
     font-size: 18px;
     font-weight: 300;
@@ -749,5 +771,6 @@ main{
         width: 320px;
     }
     main{ margin-top: 0;}
+    .go-to-listing-button {display: block;}
 }
 
