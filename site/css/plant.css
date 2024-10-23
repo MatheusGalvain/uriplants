@@ -261,7 +261,6 @@ main{
     max-width: 100%;
     height: auto;
     border-radius: 10px;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
 }
 .containerimgs-wrapp{
     display: flex;
@@ -318,7 +317,6 @@ main{
     margin-right: 10px;
     overflow: hidden;
     color: #FFF;
-    background-color: purple;
     height: 120px;
     width: 120px;
     max-width: 120px;
@@ -329,10 +327,15 @@ main{
     min-width: 120px;
     padding-left: 28px;
 }
-.slick-slide img {
+/* .slick-slide img {
     display: block;
     height: 120px; 
+} */
+
+.slick-slide {
+    height: 120px!important;
 }
+
 .lightbox-title {
     position: absolute;
     top: -25px;
@@ -359,7 +362,6 @@ main{
     -webkit-box-shadow: 10px 4px 69px -25px rgba(0,0,0,0.75);
     -moz-box-shadow: 10px 4px 69px -25px rgba(0,0,0,0.75);
     box-shadow: 10px 4px 69px -25px rgba(0,0,0,0.75);
-    width: 100%
 }
 .otherplants-wrapp{
     flex-direction: row;
@@ -644,7 +646,7 @@ main{
     .search-form-mobile input[type="text"]{padding-right: 5px;}
     footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
 }
-/* Ignorar */
+
 @media screen and (min-width: 0px) and (max-width: 359px){
     body::after{background-image: none;}
     #header .topheader,.bottomheader{display: none;}
@@ -678,10 +680,21 @@ main{
                 flex-wrap: wrap;
                 height: auto;
                 flex-wrap: wrap;
-                max-width: 280px;
             }
     footer {flex-direction: column;}
     footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
 
 }
+}
+
+@media screen and (max-width: 768px) {
+    .slick-slide {
+        height: auto!important;
+        margin-top: 10px;
+    }
+    .slick-slide img {
+        height: 88px;
+        width: 88px; 
+        object-fit: cover;
+    }
 }
