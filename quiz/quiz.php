@@ -9,70 +9,36 @@
     <link rel="stylesheet" href="../site/css/reset.css">
     <link rel="stylesheet" href="../site/css/quiz.css">
     <link rel="stylesheet" href="../site/css/header.css">
+    <link rel="stylesheet" href="../site/css/footer.css">
     <link rel="stylesheet" href="../site/css/listplant_responsive.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+  crossorigin="anonymous"></script>
+<script>
+	$.ajax({
+		type: 'post',
+		url: 'https://uricer.edu.br/requisicoes/cabecalho.php',
+		data: 'req=' + true,
+		dataType: 'html'
+	}).then((result) => {
+	
+		$('#resultH').html(result);
+	})
+	
+	$.ajax({
+		type: 'post',
+		url: 'https://uricer.edu.br/requisicoes/rodape.php',
+		data: 'req=' + true,
+		dataType: 'html'
+	}).then((result) => {
+		$('#resultR').html(result);
+	})
+</script>
 </head>
-<header id="header" class="header">
-    <div class="topheader">
-        <div class="boxheader">
-            <ul class="topheaderul">
-                <li><a class="reficon" href="https://www.instagram.com/urierechim/" target="_BLANK" aria-label="Acesso ao instagram"><img src="../site/images/instagram-icon.png" alt="instagram"></a></li>
-                <li><a class="reficon" href="https://www.youtube.com/user/urierechim/videos" target="_BLANK" aria-label="Acesso ao youtube"><img src="../site/images/youtube-icon.png" alt="youtube"></a></li>
-                <li><a class="reficon" href="https://www.facebook.com/uricampuserechim/?locale=pt_BR" target="_BLANK" aria-label="Acesso ao facebook"><img src="../site/images/facebook-icon.png" alt="facebook"></a></li>
-                <li class="lifont">+55 (54) 3520-9000</li>
-            </ul>
-            <ul class="topheaderullinks">
-                <li class="lifont">@ 2024 URI Câmpus de Erechim</li>
-                <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a politica de privacidade">Política de privacidade</a></li>
-                <li class="lihover"><a class="acesslink" href="#" target="_BLANK" alt="acesso a reitoria">Reitoria</a></li>
-                <li class="lihover"><a class="acesslink" href="https://www.uricer.edu.br/site/informacao?uri=000139000000000000000000000" target="_BLANK" alt="acesso a URI sustentabilidade">URI Sustentabilidade</a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="bottomheader">
-        <div class="boxheader">
-            <a href="../site" alt="Logo da uri" class="logoheader"><img src="https://www.uricer.edu.br/site/images/setembro_amarelo.png" alt="Logo URI Erechim"></a>
-            <ul class="ulheader">
-                <li class="liheaderhover"><a href="#">URI Quiz</a></li>
-                <li class="liheaderhover"><a href="#">URI Plantas</a></li>
-                <li>
-                    <form action="../list/list.php" method="GET" class="search-form">
-                        <input type="text" name="query" placeholder="Pesquise alguma coisa..." aria-label="Pesquisar plantas">
-                        <button type="submit"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i></button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <nav id="main-menu-mobile">
-        <div id="button-menu" class="button-menu">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
-        <ul id="main-menu-mobile-items">
-            <div class="hamburguer-wrapp">
-                <h1>Fechar menu...</h1>
-                <div id="button-menu" class="button-menu">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </div>
-            </div>
-            <li class="item-menu">
-                <a alt="Uri Plants" href="../site" class="menu-mobile-link ">Home</a>
-            </li>
-            <li class="item-menu">
-                <a alt="Uri Plants" href="#" class="menu-mobile-link ">URI Plants</a>
-            </li>
-            <li class="item-menu">
-                <a alt="Uri Quiz" href="#" class="menu-mobile-link">URI Quiz</a>
-            </li>
-        </ul>
 
-    </nav>
-</header> 
 <body>
     <main class="box-content">
+        <div id ="resultH"></div>
         <div class="container-wrapp">
                     <div class="container-infos">
                         <div class="header-container">
@@ -100,6 +66,13 @@
                     <span class="visually-hidden">Próximo</span>
                 </button>
             </div>
+           
+            <div id="question">Carregando pergunta...</div>
+
+            <div id="options">
+            </div>
+
+            <button id="next-button" class="btn btn-primary">Próxima Pergunta</button>
             <div class="title">
                 <h1 class="title-points">Quadro de pontuações:</h1>
             </div>
@@ -114,14 +87,9 @@
                     Total: <span id="total-count">0</span>
                 </div>
             </div>
-            <div id="question">Carregando pergunta...</div>
-
-            <div id="options">
-            </div>
-
-            <button id="next-button" class="btn btn-primary">Próxima Pergunta</button>
         </div>
     </main>
+    <div id ="resultR"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const QUIZ_URL = '/uriplants/public/quiz';
@@ -157,7 +125,10 @@
             const prevButton = document.querySelector('.custom-carousel-control-prev');
             const nextButton = document.querySelector('.custom-carousel-control-next');
             const totalItems = carouselInner.children.length;
-            const currentIndex = carousel.getActiveIndex();
+
+            // Directly find the active item and its index
+            const activeItem = carouselInner.querySelector('.carousel-item.active');
+            const currentIndex = Array.from(carouselInner.children).indexOf(activeItem);
 
             if (totalItems <= 1) {
                 prevButton.style.display = 'none';
