@@ -1,7 +1,7 @@
 
 @media (max-width: 480px) {
             
-    .slide {
+    .slider {
         border-bottom-left-radius: 60px; 
     }
 
@@ -10,10 +10,6 @@
         right: 25px; 
     }
 
-    /* .slide-text  p, h2 {
-        text-align: end;
-    } */
-        
     .button-group {
         margin-top: 20px;
         flex-direction: column;
