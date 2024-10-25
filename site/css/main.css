@@ -35,7 +35,7 @@
 }
 
   body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Poppins', sans-serif !important;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -79,6 +79,7 @@ body::after {
       margin-bottom: 40px;
       color: #333;
   }
+  
 
   .button-group {
       display: flex;
@@ -100,6 +101,7 @@ body::after {
     text-align: center !important;
     min-width: 227px !important;
     display: inline-block !important;
+    font-family: 'poppins' !important;
 }
 
 .btn:hover {
@@ -114,12 +116,41 @@ body::after {
       padding: 0;
   }
 
+  
+
+/* reset botões por conta do footer e header carregado que sobrescrevem o código */
+button.btn:hover {
+    color: black !important;
+    background-color: white !important;
+    font-family: 'Poppins', sans-serif !important;
+
+}
+.btn:not(.filtrar_matriz_curso)::before {
+    content: none !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: auto !important;
+    height: auto !important;
+    background: transparent !important;
+    z-index: auto !important;
+    border-radius: 0 !important;
+    transition: none !important;
+    transform-origin: auto !important;
+    transform: none !important;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+
   .button-title {
       font-weight: bold;
       font-size: 1.4em;
       transform: translateY(8px);
       color: black;
       max-width: 200px;
+      font-family: 'Poppins', sans-serif !important;
+      margin-bottom: 12px;
+
   }
 
   .subtitle {
@@ -169,11 +200,15 @@ body::after {
 
   .slide-text h2 {
       margin: 0;
+      color: white;
+      font-family: 'poppins';
   }
 
   .slide-text p {
       margin: 0;
       max-width: 200px;
+      color: white;
+      font-family: 'poppins';
   }
 
   .controls {

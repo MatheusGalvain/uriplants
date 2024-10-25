@@ -215,6 +215,7 @@ nav a.active {
     font-size: 24px;
     font-weight: bold;
     color: #000;
+    font-family: 'poppins';
 }
 
 .text-container span {
@@ -282,10 +283,14 @@ nav a.active {
     margin: 0;
     font-size: 18px;
     font-weight: bold;
+    font-family: 'poppins';
+    color: black !important;
 }
 
 .plant-info p {
     margin: 10px 0 0;
+    font-family: 'Poppins';
+    color: black;
 }
 
 .pagination {

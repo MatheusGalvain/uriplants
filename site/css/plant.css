@@ -101,16 +101,16 @@ main{
     flex-direction: column;
     flex-wrap: wrap;
 }
-.articletitleh1{
+.articletitle h1{
     font-size: 60px;
     font-weight: 400!important;
     font-style: normal!important;
     color: black!important;
     margin: 0;
 }
-.articletitleh2{
+.articletitle h2{
     font-size: 20px;
-    font-weight: 400!important;
+    font-weight: 300!important;
     font-style: normal!important;
     color: black!important;
     margin: 0;
@@ -267,6 +267,7 @@ button {width: 100%;}
 }
 .navigatorref:hover{
     text-decoration: none;
+    color: white !important;
 }
 .ecology, .taxonomy, .description, .occourrence{
     flex-direction: column;
@@ -313,17 +314,18 @@ button {width: 100%;}
     width: 100%;
     overflow: hidden;
 }
-.informationsarth1{
+.informationsart h1{
     font-size: 20px!important;
     color: #141414!important;
-    font-weight: 300!important;
-    margin: 0;
+    font-weight: 300 !important;
+    font-family: 'poppins';
 }
 
-.informationsarth2{
+.informationsart h2{
     font-size: 25px!important;
     color: #141414!important;
     font-weight: 300!important;
+    font-family: 'poppins';
 }
 
 .usefullinks{
@@ -414,6 +416,7 @@ button {width: 100%;}
     color: #141414;
     margin: 0;
     white-space: nowrap;
+    font-family: 'poppins';
 }
 .otherplants{
     display: flex;
@@ -495,6 +498,11 @@ button {width: 100%;}
     font-size: 12px;
     min-height: 50px;
     border-radius: 10px;
+}
+
+.btnotherplant:hover{
+    text-decoration: none;
+    color: white !important;
 }
 
 .slick-track {
@@ -773,4 +781,3 @@ button {width: 100%;}
     main{ margin-top: 0;}
     .go-to-listing-button {display: block;}
 }
-
