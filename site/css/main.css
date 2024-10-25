@@ -117,13 +117,14 @@ body::after {
   }
 
   
-
-/* reset botões por conta do footer e header carregado que sobrescrevem o código */
 button.btn:hover {
     color: black !important;
     background-color: white !important;
     font-family: 'Poppins', sans-serif !important;
+}
 
+a.usefullinks:hover {
+    color: black !important;
 }
 .btn:not(.filtrar_matriz_curso)::before {
     content: none !important;
