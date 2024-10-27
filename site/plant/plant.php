@@ -151,8 +151,8 @@ if (isset($_GET['id'])) {
         <section id="main-section" class="plantinfo">
             <div class="boximage">
                 <article class="articletitle">
-                    <h1 style="font-size: 60px!important "><?php echo $plantName; ?></h1>
-                    <h2>Conheça mais sobre a planta!</h2>
+                    <h1 style="font-size: 60px!important; font-family: 'poppins'; color: black;"><?php echo $plantName; ?></h1>
+                    <h2 style="font-family: 'poppins'; color: black;">Conheça mais sobre a planta!</h2>
                 </article>
                 <section class="photosplant">
                     <div class="photocentral-wrapp">
@@ -513,7 +513,7 @@ if (isset($_GET['id'])) {
                                         <?php endif; ?>
                                     </div>
                                     <div class="titleothersplants">
-                                        <h1><?php echo sanitize_input($otherPlant['name']); ?></h1>
+                                        <h1 style="white-space: break-spaces; min-height: 48px;"><?php echo sanitize_input($otherPlant['name']); ?></h1>
                                     </div>
                                 </div>
                                 <a class="btnotherplant" href="#">ACESSE</a>

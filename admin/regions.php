@@ -289,11 +289,10 @@ if ($stmt) {
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Nome</th>
-                                            <th>Descrição</th>
-                                            <th>Imagem</th>
-                                            <th>Fonte</th>
-                                            <th>Ações</th>
+                                            <th style="width: 14%">Nome</th>
+                                            <th style="width: 50%">Descrição</th>
+                                            <th>Imagem</th>  
+                                            <th style="width: 9%">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -309,7 +308,7 @@ if ($stmt) {
                                                             N/A
                                                         <?php } ?>
                                                     </td>
-                                                    <td><?php echo htmlspecialchars($row['source']); ?></td>
+                                                   
                                                     <td>
                                                         <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editRegionModal"
                                                             data-id="<?php echo htmlspecialchars($row['id']); ?>"
