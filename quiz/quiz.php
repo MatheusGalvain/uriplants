@@ -52,7 +52,7 @@
             </div>
         </div>
         <div id="quiz-container">
-            <h1 class="titlequiz">Bem Vindos ao <strong>URI Quiz</strong></h1>
+            <h1 class="titlequiz">Bem-vindos ao <strong>URI Quiz</strong></h1>
             <!-- <h2 class="subtitlequiz">Prepare-se para um desafio épico! Lembre-se, seu maior objetivo é alcançar uma pontuação inigualável sem cometer erros e se tornar o verdadeiro Deus das plantas!</h2> -->
             <div id="quizCarousel" class="carousel slide" data-bs-interval="false">
                 <div class="carousel-inner" id="carousel-inner"></div>
@@ -114,6 +114,8 @@
             wrap: false,
             keyboard: false
         });
+
+        quizCarouselElement.addEventListener('slid.bs.carousel', updateCarouselControls);
 
         $('.button-menu').click(function () {
             $(this).toggleClass('button-menu-close');
@@ -213,6 +215,7 @@
                 console.error(error);
                 questionEl.textContent = 'Erro ao carregar o quiz. Tente novamente mais tarde.';
             }
+            updateCarouselControls();
         }
 
         function handleAnswer(selectedOption, button) {

@@ -31,6 +31,13 @@
         width: 5px;
         height: 5px;
     }
+    .social-bar {
+        text-align: left!important;
+    }
+}
+
+a:hover {
+    color: white!important;
 }
 
 body {
@@ -117,8 +124,8 @@ button {
 
 
 button.btn:hover {
-    color: black !important;
-    background-color: white !important;
+    color: white !important;
+    background-color: #228B22 !important;
     font-family: 'Poppins', sans-serif !important;
 }
 

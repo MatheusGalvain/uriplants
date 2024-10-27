@@ -49,7 +49,7 @@ if (isset($_POST['login'])) {
                     <i class="fas fa-angle-left"></i>
                     Voltar ao site</a>
                     <div class="container-return">
-                        <h1>Bem Vindo de volta ao admin</h1>
+                        <h1>Bem-vindo de volta ao admin</h1>
                         <h2>URI Plants | Login</h2>
                     </div>
                 </article>

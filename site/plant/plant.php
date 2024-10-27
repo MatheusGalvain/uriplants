@@ -513,7 +513,7 @@ if (isset($_GET['id'])) {
                                         <?php endif; ?>
                                     </div>
                                     <div class="titleothersplants">
-                                        <h1><?php echo sanitize_input($otherPlant['name']); ?></h1>
+                                        <h1 style="white-space: break-spaces; min-height: 48px;"><?php echo sanitize_input($otherPlant['name']); ?></h1>
                                     </div>
                                 </div>
                                 <a class="btnotherplant" href="#">ACESSE</a>
