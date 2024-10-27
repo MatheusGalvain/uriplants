@@ -1,13 +1,12 @@
-
 @media (max-width: 480px) {
-            
+
     .slider {
-        border-bottom-left-radius: 60px; 
+        border-bottom-left-radius: 60px;
     }
 
     .slide-text {
         bottom: 40px;
-        right: 25px; 
+        right: 25px;
     }
 
     .button-group {
@@ -20,12 +19,12 @@
 
     .btn {
         width: 100%;
-        margin-bottom: 20px; 
+        margin-bottom: 20px;
 
     }
 
     .btn:last-child {
-        margin-bottom: 40px; 
+        margin-bottom: 40px;
     }
 
     .controls .dot {
@@ -34,20 +33,20 @@
     }
 }
 
-  body {
-      font-family: 'Poppins', sans-serif !important;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-      overflow-x: hidden;
-  }
+body {
+    font-family: 'Poppins', sans-serif !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    overflow-x: hidden;
+}
 
-  body::before {
+body::before {
     content: "";
     position: fixed;
     top: 0;
@@ -75,25 +74,25 @@ body::after {
     pointer-events: none;
 }
 
-  h1 {
-      margin-bottom: 40px;
-      color: #333;
-  }
-  
+h1 {
+    margin-bottom: 40px;
+    color: #333;
+}
 
-  .button-group {
-      display: flex;
-      justify-content: space-around;
-      gap: 60px;
-      z-index: 99;
-  }
 
-  .btn {
+.button-group {
+    display: flex;
+    justify-content: space-around;
+    gap: 60px;
+    z-index: 99;
+}
+
+.btn {
     padding: 15px 30px !important;
     margin: auto !important;
-    background-color: white !important; 
+    background-color: white !important;
     color: black !important;
-    border: 2px solid #228B22 !important; 
+    border: 2px solid #228B22 !important;
     border-radius: 5px !important;
     font-size: 1.1em !important;
     cursor: pointer !important;
@@ -109,14 +108,14 @@ body::after {
 }
 
 
-  button {
-      width: 90%;
-      background: none;
-      border: none;
-      padding: 0;
-  }
+button {
+    width: 90%;
+    background: none;
+    border: none;
+    padding: 0;
+}
 
-  
+
 button.btn:hover {
     color: black !important;
     background-color: white !important;
@@ -126,6 +125,7 @@ button.btn:hover {
 a.usefullinks:hover {
     color: black !important;
 }
+
 .btn:not(.filtrar_matriz_curso)::before {
     content: none !important;
     position: static !important;
@@ -143,137 +143,137 @@ a.usefullinks:hover {
 }
 
 
-  .button-title {
-      font-weight: bold;
-      font-size: 1.4em;
-      transform: translateY(8px);
-      color: black;
-      max-width: 200px;
-      font-family: 'Poppins', sans-serif !important;
-      margin-bottom: 12px;
+.button-title {
+    font-weight: bold;
+    font-size: 1.4em;
+    transform: translateY(8px);
+    color: black;
+    max-width: 200px;
+    font-family: 'Poppins', sans-serif !important;
+    margin-bottom: 12px;
 
-  }
+}
 
-  .subtitle {
-      font-size: 0.9em;
-      color: gray;
-      margin-left: 5px;
-  }
+.subtitle {
+    font-size: 0.9em;
+    color: gray;
+    margin-left: 5px;
+}
 
-  .slider {
-      position: relative;
-      width: 100%;
-      height: 55vh; 
-      overflow: hidden;
-  }
+.slider {
+    position: relative;
+    width: 100%;
+    height: 55vh;
+    overflow: hidden;
+}
 
-  .slider::before {
-      left: 0;
-      background: linear-gradient(to right, black, rgba(0, 0, 0, 0));
-  }
+.slider::before {
+    left: 0;
+    background: linear-gradient(to right, black, rgba(0, 0, 0, 0));
+}
 
-  .slider::after {
-      right: 0;
-      background: linear-gradient(to left, black, rgba(0, 0, 0, 0));
-  }
+.slider::after {
+    right: 0;
+    background: linear-gradient(to left, black, rgba(0, 0, 0, 0));
+}
 
-  .slides {
-      display: flex;
-      transition: transform 2s cubic-bezier(0.25, 0.1, 0.25, 1); 
-  }
+.slides {
+    display: flex;
+    transition: transform 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
 
-  .slide {
-      min-width: 100%;
-      background-size: cover;
-      background-position: center;
-      height: 55vh;
-      position: relative;
-  }
+.slide {
+    min-width: 100%;
+    background-size: cover;
+    background-position: center;
+    height: 55vh;
+    position: relative;
+}
 
-  .slide-text {
-      position: absolute;
-      bottom: 40px;
-      right: 50px; 
-      color: white;
-      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
-      z-index: 3; 
-  }
+.slide-text {
+    position: absolute;
+    bottom: 40px;
+    right: 50px;
+    color: white;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    z-index: 3;
+}
 
-  .slide-text h2 {
-      margin: 0;
-      color: white;
-      font-family: 'poppins';
-  }
+.slide-text h2 {
+    margin: 0;
+    color: white;
+    font-family: 'poppins';
+}
 
-  .slide-text p {
-      margin: 0;
-      max-width: 200px;
-      color: white;
-      font-family: 'poppins';
-  }
+.slide-text p {
+    margin: 0;
+    max-width: 200px;
+    color: white;
+    font-family: 'poppins';
+}
 
-  .controls {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      z-index: 3; 
-  }
+.controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 3;
+}
 
-  .controls .dot {
-      cursor: pointer;
-      height: 15px;
-      width: 15px;
-      background-color: rgba(255, 255, 255, 0.7);
-      border-radius: 50%;
-      display: inline-block;
-      transition: background-color 0.3s ease;
-  }
+.controls .dot {
+    cursor: pointer;
+    height: 15px;
+    width: 15px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
 
-  .controls .dot.active,
-  .controls .dot:hover {
-      background-color: rgba(255, 255, 255, 1);
-  }
+.controls .dot.active,
+.controls .dot:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
 
-  .background-div {
-      top: 0;
-      width: 100%;
-      z-index: 999;
-      background-color: transparent;
-  }
+.background-div {
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    background-color: transparent;
+}
 
-  .header {
-      display: flex;
-      flex-direction: column;
-      top: 0;
-      position: absolute;
-      width: 100%;
-      z-index: 1000; 
-  }
+.header {
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+}
 
-  .top-bar {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background-color: rgba(51, 51, 51, 0.8); 
-      color: white;
-  }
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: rgba(51, 51, 51, 0.8);
+    color: white;
+}
 
-  .logo-slider {
-      display: flex;
-      justify-content: flex-start;
-      padding: 20px 0;
-      background-color: rgba(0, 0, 0, 0.2);
-  }
+.logo-slider {
+    display: flex;
+    justify-content: flex-start;
+    padding: 20px 0;
+    background-color: rgba(0, 0, 0, 0.2);
+}
 
-  .logo-slider img {
-      max-height: 80px;
-  }
+.logo-slider img {
+    max-height: 80px;
+}
 
 
-  @media (max-width: 1000px) {
+@media (max-width: 1000px) {
     .button-group {
         margin-top: 20px;
         flex-direction: column;
@@ -282,8 +282,15 @@ a.usefullinks:hover {
         align-items: center;
         gap: 0px;
     }
+
     .btn:last-child {
         margin-bottom: 40px;
     }
+
 }
 
+@media screen and (max-width: 600px) {
+    .slide-text {
+        left: 50px;
+    }
+}
