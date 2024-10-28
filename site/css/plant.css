@@ -532,6 +532,12 @@ button {width: 100%;}
 ::-webkit-scrollbar {
     width: 12px;
 }
+/* .source {
+    font-style: italic; 
+    overflow:hidden; 
+    margin: 0;
+    max-width: 70vw;
+} */
 
 ::-webkit-scrollbar-track {
     background: #fff;
@@ -568,10 +574,7 @@ button {width: 100%;}
     }
     .otherphotos-wrapp{gap:15px;}
 }
-@media screen and (min-width: 1450px) {
-    .otherphotos-wrapp {
-    max-height: 900px;}
-}
+
 @media screen and (min-width: 1251px) and (max-width: 1450px) {
     .boxheader{
         width: 1200px;
@@ -772,7 +775,6 @@ button {width: 100%;}
         flex-wrap: nowrap;
         gap: 10px;
         overflow: hidden;
-        max-height: 900px;
     }
     .photocentral-wrapp{
         display: flex;
@@ -789,6 +791,7 @@ button {width: 100%;}
         align-items: flex-start;
         flex-direction: column;
         max-width: 140px;
+        max-height: 700px;
         gap: 10px;
         overflow-y: auto;
         overflow-x: hidden;

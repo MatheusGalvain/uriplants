@@ -167,6 +167,7 @@ if (isset($_GET['id'])) {
                             ?>
                             <img id="mainImage" class="photoImg" src="<?php echo $mainImageSrc; ?>"
                                 alt="<?php echo sanitize_input($plantImageAlt); ?>">
+                                <p class="source"><?php echo htmlspecialchars($plant['image_source']); ?></p>
                         </div>
                     </div>
                     <div class="otherphotos-wrapp">
@@ -179,18 +180,16 @@ if (isset($_GET['id'])) {
                         <?php if (!empty($plantImages)): ?>
                             <?php foreach ($plantImages as $image): ?>
                                 <?php if ($count < $maxPhotos && $image['image_blob'] !== base64_encode($mainImageSrc)): ?>
-                                    <div class="otherphotodiv"
-                                    onclick="changeMainImage('data:image/jpeg;base64,<?php echo $image['image_blob']; ?>')">
-                                    <img class="otherphoto" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
-                                    alt="<?php echo sanitize_input($plantName); ?>">
-                                </div>
+                                    <div class="otherphotodiv" onclick="changeMainImage('data:image/jpeg;base64,<?php echo $image['image_blob']; ?>', '<?php echo htmlspecialchars($image['image_source']); ?>')">
+    <img class="otherphoto" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>" alt="<?php echo sanitize_input($plantName); ?>">
+</div>
                                 <?php $count++; ?>
                                 <?php endif; ?>
                                 <?php endforeach; ?>
-                                <?php endif; ?>
-                            </div>
-                        </section>
-                        <span class="source" style="font-style: italic;"><?php echo htmlspecialchars($plant['image_source']); ?></span>
+                            <?php endif; ?>
+                            
+                    </div>
+                    </section>
             </div>
         </section>
 
@@ -550,8 +549,9 @@ if (isset($_GET['id'])) {
             }
         });
 
-        function changeMainImage(imageSrc) {
+        function changeMainImage(imageSrc, imageSource) {
             document.getElementById('mainImage').src = imageSrc;
+            document.querySelector('.source').innerText = imageSource;
         }
 
         function goToPlant(plantId) {
