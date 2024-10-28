@@ -13,6 +13,7 @@ main{
     z-index: 999;
     width: 100%;
     margin-top: 120px;
+    overflow: hidden;
 }
 
 .navigatorcontainer{
@@ -91,7 +92,7 @@ main{
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    gap: 50px;
+
 }
 .articletitle{
     display: flex;
@@ -119,7 +120,7 @@ main{
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    align-content: flex-start;
+    border-radius: 8px;
     flex-direction: row;
     flex-wrap: nowrap;
     gap: 10px;
@@ -156,9 +157,10 @@ main{
 
 .photoImg{
     border-radius: 8px;
-    min-width: 100%;
-    object-fit: cover;
-    min-height: 100%;
+    max-width: inherit;
+    max-height: inherit;
+    height: inherit;
+    width: inherit;
 }
 .otherphotos-wrapp{
     display: flex;
@@ -169,6 +171,7 @@ main{
     flex-wrap: wrap;
     max-width: 100%;
     gap: 10px;
+    flex-wrap: nowrap;
 }
 .otherphotodiv{
     display: block;
@@ -565,6 +568,10 @@ button {width: 100%;}
     }
     .otherphotos-wrapp{gap:15px;}
 }
+@media screen and (min-width: 1450px) {
+    .otherphotos-wrapp {
+    max-height: 900px;}
+}
 @media screen and (min-width: 1251px) and (max-width: 1450px) {
     .boxheader{
         width: 1200px;
@@ -577,7 +584,7 @@ button {width: 100%;}
     }
     .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
     .photocentral{width: 850px;}
-    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap; max-height: 710px;}
     .otherplant{width: 280px;}
 
 }
@@ -593,7 +600,7 @@ button {width: 100%;}
     }
     .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
     .photocentral{width: 850px;}
-    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap; max-height: 710px;}
     .otherplant{width: 260px;}
 }
 @media screen and (min-width: 1024px) and (max-width: 1150px) {
@@ -608,10 +615,11 @@ button {width: 100%;}
     }
     .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
     .photocentral{width: 850px;}
-    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
+    .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap; max-height: 710px;}
     .otherplant{width: 240px;}
 }
 @media screen and (min-width: 800px) and (max-width: 1024px) {
+
     body::after{background-image: none;}
     #header .topheader,.bottomheader{display: none;}
     #main-menu-mobile{ display: flex; }
@@ -630,7 +638,6 @@ button {width: 100%;}
     .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
     .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
-	
 }
 @media screen and (min-width: 599px) and (max-width: 799px) {
     body::after{background-image: none;}
@@ -755,7 +762,40 @@ button {width: 100%;}
 }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (min-width: 801px) { 
+	.photosplant{
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 10px;
+        overflow: hidden;
+        max-height: 900px;
+    }
+    .photocentral-wrapp{
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+    
+    .otherphotos-wrapp{
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: column;
+        max-width: 140px;
+        gap: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}
+
+@media screen and (max-width: 800px) {
 
     .photoproperty-wrapp{
         min-width: 88px!important;
@@ -780,4 +820,42 @@ button {width: 100%;}
     }
     main{ margin-top: 0;}
     .go-to-listing-button {display: block;}
+    .otherphotos-wrapp {
+        overflow: auto;
+        max-width: 89vw;
+        margin: 0 1vw;
+    }
+    .navbar {
+        pointer-events: none;
+        background-color: transparent!important;
+    }
+    .source {
+        margin-left:55px;
+    }
+}
+
+@media screen and (min-width: 800px) and (max-width: 1024px)  { 
+    .photosplant {        
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        display: flex;
+        
+    }
+    .photocentral-wrapp {
+        width: 100%;
+        flex-direction: column;
+        flex-wrap: wrap;
+    }
+    .otherphotos-wrapp {
+        overflow: auto;
+        max-width: 89vw;
+        margin: 0 1vw;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+    .source {
+        margin-left:55px;
+    }
 }
