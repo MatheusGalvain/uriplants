@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
         $deleteUserId = intval($_POST['delete']);
         
-        if ($deleteUserId) {
+        if ($deleteUserId != 1) {
             $deleteQuery = "DELETE FROM users WHERE id='$deleteUserId'";
             $msg = mysqli_query($con, $deleteQuery);
             
@@ -133,15 +133,24 @@ if ($editUserId) {
                                                 <td><?php echo htmlspecialchars($row['fname']); ?></td>
                                                 <td><?php echo htmlspecialchars($row['email']); ?></td>
                                                 <?php if ($isAdmin): ?>
-                                                    <td>
+                                                <td>
+                                                    <?php if ($row['id'] == 1): ?>
+                                                        <button class="btn btn-outline-secondary btn-sm" disabled>
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm" disabled>
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    <?php else: ?>
                                                         <a href="?uid=<?php echo $row['id']; ?>" class="btn btn-outline-secondary btn-sm">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                         <a href="#" class="btn btn-danger btn-sm delete-user-btn" data-user-id="<?php echo $row['id']; ?>">
-                                                            <i class="fa fa-trash" ></i>
+                                                            <i class="fa fa-trash"></i>
                                                         </a>
-                                                    </td>
-                                                <?php endif; ?>
+                                                    <?php endif; ?>
+                                                </td>
+                                            <?php endif; ?>
                                             </tr>
                                         <?php $cnt++; } ?>
                                     </tbody>
