@@ -47,7 +47,7 @@
         <div class="container-wrapp">
             <div class="container-infos">
                 <div class="header-container">
-                    <a href="../" class="icon-container">
+                <a href="../home.php" class="icon-container">
                         <i class="fas fa-angle-left"></i>
                     </a>
                     <div class="text-container">
