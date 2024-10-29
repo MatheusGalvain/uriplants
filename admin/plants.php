@@ -749,8 +749,6 @@ $qrcode_base_url = get_qrcode_url($con);
         .plant-names {
             height: 20px;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
             width: 100%;
         }
         .plant-names-cont {
@@ -961,7 +959,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <tr>
                                         <th>Nome científico</th>
                                         <th>Nomes populares</th>
-                                        <th style="width: 14%">Ações</th>
+                                        <th>Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -974,9 +972,11 @@ $qrcode_base_url = get_qrcode_url($con);
                                             <td><?php echo htmlspecialchars($row['name']); ?></td>
                                             <td ><div class="plant-names-cont">  <p class="plant-names"> <?php echo htmlspecialchars($row['common_names']); ?></p> </div></td>
                                             <td>
-                                                <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-sm">Editar</a>
-                                                <button type="button" class="btn btn-primary btn-sm qrcode-button" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">QR Code</button>
-                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">Excluir</button>
+                                                <div style="display: flex; gap: 2px">
+                                                    <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-sm">Editar</a>
+                                                    <button type="button" class="btn btn-primary btn-sm qrcode-button" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">QR Code</button>
+                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">Excluir</button>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php } ?>

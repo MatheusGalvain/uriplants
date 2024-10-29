@@ -289,10 +289,10 @@ if ($stmt) {
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th style="width: 14%">Nome</th>
-                                            <th style="width: 50%">Descrição</th>
+                                            <th>Nome</th>
+                                            <th>Descrição</th>
                                             <th>Imagem</th>  
-                                            <th style="width: 9%">Ações</th>
+                                            <th>Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -310,18 +310,21 @@ if ($stmt) {
                                                     </td>
                                                    
                                                     <td>
-                                                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editRegionModal"
-                                                            data-id="<?php echo htmlspecialchars($row['id']); ?>"
-                                                            data-name="<?php echo htmlspecialchars($row['name']); ?>"
-                                                            data-source="<?php echo htmlspecialchars($row['source']); ?>"
-                                                            data-description="<?php echo htmlspecialchars($row['description']); ?>">
-                                                            Editar
-                                                        </button>
+                                                        <div style="display: flex; gap: 2px">
 
-                                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
-                                                            data-id="<?php echo htmlspecialchars($row['id']); ?>">
-                                                            Excluir
-                                                        </button>
+                                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editRegionModal"
+                                                                data-id="<?php echo htmlspecialchars($row['id']); ?>"
+                                                                data-name="<?php echo htmlspecialchars($row['name']); ?>"
+                                                                data-source="<?php echo htmlspecialchars($row['source']); ?>"
+                                                                data-description="<?php echo htmlspecialchars($row['description']); ?>">
+                                                                Editar
+                                                            </button>
+    
+                                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                                                                data-id="<?php echo htmlspecialchars($row['id']); ?>">
+                                                                Excluir
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             <?php } ?>
