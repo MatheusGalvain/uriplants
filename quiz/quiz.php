@@ -41,7 +41,7 @@
         <div class="container-wrapp">
             <div class="container-infos">
                 <div class="header-container">
-                    <a href="../site/home.php" class="icon-container">
+                    <a href="../site/index.php" class="icon-container">
                         <i class="fas fa-angle-left"></i>
                     </a>
                     <div class="text-container">

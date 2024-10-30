@@ -45,7 +45,7 @@ if (isset($_POST['login'])) {
             <div class="container">
                 <article class="title-admin">
                     <!-- TODO:  Ajustar href -->
-                    <a class="returnbtn" href="../site/home.php" alt="Link do Site"> 
+                    <a class="returnbtn" href="../site/index.php" alt="Link do Site"> 
                     <i class="fas fa-angle-left"></i>
                     Voltar ao site</a>
                     <div class="container-return">
