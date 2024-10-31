@@ -223,9 +223,15 @@ main{
 button {width: 100%;}
 
 .go-to-listing-button {
-    display: none;
+
     text-align: center;
     width: 200px;
+}
+
+.btnHolder {
+    display: flex;  
+    gap: 5px;
+
 }
 
 .go-to-listing-button button {
@@ -822,6 +828,7 @@ button {width: 100%;}
         width: 320px;
     }
     main{ margin-top: 0;}
+    .btnHolder{ flex-direction: column;}
     .go-to-listing-button {display: block;}
     .otherphotos-wrapp {
         overflow: auto;

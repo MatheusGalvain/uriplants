@@ -524,11 +524,13 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
         </section>
-        <div class="go-to-listing-button">
-            <button style="margin-bottom: 10px;" onclick="window.location.href='../list/list.php'">Ir para todas as plantas</button>
-        </div>
-        <div class="go-to-listing-button" style="display:block;">
-            <button style="margin-bottom: 40px;" onclick="window.location.href='../../quiz/quiz.php'">URI Quiz</button>
+        <div class="btnHolder">
+            <div class="go-to-listing-button">
+                <button style="margin-bottom: 10px;" onclick="window.location.href='../list/list.php'">Lista geral</button>
+            </div>
+            <div class="go-to-listing-button" style="display:block;">
+                <button style="margin-bottom: 40px;" onclick="window.location.href='../../quiz/quiz.php'">URI Quiz</button>
+            </div>
         </div>
         <div id ="resultR"></div>
     </main>
