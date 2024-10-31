@@ -356,7 +356,7 @@ if (isset($_GET['id'])) {
                     <article class="informationsart">
                         <h1>Casca</h1>
                         <h2><?php echo $barkDescription; ?></h2>
-                        <div class="photos-wrapp">
+                        <div class="photos-wrapp scroll-container">
                             <?php
                             $propertyId = 3;
                             $plantImages = $plantController->getPlantImages($id, $propertyId);
@@ -384,7 +384,7 @@ if (isset($_GET['id'])) {
                     <article class="informationsart">
                         <h1>Folhas</h1>
                         <h2><?php echo $leafDescription; ?></h2>
-                        <div class="photos-wrapp">
+                        <div class="photos-wrapp scroll-container">
                             <?php
                             $propertyId = 4;
                             $plantImages = $plantController->getPlantImages($id, $propertyId);
@@ -412,7 +412,7 @@ if (isset($_GET['id'])) {
                     <article class="informationsart">
                         <h1>Flores</h1>
                         <h2><?php echo $flowerDescription; ?></h2>
-                        <div class="photos-wrapp">
+                        <div class="photos-wrapp scroll-container">
                             <?php
                             $propertyId = 5;
                             $plantImages = $plantController->getPlantImages($id, $propertyId);
@@ -440,7 +440,7 @@ if (isset($_GET['id'])) {
                     <article class="informationsart">
                         <h1>Frutos</h1>
                         <h2><?php echo $fruitDescription; ?></h2>
-                        <div class="photos-wrapp">
+                        <div class="photos-wrapp scroll-container">
                             <?php
                             $propertyId = 6;
                             $plantImages = $plantController->getPlantImages($id, $propertyId);
@@ -468,7 +468,7 @@ if (isset($_GET['id'])) {
                     <article class="informationsart">
                         <h1>Sementes</h1>
                         <h2><?php echo $seedDescription; ?></h2>
-                        <div class="photos-wrapp">
+                        <div class="photos-wrapp scroll-container">
                             <?php
                             $propertyId = 7;
                             $plantImages = $plantController->getPlantImages($id, $propertyId);
