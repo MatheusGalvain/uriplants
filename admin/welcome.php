@@ -16,6 +16,7 @@ $stmt->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Dashboard</title>
@@ -56,4 +57,5 @@ $stmt->close();
         </div>
     </div>
 </body>
+
 </html>

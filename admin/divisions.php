@@ -18,14 +18,13 @@ if (isset($_POST['add_division'])) {
             $new_class_id = mysqli_insert_id($con);
 
             $table = 'Divisões';
-            $action_id = 1; 
+            $action_id = 1;
             $changed_by = $_SESSION['id'];
-            $old_value = null; 
+            $old_value = null;
             $new_value = "ID: $new_class_id, Nome: $name";
             $plant_id = null;
 
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
         } else {
             $error = "Erro ao adicionar divisão: " . mysqli_error($con);
         }
@@ -44,14 +43,13 @@ if (isset($_POST['delete_division'])) {
         $success = "Divisão excluída com sucesso.";
 
         $table = 'Divisões';
-        $action_id = 2; 
+        $action_id = 2;
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";
-        $new_value = null; 
-        $plant_id = null; 
+        $new_value = null;
+        $plant_id = null;
 
         log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
     } else {
         $error = "Erro ao excluir divisão: " . mysqli_error($con);
     }
@@ -73,14 +71,14 @@ if (isset($_POST['edit_division'])) {
         if (mysqli_query($con, $sql)) {
             $success = "Divisão editada com sucesso.";
 
-        $table = 'Divisões';
-        $action_id = 3; 
-        $changed_by = $_SESSION['id'];
-        $old_value = "$old_name";
-        $new_value = "$name";
-        $plant_id = null; 
+            $table = 'Divisões';
+            $action_id = 3;
+            $changed_by = $_SESSION['id'];
+            $old_value = "$old_name";
+            $new_value = "$name";
+            $plant_id = null;
 
-        log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
+            log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
         } else {
             $error = "Erro ao editar divisão: " . mysqli_error($con);
         }
@@ -146,51 +144,51 @@ $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at I
 
                     <div class="card mb-4">
                         <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title mb-0">Divisões Cadastradas</h5>
-                            <form method="GET" action="" class="d-flex">
-                                <input type="text" class="form-control me-2" name="search" placeholder="Buscar divisões" value="<?php echo htmlspecialchars($search); ?>">
-                                <button class="btn btn-primary" type="submit">Buscar</button>
-                                <?php if ($search) { ?>
-                                    <a href="divisions.php" class="btn btn-secondary ms-2 w-100">Remover Filtro</a>
-                                <?php } ?>
-                            </form>
-                        </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Divisões Cadastradas</h5>
+                                <form method="GET" action="" class="d-flex">
+                                    <input type="text" class="form-control me-2" name="search" placeholder="Buscar divisões" value="<?php echo htmlspecialchars($search); ?>">
+                                    <button class="btn btn-primary" type="submit">Buscar</button>
+                                    <?php if ($search) { ?>
+                                        <a href="divisions.php" class="btn btn-secondary ms-2 w-100">Remover Filtro</a>
+                                    <?php } ?>
+                                </form>
+                            </div>
 
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Nome da divisão</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($row = mysqli_fetch_array($divisionsQuery)) { ?>
+                            <table class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                        <td>
-                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editDivisionModal" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">
-                                                Editar
-                                            </button>
-
-                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
-                                                Excluir
-                                            </button>
-                                        </td>
+                                        <th>Nome da divisão</th>
+                                        <th>Ações</th>
                                     </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = mysqli_fetch_array($divisionsQuery)) { ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                            <td>
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editDivisionModal" data-id="<?php echo htmlspecialchars($row['id']); ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>">
+                                                    Editar
+                                                </button>
+
+                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="<?php echo htmlspecialchars($row['id']); ?>">
+                                                    Excluir
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                <?php include('includes/pagination.php'); ?> 
+                    <?php include('includes/pagination.php'); ?>
             </main>
             <?php include('includes/footer.php'); ?>
         </div>
-        </div>
+    </div>
     </div>
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -211,7 +209,7 @@ $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at I
         </div>
     </div>
 
-    <div class="modal fade" id="editDivisionModal" tabindex="-1" aria-labelledby="editDivisionModalLabel" >
+    <div class="modal fade" id="editDivisionModal" tabindex="-1" aria-labelledby="editDivisionModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -240,7 +238,7 @@ $divisionsQuery = mysqli_query($con, "SELECT * FROM Divisions WHERE deleted_at I
             var editIdInput = document.getElementById('editId');
             var editNameInput = document.getElementById('editName');
             var editButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-            
+
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');

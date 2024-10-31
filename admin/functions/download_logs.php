@@ -63,4 +63,3 @@ if ($result) {
 
 fclose($output);
 exit();
-?>

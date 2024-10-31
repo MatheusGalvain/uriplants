@@ -1,7 +1,8 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 
-class PlantController {
+class PlantController
+{
 
     /**
      * Obtém uma única planta pelo ID.
@@ -9,7 +10,8 @@ class PlantController {
      * @param int $id
      * @return array|null
      */
-    public function getSinglePlant($id) {
+    public function getSinglePlant($id)
+    {
         if ($id <= 0) {
             return ["message" => "Parâmetro 'id' inválido"];
         }
@@ -37,7 +39,7 @@ class PlantController {
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                 WHERE plants.id = ?
-                ORDER BY images.sort_order ASC"; 
+                ORDER BY images.sort_order ASC";
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -50,7 +52,7 @@ class PlantController {
             $result = $stmt->get_result();
             if ($result->num_rows > 0) {
                 $plant = $result->fetch_assoc();
-                
+
                 if (!empty($plant['region_map_image'])) {
                     $plant['region_map_image'] = base64_encode($plant['region_map_image']);
                 }
@@ -81,49 +83,50 @@ class PlantController {
      * @param int $page
      * @return array
      */
-    public function getPlants($limit = 10, $page = 1, $query = '') {
+    public function getPlants($limit = 10, $page = 1, $query = '')
+    {
         if ($limit <= 0) $limit = 10;
         if ($page <= 0) $page = 1;
-    
+
         $offset = ($page - 1) * $limit;
-    
+
         $conn = getConnection();
-    
+
         // Consulta com query
         $countSql = "SELECT COUNT(DISTINCT plants.id) as total FROM plants
                      LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                      LEFT JOIN properties ON plantsproperties.property_id = properties.id
                      LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                      WHERE plants.deleted_at IS NULL";
-    
+
         if (!empty($query)) {
             $countSql .= " AND plants.name LIKE ?";
             $query = "%" . $query . "%";
         }
-    
+
         $countStmt = $conn->prepare($countSql);
         if (!$countStmt) {
             return ["message" => "Erro na preparação da consulta de contagem", "error" => $conn->error];
         }
-    
+
         if (!empty($query)) {
             $countStmt->bind_param("s", $query);
         }
-    
+
         if (!$countStmt->execute()) {
             $error = ["message" => "Erro ao contar plantas", "error" => $countStmt->error];
             $countStmt->close();
             $conn->close();
             return $error;
         }
-    
+
         $countResult = $countStmt->get_result();
         $totalPlants = 0;
         if ($row = $countResult->fetch_assoc()) {
             $totalPlants = intval($row['total']);
         }
         $totalPages = ceil($totalPlants / $limit);
-    
+
         $countStmt->close();
         $sql = "SELECT 
                     plants.id,
@@ -136,27 +139,27 @@ class PlantController {
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                 WHERE plants.deleted_at IS NULL";
-    
+
         if (!empty($query)) {
             $sql .= " AND plants.name LIKE ?";
         }
-    
+
         $sql .= " GROUP BY plants.id
                   ORDER BY images.sort_order ASC, plants.id ASC
-                  LIMIT ? OFFSET ?"; 
-    
+                  LIMIT ? OFFSET ?";
+
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             $conn->close();
             return ["message" => "Erro na preparação da consulta padrão", "error" => $conn->error];
         }
-    
+
         if (!empty($query)) {
             $stmt->bind_param("sii", $query, $limit, $offset);
         } else {
             $stmt->bind_param("ii", $limit, $offset);
         }
-    
+
         if ($stmt->execute()) {
             $result = $stmt->get_result();
             $plants = [];
@@ -168,10 +171,10 @@ class PlantController {
                     $plants[] = $row;
                 }
             }
-    
+
             $stmt->close();
             $conn->close();
-    
+
             return [
                 "plants" => $plants,
                 "totalPlants" => $totalPlants,
@@ -185,10 +188,11 @@ class PlantController {
             return $error;
         }
     }
-    
-    public function get() {
+
+    public function get()
+    {
         header('Content-Type: application/json; charset=utf-8');
-    
+
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (isset($_GET['id'])) {
                 $id = intval($_GET['id']);
@@ -196,36 +200,37 @@ class PlantController {
                 echo json_encode($plant, JSON_UNESCAPED_UNICODE);
                 return;
             }
-    
+
             $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
             $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-    
+
             $plantsData = $this->getPlants($limit, $page, isset($_GET['query']) ? $_GET['query'] : '');
-    
+
             echo json_encode($plantsData, JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode(["message" => "Método não suportado"], JSON_UNESCAPED_UNICODE);
         }
     }
 
-    public function getOtherPlants($currentPlantId, $limit = 4) {
+    public function getOtherPlants($currentPlantId, $limit = 4)
+    {
         $conn = getConnection();
-        
+
         $sql = "SELECT plants.id, plants.name, images.imagem AS image_blob
                 FROM plants
                 LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
                 LEFT JOIN properties ON plantsproperties.property_id = properties.id
                 LEFT JOIN images ON plantsproperties.id = images.plants_property_id
                 WHERE plants.id != ? AND properties.id = 1
-                ORDER BY images.sort_order ASC, RAND() LIMIT ?"; 
-        
+                ORDER BY images.sort_order ASC, RAND() LIMIT ?";
+
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
         }
-    
+
         $stmt->bind_param("ii", $currentPlantId, $limit);
-    
+
         if ($stmt->execute()) {
             $result = $stmt->get_result();
             $otherPlants = [];
@@ -235,7 +240,7 @@ class PlantController {
                 }
                 $otherPlants[] = $row;
             }
-    
+
             $stmt->close();
             $conn->close();
             return $otherPlants;
@@ -247,23 +252,24 @@ class PlantController {
         }
     }
 
-    public function getPlantImages($plantId, $propertyId) {
+    public function getPlantImages($plantId, $propertyId)
+    {
         $conn = getConnection();
-        
+
         $sql = "SELECT images.imagem AS image_blob, images.source AS image_source, properties.name AS property_name
                 FROM images
                 JOIN plantsproperties ON images.plants_property_id = plantsproperties.id
                 JOIN properties ON plantsproperties.property_id = properties.id
                 WHERE plantsproperties.plant_id = ? AND plantsproperties.property_id = ?
-                ORDER BY images.sort_order ASC"; 
-        
+                ORDER BY images.sort_order ASC";
+
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
         }
-    
+
         $stmt->bind_param("ii", $plantId, $propertyId);
-    
+
         if ($stmt->execute()) {
             $result = $stmt->get_result();
             $images = [];
@@ -273,7 +279,7 @@ class PlantController {
                 }
                 $images[] = $row;
             }
-    
+
             $stmt->close();
             $conn->close();
             return $images;
@@ -285,28 +291,29 @@ class PlantController {
         }
     }
 
-    public function getUsefullLinks($plantId) {
+    public function getUsefullLinks($plantId)
+    {
         $conn = getConnection();
-        
+
         $sql = "SELECT name, link
                 FROM usefullinks
                 WHERE plant_id = ?
                 AND deleted_at IS NULL;";
-        
+
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             return ["message" => "Erro na preparação da consulta", "error" => $conn->error];
         }
-    
+
         $stmt->bind_param("i", $plantId);
-    
+
         if ($stmt->execute()) {
             $result = $stmt->get_result();
             $u_links = [];
             while ($row = $result->fetch_assoc()) {
                 $u_links[] = $row;
             }
-    
+
             $stmt->close();
             $conn->close();
             return $u_links;
@@ -318,4 +325,3 @@ class PlantController {
         }
     }
 }
-?>

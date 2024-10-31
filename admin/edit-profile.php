@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once('includes/config.php');
 
 check_user_session();
@@ -25,21 +25,23 @@ if (isset($_POST['update'])) {
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Editar Perfil</title>
 
 </head>
+
 <body class="sb-nav-fixed">
     <?php include_once('includes/navbar.php'); ?>
-    
+
     <div id="layoutSidenav">
         <?php include_once('includes/sidebar.php'); ?>
 
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <?php 
+                    <?php
                     $userid = $_SESSION['id'];
 
                     if ($stmt = $con->prepare("SELECT fname, email FROM users WHERE id = ?")) {
@@ -63,7 +65,7 @@ if (isset($_POST['update'])) {
                                 </tr>
                                 <tr>
                                     <th>Email:</th>
-                                    <td >
+                                    <td>
                                         <input class="form-control" id="email" name="email" type="email" value="<?php echo htmlspecialchars($email_db); ?>" required />
                                     </td>
                                 </tr>
@@ -80,13 +82,13 @@ if (isset($_POST['update'])) {
                     </div>
                 </div>
             </main>
-            
+
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
 
     <!-- Modal de Mensagem -->
-    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" >
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -108,18 +110,19 @@ if (isset($_POST['update'])) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <?php if (!empty($message)): ?>
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            var message = <?php echo json_encode($message); ?>;
-            document.getElementById('messageModalBody').textContent = message;
 
-            var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
-            messageModal.show();
-        });
-    </script>
+    <?php if (!empty($message)): ?>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                var message = <?php echo json_encode($message); ?>;
+                document.getElementById('messageModalBody').textContent = message;
+
+                var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+                messageModal.show();
+            });
+        </script>
     <?php endif; ?>
 
 </body>
+
 </html>

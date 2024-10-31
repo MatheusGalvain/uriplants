@@ -13,33 +13,33 @@
     <link rel="stylesheet" href="site/css/main.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-    crossorigin="anonymous"></script>
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
     <script>
-    $(document).ready(function() {
-        $.ajax({
-            type: 'post',
-            url: 'https://uricer.edu.br/requisicoes/cabecalho.php',
-            data: 'req=' + true,
-            dataType: 'html'
-        }).then((result) => {
-            $('#resultH').html(result);
-        });
+        $(document).ready(function() {
+            $.ajax({
+                type: 'post',
+                url: 'https://uricer.edu.br/requisicoes/cabecalho.php',
+                data: 'req=' + true,
+                dataType: 'html'
+            }).then((result) => {
+                $('#resultH').html(result);
+            });
 
-        $.ajax({
-            type: 'post',
-            url: 'https://uricer.edu.br/requisicoes/rodape.php',
-            data: 'req=' + true,
-            dataType: 'html'
-        }).then((result) => {
-            $('#resultR').html(result);
+            $.ajax({
+                type: 'post',
+                url: 'https://uricer.edu.br/requisicoes/rodape.php',
+                data: 'req=' + true,
+                dataType: 'html'
+            }).then((result) => {
+                $('#resultR').html(result);
+            });
         });
-    });
-</script>
+    </script>
 
     <script src="https://kit.fontawesome.com/70aed2b9f4.js" crossorigin="anonymous"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             let currentSlide = 0;
             const slidesContainer = document.querySelector('.slides');
             const slides = document.querySelectorAll('.slide');
@@ -54,9 +54,9 @@
             const updatedTotalSlides = slidesContainer.querySelectorAll('.slide').length;
 
             function updateSlide(index) {
-                if (isTransitioning) return; 
+                if (isTransitioning) return;
                 isTransitioning = true;
-                slidesContainer.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)'; 
+                slidesContainer.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)';
                 slidesContainer.style.transform = `translateX(-${index * 100}%)`;
                 currentSlide = index;
                 updateDots();
@@ -70,14 +70,14 @@
 
             slidesContainer.addEventListener('transitionend', () => {
                 if (currentSlide === updatedTotalSlides - 1) {
-                    
+
                     slidesContainer.style.transition = 'none';
                     slidesContainer.style.transform = `translateX(0)`;
                     currentSlide = 0;
                     updateDots();
-                    
+
                     void slidesContainer.offsetWidth;
-                    
+
                     slidesContainer.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)';
                 }
                 isTransitioning = false;
@@ -86,14 +86,14 @@
             dots.forEach((dot, index) => {
                 dot.addEventListener('click', () => {
                     updateSlide(index);
-                    resetInterval(); 
+                    resetInterval();
                 });
             });
 
             function startSlideShow() {
                 slideInterval = setInterval(() => {
                     updateSlide(currentSlide + 1);
-                }, 10000); 
+                }, 10000);
             }
 
             function resetInterval() {
@@ -110,9 +110,9 @@
 
 <body>
     <header class="background-div">
-    <!-- HEADER URI -->
-    <div id ="resultH"></div>
-       
+        <!-- HEADER URI -->
+        <div id="resultH"></div>
+
         <div class="slider">
             <div class="slides">
                 <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%), url('site/images/bg1.jpg'); ">
@@ -134,7 +134,7 @@
                     </div>
                 </div>
             </div>
-    
+
             <div class="controls">
                 <span class="dot active"></span>
                 <span class="dot"></span>
@@ -158,9 +158,10 @@
     </div>
 
     <!-- FOOTER URI -->
-     <footer>
-         <div id ="resultR"></div>
-     </footer>
-   
+    <footer>
+        <div id="resultR"></div>
+    </footer>
+
 </body>
+
 </html>

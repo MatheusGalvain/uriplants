@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <title>Quiz de Plantas</title>
@@ -30,8 +31,8 @@
     <link rel="stylesheet" href="../site/css/footer.css">
     <link rel="stylesheet" href="../site/css/listplant_responsive.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-    crossorigin="anonymous"></script>
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../site/css/quiz.css">
 </head>
 
@@ -117,12 +118,12 @@
 
         quizCarouselElement.addEventListener('slid.bs.carousel', updateCarouselControls);
 
-        $('.button-menu').click(function () {
+        $('.button-menu').click(function() {
             $(this).toggleClass('button-menu-close');
             $('#main-menu-mobile-items').toggleClass('main-menu-mobile-items-open');
         });
 
-        $('.item-menu').click(function () {
+        $('.item-menu').click(function() {
 
             $('.menu-link').removeClass('activeheader');
 
@@ -147,7 +148,7 @@
             nextButton.style.display = currentIndex === totalItems - 1 ? 'none' : 'flex';
         }
 
-        bootstrap.Carousel.prototype.getActiveIndex = function () {
+        bootstrap.Carousel.prototype.getActiveIndex = function() {
             return Array.from(this._element.querySelectorAll('.carousel-item')).indexOf(this._element.querySelector('.carousel-item.active'));
         };
 
@@ -209,7 +210,10 @@
                     button.onclick = () => handleAnswer(option, button);
                     optionsEl.appendChild(button);
                 });
-                nextButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                nextButton.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
 
             } catch (error) {
                 console.error(error);
@@ -257,4 +261,5 @@
         window.onload = fetchQuiz;
     </script>
 </body>
+
 </html>

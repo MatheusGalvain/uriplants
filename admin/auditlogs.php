@@ -3,7 +3,8 @@ include_once('includes/config.php');
 
 check_user_session();
 
-function display_value($value) {
+function display_value($value)
+{
     return isset($value) ? htmlspecialchars($value) : 'N/A';
 }
 
@@ -61,11 +62,13 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <?php include_once("includes/head.php"); ?>
     <link href="css/pagination.css" rel="stylesheet" />
     <title>Admin | Gerenciamento de Logs</title>
 </head>
+
 <body class="sb-nav-fixed">
     <?php include_once('includes/navbar.php'); ?>
     <div id="layoutSidenav">
@@ -107,7 +110,7 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                                 <td><?php echo htmlspecialchars($row['id']); ?></td>
                                                 <td><?php echo display_value($row['table_name']); ?></td>
                                                 <td>
-                                                    <?php 
+                                                    <?php
                                                     if (!empty($row['plant_id']) && !empty($row['plantName'])) {
                                                         echo htmlspecialchars($row['plant_id']) . ' - ' . htmlspecialchars($row['plantName']);
                                                     } else {
@@ -117,7 +120,7 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                                 </td>
                                                 <td><?php echo display_value($row['actionName']); ?></td>
                                                 <td>
-                                                    <?php 
+                                                    <?php
                                                     if (!empty($row['userName']) && !empty($row['email'])) {
                                                         echo htmlspecialchars($row['userName']) . ' - ' . htmlspecialchars($row['email']);
                                                     } else {
@@ -137,9 +140,9 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <?php endif; ?>
                                 </tbody>
                             </table>
-                            <?php 
+                            <?php
                             $_GET['search'] = $search;
-                            include('includes/pagination.php'); 
+                            include('includes/pagination.php');
                             ?>
                         </div>
                     </div>
@@ -149,4 +152,5 @@ $logs = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
         </div>
     </div>
 </body>
+
 </html>

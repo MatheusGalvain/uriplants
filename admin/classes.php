@@ -18,14 +18,13 @@ if (isset($_POST['add_class'])) {
             $new_class_id = mysqli_insert_id($con);
 
             $table = 'Classes';
-            $action_id = 1; 
+            $action_id = 1;
             $changed_by = $_SESSION['id'];
-            $old_value = null; 
+            $old_value = null;
             $new_value = "ID: $new_class_id, Nome: $name";
             $plant_id = null;
 
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
         } else {
             $error = "Erro ao adicionar classe: " . mysqli_error($con);
         }
@@ -50,11 +49,11 @@ if (isset($_POST['edit_class'])) {
             $success = "Nome da classe atualizado com sucesso.";
 
             $table = 'Classes';
-            $action_id = 3; 
+            $action_id = 3;
             $changed_by = $_SESSION['id'];
             $old_value = "$old_name";
             $new_value = "$name";
-            $plant_id = null; 
+            $plant_id = null;
 
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
         } else {
@@ -75,14 +74,13 @@ if (isset($_POST['delete_class'])) {
         $success = "Classe excluída com sucesso.";
 
         $table = 'Classes';
-        $action_id = 2; 
+        $action_id = 2;
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";
-        $new_value = null; 
-        $plant_id = null; 
+        $new_value = null;
+        $plant_id = null;
 
         log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
     } else {
         $error = "Erro ao excluir classe: " . mysqli_error($con);
     }
@@ -111,7 +109,7 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Classes</title>
-    <link href="css/pagination.css" rel="stylesheet" /> 
+    <link href="css/pagination.css" rel="stylesheet" />
 </head>
 
 <body class="sb-nav-fixed">
@@ -191,7 +189,7 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
         </div>
     </div>
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -212,7 +210,7 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
         </div>
     </div>
 
-    <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel" >
+    <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -234,7 +232,6 @@ $classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NU
     </div>
 
     <script>
-
         document.addEventListener('DOMContentLoaded', function() {
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
             var deleteIdInput = document.getElementById('deleteId');

@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once('includes/config.php');
 
 check_user_session();
@@ -25,11 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['delete'])) {
         $deleteUserId = intval($_POST['delete']);
-        
+
         if ($deleteUserId != 1) {
             $deleteQuery = "DELETE FROM users WHERE id='$deleteUserId'";
             $msg = mysqli_query($con, $deleteQuery);
-            
+
             if ($msg) {
                 $message = 'Usuário excluído com sucesso';
             } else {
@@ -52,12 +52,14 @@ if ($editUserId) {
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Gerenciamento de Usuários</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="sb-nav-fixed">
     <?php include_once('includes/navbar.php'); ?>
 
@@ -70,13 +72,13 @@ if ($editUserId) {
                     <h1 class="mt-4 mb-4 h1">Gerenciamento de Usuários</h1>
 
                     <?php if ($editUserId && isset($editUser)): ?>
-                
+
                         <div class="d-flex justify-content-between mb-3">
                             <h2>Editar Usuário</h2>
                             <a href="manage-users.php" class="btn btn-secondary">Voltar</a>
                         </div>
 
-                 
+
                         <div class="card mb-4">
                             <form method="post">
                                 <input type="hidden" name="userid" value="<?php echo htmlspecialchars($editUser['id']); ?>" />
@@ -133,26 +135,27 @@ if ($editUserId) {
                                                 <td><?php echo htmlspecialchars($row['fname']); ?></td>
                                                 <td><?php echo htmlspecialchars($row['email']); ?></td>
                                                 <?php if ($isAdmin): ?>
-                                                <td>
-                                                    <?php if ($row['id'] == 1): ?>
-                                                        <button class="btn btn-outline-secondary btn-sm" disabled>
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <button class="btn btn-danger btn-sm" disabled>
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    <?php else: ?>
-                                                        <a href="?uid=<?php echo $row['id']; ?>" class="btn btn-outline-secondary btn-sm">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <a href="#" class="btn btn-danger btn-sm delete-user-btn" data-user-id="<?php echo $row['id']; ?>">
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
-                                                    <?php endif; ?>
-                                                </td>
-                                            <?php endif; ?>
+                                                    <td>
+                                                        <?php if ($row['id'] == 1): ?>
+                                                            <button class="btn btn-outline-secondary btn-sm" disabled>
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button class="btn btn-danger btn-sm" disabled>
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        <?php else: ?>
+                                                            <a href="?uid=<?php echo $row['id']; ?>" class="btn btn-outline-secondary btn-sm">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                            <a href="#" class="btn btn-danger btn-sm delete-user-btn" data-user-id="<?php echo $row['id']; ?>">
+                                                                <i class="fa fa-trash"></i>
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                <?php endif; ?>
                                             </tr>
-                                        <?php $cnt++; } ?>
+                                        <?php $cnt++;
+                                        } ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -166,7 +169,7 @@ if ($editUserId) {
     </div>
 
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form method="post" id="deleteForm">
@@ -188,7 +191,7 @@ if ($editUserId) {
     </div>
 
 
-    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" >
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -196,7 +199,7 @@ if ($editUserId) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body" id="messageModalBody">
-             
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -213,7 +216,7 @@ if ($editUserId) {
             if (datatablesSimple) {
                 new simpleDatatables.DataTable(datatablesSimple, {
                     labels: {
-                        placeholder: "Buscar...", 
+                        placeholder: "Buscar...",
                         perPage: "por página",
                         noRows: "Nenhum registro encontrado",
                         info: "Mostrando {start} a {end} de {rows} entradas",
@@ -240,7 +243,7 @@ if ($editUserId) {
 
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function(event) {
-                    event.preventDefault(); 
+                    event.preventDefault();
 
                     const userId = this.getAttribute('data-user-id');
                     deleteUserIdInput.value = userId;
@@ -260,4 +263,5 @@ if ($editUserId) {
     <?php endif; ?>
 
 </body>
+
 </html>

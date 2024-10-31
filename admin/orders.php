@@ -19,14 +19,13 @@ if (isset($_POST['add_order'])) {
             $new_class_id = mysqli_insert_id($con);
 
             $table = 'Ordem';
-            $action_id = 1; 
+            $action_id = 1;
             $changed_by = $_SESSION['id'];
-            $old_value = null; 
+            $old_value = null;
             $new_value = "ID: $new_class_id, Nome: $name";
             $plant_id = null;
 
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
         } else {
             $error = "Erro ao adicionar ordem: " . mysqli_error($con);
         }
@@ -45,14 +44,13 @@ if (isset($_POST['delete_order'])) {
         $success = "Ordem excluída com sucesso.";
 
         $table = 'Ordem';
-        $action_id = 2; 
+        $action_id = 2;
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";
-        $new_value = null; 
-        $plant_id = null; 
+        $new_value = null;
+        $plant_id = null;
 
         log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
     } else {
         $error = "Erro ao excluir ordem: " . mysqli_error($con);
     }
@@ -72,11 +70,11 @@ if (isset($_POST['edit_order'])) {
         $success = "Ordem atualizada com sucesso.";
 
         $table = 'Ordem';
-        $action_id = 3; 
+        $action_id = 3;
         $changed_by = $_SESSION['id'];
         $old_value = "$old_name";
         $new_value = "$name";
-        $plant_id = null; 
+        $plant_id = null;
 
         log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
     } else {
@@ -107,7 +105,7 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Ordens</title>
-    <link href="css/pagination.css" rel="stylesheet" /> 
+    <link href="css/pagination.css" rel="stylesheet" />
 </head>
 
 <body class="sb-nav-fixed">
@@ -139,7 +137,7 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
                             </form>
                         </div>
                     </div>
-                    
+
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -179,13 +177,13 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
                         </div>
                     </div>
                 </div>
-                <?php include('includes/pagination.php'); ?> 
-                            </main>
+                <?php include('includes/pagination.php'); ?>
+            </main>
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -206,7 +204,7 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
         </div>
     </div>
 
-    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" >
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -228,7 +226,6 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
     </div>
 
     <script>
-
         document.addEventListener('DOMContentLoaded', function() {
             var deleteIdInput = document.getElementById('deleteId');
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
@@ -236,7 +233,7 @@ $ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL
             var editIdInput = document.getElementById('editId');
             var editNameInput = document.getElementById('editName');
             var editButtons = document.querySelectorAll('[data-bs-target="#editOrderModal"]');
-            
+
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');

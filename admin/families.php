@@ -19,14 +19,13 @@ if (isset($_POST['add_family'])) {
             $new_class_id = mysqli_insert_id($con);
 
             $table = 'Família';
-            $action_id = 1; 
+            $action_id = 1;
             $changed_by = $_SESSION['id'];
-            $old_value = null; 
+            $old_value = null;
             $new_value = "ID: $new_class_id, Nome: $name";
             $plant_id = null;
 
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
         } else {
             $error = "Erro ao adicionar família: " . mysqli_error($con);
         }
@@ -50,13 +49,13 @@ if (isset($_POST['edit_family'])) {
         if (mysqli_query($con, $sql)) {
             $success = "Nome da família atualizado com sucesso.";
 
-            
+
             $table = 'Família';
-            $action_id = 3; 
+            $action_id = 3;
             $changed_by = $_SESSION['id'];
             $old_value = "$old_name";
             $new_value = "$name";
-            $plant_id = null; 
+            $plant_id = null;
 
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
         } else {
@@ -77,14 +76,13 @@ if (isset($_POST['delete_family'])) {
         $success = "Família excluída com sucesso.";
 
         $table = 'Família';
-        $action_id = 2; 
+        $action_id = 2;
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";
-        $new_value = null; 
-        $plant_id = null; 
+        $new_value = null;
+        $plant_id = null;
 
         log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
     } else {
         $error = "Erro ao excluir família: " . mysqli_error($con);
     }
@@ -113,7 +111,7 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Famílias</title>
-    <link href="css/pagination.css" rel="stylesheet" /> 
+    <link href="css/pagination.css" rel="stylesheet" />
 </head>
 
 <body class="sb-nav-fixed">
@@ -186,14 +184,14 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
                         </div>
                     </div>
                 </div>
-                <?php include('includes/pagination.php'); ?> 
+                <?php include('includes/pagination.php'); ?>
             </main>
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
-    
-<!-- Modal para excluir -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
+
+    <!-- Modal para excluir -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -214,8 +212,8 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
         </div>
     </div>
 
-<!-- Modal para editar -->
-    <div class="modal fade" id="editFamilyModal" tabindex="-1" aria-labelledby="editFamilyModalLabel" >
+    <!-- Modal para editar -->
+    <div class="modal fade" id="editFamilyModal" tabindex="-1" aria-labelledby="editFamilyModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -238,10 +236,10 @@ $familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS 
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            
+
             var deleteButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#confirmDeleteModal"]');
             var deleteIdInput = document.getElementById('deleteId');
-           
+
             var editButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#editFamilyModal"]');
             var editIdInput = document.getElementById('editId');
             var editNameInput = document.getElementById('editName');

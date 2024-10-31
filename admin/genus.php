@@ -18,14 +18,13 @@ if (isset($_POST['add_genus'])) {
             $new_class_id = mysqli_insert_id($con);
 
             $table = 'Gênero';
-            $action_id = 1; 
+            $action_id = 1;
             $changed_by = $_SESSION['id'];
-            $old_value = null; 
+            $old_value = null;
             $new_value = "ID: $new_class_id, Nome: $name";
             $plant_id = null;
 
             log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
         } else {
             $error = "Erro ao adicionar gênero: " . mysqli_error($con);
         }
@@ -41,17 +40,16 @@ if (isset($_POST['delete_genus'])) {
 
     $sql = "UPDATE genus SET deleted_at = NOW() WHERE id = $id";
     if (mysqli_query($con, $sql)) {
-        $success = "Gênero excluído com sucesso."; 
+        $success = "Gênero excluído com sucesso.";
 
         $table = 'Gênero';
-        $action_id = 2; 
+        $action_id = 2;
         $changed_by = $_SESSION['id'];
         $old_value = "Nome: $old_name";
-        $new_value = null; 
-        $plant_id = null; 
+        $new_value = null;
+        $plant_id = null;
 
         log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
     } else {
         $error = "Erro ao excluir gênero: " . mysqli_error($con);
     }
@@ -70,14 +68,13 @@ if (isset($_POST['edit_genus'])) {
         $success = "Gênero atualizado com sucesso.";
 
         $table = 'Gênero';
-        $action_id = 3; 
+        $action_id = 3;
         $changed_by = $_SESSION['id'];
         $old_value = "$old_name";
         $new_value = "$name";
-        $plant_id = null; 
+        $plant_id = null;
 
         log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
-
     } else {
         $error = "Erro ao atualizar gênero: " . mysqli_error($con);
     }
@@ -105,7 +102,7 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
 <head>
     <?php include_once("includes/head.php"); ?>
     <title>Admin | Gêneros</title>
-    <link href="css/pagination.css" rel="stylesheet" /> 
+    <link href="css/pagination.css" rel="stylesheet" />
 </head>
 
 <body class="sb-nav-fixed">
@@ -116,7 +113,7 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
             <main>
                 <div class="container-fluid px-4">
                     <h1 class="mt-4 mb-4">Gerenciar Gêneros</h1>
-                    
+
                     <?php if (isset($success)) { ?>
                         <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
                     <?php } ?>
@@ -179,13 +176,13 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
                         </div>
                     </div>
                 </div>
-                <?php include('includes/pagination.php'); ?> 
+                <?php include('includes/pagination.php'); ?>
             </main>
             <?php include('includes/footer.php'); ?>
         </div>
     </div>
 
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -206,7 +203,7 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
         </div>
     </div>
 
-    <div class="modal fade" id="editGenusModal" tabindex="-1" aria-labelledby="editGenusModalLabel" >
+    <div class="modal fade" id="editGenusModal" tabindex="-1" aria-labelledby="editGenusModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -235,7 +232,7 @@ $genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $
             var editIdInput = document.getElementById('editId');
             var editNameInput = document.getElementById('editName');
             var editButtons = document.querySelectorAll('[data-bs-target="#editGenusModal"]');
-            
+
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     var id = this.getAttribute('data-id');

@@ -25,7 +25,7 @@ if (isset($_POST['edit_url'])) {
             $success = "URL atualizado com sucesso.";
 
             $table = 'QR Code URL';
-            $action_id = 2; 
+            $action_id = 2;
             $changed_by = $_SESSION['id'];
             $old_value = $old_url;
             $new_value = $url;
@@ -42,7 +42,7 @@ if (isset($_POST['edit_url'])) {
             $success = "URL inserida com sucesso.";
 
             $table = 'QR Code URL';
-            $action_id = 1; 
+            $action_id = 1;
             $changed_by = $_SESSION['id'];
             $old_value = null;
             $new_value = $url;
@@ -88,9 +88,9 @@ $urlQuery = mysqli_query($con, "SELECT url FROM qrcode_url WHERE id = 1");
                         <div class="card-body">
                             <h5 class="card-title">Editar URL</h5>
                             <form method="POST" action="">
-                               
+
                                 <input type="hidden" name="id" value="1">
-                                
+
                                 <div class="mb-3">
                                     <label for="url" class="form-label">Novo endereço</label>
                                     <input type="text" class="form-control" id="url" name="url" required>
@@ -112,7 +112,7 @@ $urlQuery = mysqli_query($con, "SELECT url FROM qrcode_url WHERE id = 1");
                                     <?php while ($row = mysqli_fetch_array($urlQuery)) { ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($row['url']); ?></td>
-                                          
+
                                         </tr>
                                     <?php } ?>
                                 </tbody>

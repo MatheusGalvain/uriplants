@@ -34,8 +34,8 @@ if (isset($_POST['recover'])) {
             $mail->SMTPAuth = true;
             $mail->Username = 'uriplantaspi3@gmail.com';   // TODO: Endereço de e-mail 
             $mail->Password = 'xcpp nbia xrnl liyi';        // TODO: Senha de app - FAVOR NÃO DEIXAR AQUI QUEM FOR BOTAR ISSO EM PROD
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
-            $mail->Port = 587; 
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
 
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
@@ -44,7 +44,7 @@ if (isset($_POST['recover'])) {
             $mail->addAddress($useremail, $num['fname']);
 
             // TODO: Conteúdo do e-mail - personalizar conforme necessário
-            $mail->isHTML(true); 
+            $mail->isHTML(true);
             $mail->Subject = 'Recuperação de Senha';
             $mail->Body    = "
                 <p>Olá <strong>" . htmlspecialchars($num['fname']) . "</strong>,</p>
@@ -88,7 +88,7 @@ if (isset($_POST['recover'])) {
             width: 368px;
             display: none;
             cursor: not-allowed;
-            background-color: #6c757d; 
+            background-color: #6c757d;
             color: #fff;
             border: none;
             padding: 10px 20px;
@@ -104,7 +104,7 @@ if (isset($_POST['recover'])) {
             <div class="container">
                 <article class="title-admin">
                     <!-- TODO: Ajustar href -->
-                    <a class="returnbtn" href="index.php" alt="Link do Site"> 
+                    <a class="returnbtn" href="index.php" alt="Link do Site">
                         <i class="fas fa-angle-left"></i>
                         Voltar para o login
                     </a>
@@ -115,7 +115,7 @@ if (isset($_POST['recover'])) {
                 </article>
                 <form class="custom-form" method="post">
                     <div class="form-group">
-                        <input class="form-input" placeholder="Informe seu E-mail" type="email" name="uemail" id="inputEmail" required />             
+                        <input class="form-input" placeholder="Informe seu E-mail" type="email" name="uemail" id="inputEmail" required />
                     </div>
                     <div class="form-actions">
                         <button class="submit-btn" name="recover" type="submit">Enviar E-mail</button>

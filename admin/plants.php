@@ -1,14 +1,16 @@
 <?php
 include_once('includes/config.php');
-require_once('functions/audit.php'); 
+require_once('functions/audit.php');
 
 check_user_session();
 
-function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id = null) {
+function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id = null)
+{
     log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 }
 
-function get_plant_name($con, $plant_id) {
+function get_plant_name($con, $plant_id)
+{
     $sql = "SELECT name FROM Plants WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
     if ($stmt) {
@@ -23,7 +25,8 @@ function get_plant_name($con, $plant_id) {
 }
 
 // Para listar as propriedades que a planta pode ter
-function get_property_name($con, $property_id) {
+function get_property_name($con, $property_id)
+{
 
     $sql = "SELECT name, name_ref FROM properties WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
@@ -43,13 +46,16 @@ function get_property_name($con, $property_id) {
     return "Desconhecida";
 }
 
-function filter_input_data_custom($con, $data) {
+function filter_input_data_custom($con, $data)
+{
     return mysqli_real_escape_string($con, trim($data));
 }
 
-function get_qrcode_url($con) {
+function get_qrcode_url($con)
+{
     $sql = "SELECT url FROM qrcode_url LIMIT 1";
-    
+    $url = null;
+
     if ($stmt = $con->prepare($sql)) {
 
         if ($stmt->execute()) {
@@ -153,7 +159,7 @@ if (isset($_POST['add_plant'])) {
             if (!empty($images)) {
                 foreach ($images as $imageData) {
                     $source = filter_input_data_custom($con, $imageData['source']);
-                    $image = $imageData['image']; 
+                    $image = $imageData['image'];
 
                     $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
 
@@ -166,7 +172,7 @@ if (isset($_POST['add_plant'])) {
                         $next_sort_order = $max_sort_order !== null ? $max_sort_order + 1 : 1;
                         $stmt_order->close();
                     } else {
-                        $next_sort_order = 1; 
+                        $next_sort_order = 1;
                     }
 
                     $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
@@ -220,7 +226,7 @@ if (isset($_POST['delete_plant'])) {
     if ($delete_id > 0) {
         mysqli_begin_transaction($con);
         try {
-           
+
             $stmt = $con->prepare("SELECT name FROM Plants WHERE id = ? AND deleted_at IS NULL");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da consulta: " . $con->error);
@@ -262,7 +268,7 @@ if (isset($_POST['delete_plant'])) {
 }
 
 if (isset($_POST['edit_plant'])) {
-   
+
     $edit_id = intval($_POST['plant_id']);
     $name = filter_input_data_custom($con, $_POST['name']);
     $common_names = filter_input_data_custom($con, $_POST['common_names']);
@@ -322,7 +328,7 @@ if (isset($_POST['edit_plant'])) {
             $changed_by = $_SESSION['id'];
             $old_value = "Planta: $plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description";
             $new_value = "Planta: $name, $common_names, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description";
-            
+
             log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $edit_id);
 
             $stmt = $con->prepare("SELECT property_id, id FROM PlantsProperties WHERE plant_id = ?");
@@ -356,7 +362,6 @@ if (isset($_POST['edit_plant'])) {
                     }
                     $plants_property_id = mysqli_insert_id($con);
                     $stmt->close();
-
                 }
 
                 // Atualizar imagens existentes
@@ -417,9 +422,9 @@ if (isset($_POST['edit_plant'])) {
                 // Processar as imagens enviadas
                 foreach ($images as $order => $imageData) {
                     if (isset($imageData['id']) && $imageData['id'] > 0) {
-                       
+
                         $image_id = intval($imageData['id']);
-                        $new_sort_order = intval($order) + 1; 
+                        $new_sort_order = intval($order) + 1;
                         $stmt = $con->prepare("UPDATE images SET sort_order = ? WHERE id = ?");
                         if ($stmt) {
                             $stmt->bind_param("ii", $new_sort_order, $image_id);
@@ -428,11 +433,10 @@ if (isset($_POST['edit_plant'])) {
                             }
                             $stmt->close();
                         }
-
                     } else {
                         // Inserir nova imagem
                         $source = filter_input_data_custom($con, $imageData['source']);
-                        $image = $imageData['image']; 
+                        $image = $imageData['image'];
 
                         $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
 
@@ -445,7 +449,7 @@ if (isset($_POST['edit_plant'])) {
                             $next_sort_order = $max_sort_order !== null ? $max_sort_order + 1 : 1;
                             $stmt_order->close();
                         } else {
-                            $next_sort_order = 1; 
+                            $next_sort_order = 1;
                         }
 
                         $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
@@ -463,7 +467,6 @@ if (isset($_POST['edit_plant'])) {
                         log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $edit_id);
                     }
                 }
-
             }
 
             // Processar Links Úteis
@@ -486,7 +489,7 @@ if (isset($_POST['edit_plant'])) {
 
             foreach ($usefullinks_data as $link) {
                 if (isset($link['id']) && intval($link['id']) > 0 && isset($existing_links[$link['id']])) {
-     
+
                     $link_id = intval($link['id']);
                     $link_name = filter_input_data_custom($con, $link['name']);
                     $link_url = filter_input_data_custom($con, $link['link']);
@@ -560,7 +563,7 @@ if (isset($_POST['edit_plant'])) {
 }
 
 // Configuração de Paginação
-$items_per_page = 20; 
+$items_per_page = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? intval($_GET['page']) : 1;
 if ($page < 1) $page = 1;
 
@@ -688,7 +691,6 @@ if (isset($_GET['edit'])) {
                     while ($row = $result_links->fetch_assoc()) {
                         $edit_plant['usefullinks'][] = $row;
                     }
-                  
                 }
                 $edit_mode = true;
             }
@@ -746,11 +748,13 @@ $qrcode_base_url = get_qrcode_url($con);
         .pagination span {
             margin: 0 2px;
         }
+
         .plant-names {
             height: 20px;
             overflow: hidden;
             width: 100%;
         }
+
         .plant-names-cont {
             max-width: 1000px;
             overflow: hidden;
@@ -899,7 +903,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                         <h4><?php echo htmlspecialchars($property_item['name']); ?></h4>
                                         <button type="button" class="btn btn-primary btn-sm add-image-button" data-property-id="<?php echo $property_item['id']; ?>">Adicionar Imagem</button>
                                         <div class="images-list image-preview mt-3" id="images_list_<?php echo $property_item['id']; ?>">
-                                            <?php 
+                                            <?php
                                             if ($edit_mode && isset($edit_plant['properties'][$property_item['id']])) {
                                                 foreach ($edit_plant['properties'][$property_item['id']] as $image) { ?>
                                                     <div class="image-item" data-id="<?php echo htmlspecialchars($image['id']); ?>">
@@ -963,14 +967,18 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php 
-                                        $plantCount = 0;
-                                        while ($row = mysqli_fetch_array($plantsQuery)) { 
-                                            $plantCount++;
+                                    <?php
+                                    $plantCount = 0;
+                                    while ($row = mysqli_fetch_array($plantsQuery)) {
+                                        $plantCount++;
                                     ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                            <td ><div class="plant-names-cont">  <p class="plant-names"> <?php echo htmlspecialchars($row['common_names']); ?></p> </div></td>
+                                            <td>
+                                                <div class="plant-names-cont">
+                                                    <p class="plant-names"> <?php echo htmlspecialchars($row['common_names']); ?></p>
+                                                </div>
+                                            </td>
                                             <td>
                                                 <div style="display: flex; gap: 2px">
                                                     <a href="?edit=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-success btn-sm">Editar</a>
@@ -995,7 +1003,7 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                         <li class="page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
                                             <a class="page-link" href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>" aria-label="Anterior">
-                                                <span >&laquo;</span>
+                                                <span>&laquo;</span>
                                             </a>
                                         </li>
 
@@ -1006,14 +1014,14 @@ $qrcode_base_url = get_qrcode_url($con);
                                             if ($i == $page) {
                                                 echo '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
                                             } else {
-                                                echo '<li class="page-item"><a class="page-link" href="?'. http_build_query(array_merge($_GET, ['page' => $i])) .'">' . $i . '</a></li>';
+                                                echo '<li class="page-item"><a class="page-link" href="?' . http_build_query(array_merge($_GET, ['page' => $i])) . '">' . $i . '</a></li>';
                                             }
                                         }
                                         ?>
 
                                         <li class="page-item <?php echo ($page >= $total_pages) ? 'disabled' : ''; ?>">
                                             <a class="page-link" href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>" aria-label="Próximo">
-                                                <span >&raquo;</span>
+                                                <span>&raquo;</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -1029,7 +1037,7 @@ $qrcode_base_url = get_qrcode_url($con);
     </div>
 
     <!-- Modal para Adicionar Imagem -->
-    <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel" >
+    <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel">
         <div class="modal-dialog">
             <form id="propertyForm">
                 <div class="modal-content">
@@ -1058,7 +1066,7 @@ $qrcode_base_url = get_qrcode_url($con);
     </div>
 
     <!-- Modal para QRCode -->
-    <div class="modal fade" id="qrcodeModal" tabindex="-1" aria-labelledby="qrcodeModalLabel" >
+    <div class="modal fade" id="qrcodeModal" tabindex="-1" aria-labelledby="qrcodeModalLabel">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1086,7 +1094,7 @@ $qrcode_base_url = get_qrcode_url($con);
 
 
     <!-- Modal de Confirmação de Exclusão -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" >
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel">
         <div class="modal-dialog">
             <form method="POST" action="">
                 <div class="modal-content">
@@ -1165,9 +1173,9 @@ $qrcode_base_url = get_qrcode_url($con);
             var cancelAddPlant = document.getElementById('cancelAddPlant');
 
             // Dados das Propriedades
-            var propertiesData = {}; 
-            var propertyCounter = 0; 
-            var currentPropertyId = null; 
+            var propertiesData = {};
+            var propertyCounter = 0;
+            var currentPropertyId = null;
 
             <?php if ($edit_mode && isset($edit_plant['properties'])) { ?>
                 propertiesData = <?php echo json_encode($edit_plant['properties']); ?>;
@@ -1213,7 +1221,7 @@ $qrcode_base_url = get_qrcode_url($con);
             document.querySelectorAll('.add-image-button').forEach(function(button) {
                 button.addEventListener('click', function() {
                     var propertyId = this.getAttribute('data-property-id');
-                    currentPropertyId = propertyId; 
+                    currentPropertyId = propertyId;
                     propertyForm.reset();
                     addPropertyModal.show();
                 });
@@ -1222,7 +1230,7 @@ $qrcode_base_url = get_qrcode_url($con);
             // Submit
             propertyForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                hideError(); 
+                hideError();
                 var source = document.getElementById('source').value.trim();
                 var imageInput = document.getElementById('imageFile');
                 var file = imageInput.files[0];
@@ -1235,7 +1243,7 @@ $qrcode_base_url = get_qrcode_url($con);
                     }
 
                     // Tamanho do arquivo (5 MB)
-                    var maxFileSize = 5 * 1024 * 1024; 
+                    var maxFileSize = 5 * 1024 * 1024;
                     if (file.size > maxFileSize) {
                         displayError('O tamanho da imagem não pode exceder 5 MB.');
                         return;
@@ -1254,9 +1262,9 @@ $qrcode_base_url = get_qrcode_url($con);
 
                         // Adiciona a imagem ao array da propriedade atual
                         propertiesData[currentPropertyId].push({
-                            id: null, 
+                            id: null,
                             source: source,
-                            image: imageUrl, 
+                            image: imageUrl,
                             sort_order: nextSortOrder
                         });
 
@@ -1414,7 +1422,7 @@ $qrcode_base_url = get_qrcode_url($con);
             // Evento para adicionar um novo link útil
             addLinkButton.addEventListener('click', function() {
                 usefullinksData.push({
-                    id: null, 
+                    id: null,
                     name: '',
                     link: ''
                 });
@@ -1472,4 +1480,5 @@ $qrcode_base_url = get_qrcode_url($con);
         });
     </script>
 </body>
+
 </html>

@@ -1,14 +1,17 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 
-class quizController {
+class quizController
+{
     private $conn;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->conn = getConnection();
     }
 
-    public function get() {
+    public function get()
+    {
         header('Content-Type: application/json');
 
         try {
@@ -105,7 +108,4 @@ class quizController {
             echo json_encode(["message" => "Erro interno no servidor.", "error" => $e->getMessage()]);
         }
     }
-
 }
-
-?>
