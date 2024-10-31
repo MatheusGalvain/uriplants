@@ -8,9 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/reset.css">
-    <link rel="stylesheet" href="./css/footer.css">
-    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="site/css/reset.css">
+    <link rel="stylesheet" href="site/css/footer.css">
+    <link rel="stylesheet" href="site/css/main.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -115,19 +115,19 @@
        
         <div class="slider">
             <div class="slides">
-                <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%), url('images/bg1.jpg'); ">
+                <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%), url('site/images/bg1.jpg'); ">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
                         <p>URI Plantas oferece uma diversidade<br> gigante sobre as plantas</p>
                     </div>
                 </div>
-                <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('images/bg2.jpg'); ">
+                <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('site//images/bg2.jpg'); ">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
                         <p>Leia o QR Code<br> e conheça mais sobre variadas espécies!</p>
                     </div>
                 </div>
-                <div class="slide" style="  background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('images/bg3.jpg');">
+                <div class="slide" style="  background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('site//images/bg3.jpg');">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
                         <p>Uma parceria dos cursos de Arquitetura,<br> Biologia e Ciência da Computação</p>
@@ -145,7 +145,7 @@
     <div class="button-group">
         <div class="uriplantas-btn-start" style="width: 300px">
             <div class="button-title">URI Plantas</div>
-            <button onclick="window.location.href='list/list.php'" class="btn">Plantas Cadastradas</button>
+            <button onclick="window.location.href='site/list/list.php'" class="btn">Plantas Cadastradas</button>
         </div>
         <div class="uriplantas-btn-start" style="width: 300px">
             <div class="button-title">URI Quiz</div>
