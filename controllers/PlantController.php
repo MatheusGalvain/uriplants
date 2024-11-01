@@ -95,7 +95,7 @@ class PlantController
         // Consulta com query
         $countSql = "SELECT COUNT(DISTINCT Plants.id) as total FROM Plants
                      LEFT JOIN PlantsProperties ON Plants.id = PlantsProperties.plant_id
-                     LEFT JOIN propertPropertiesies ON PlantsProperties.property_id = Properties.id
+                     LEFT JOIN Properties ON PlantsProperties.property_id = Properties.id
                      LEFT JOIN Images ON PlantsProperties.id = Images.plants_property_id
                      WHERE Plants.deleted_at IS NULL";
 

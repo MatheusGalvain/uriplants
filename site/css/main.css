@@ -89,6 +89,8 @@ h1 {
 
 .button-group {
     display: flex;
+    min-height: 400px;
+    align-items: center;
     justify-content: space-around;
     gap: 60px;
     z-index: 99;

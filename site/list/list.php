@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -100,7 +101,7 @@
 
             async function fetchPlants(page, limit, query) {
                 try {
-                    const response = await fetch(`http://localhost/uriplants/public/plants?limit=${limit}&page=${page}&query=${encodeURIComponent(query)}`);
+                    const response = await fetch(`http://arborea.uricer.edu.br/public/plants?limit=${limit}&page=${page}&query=${encodeURIComponent(query)}`);
                     if (!response.ok) {
                         throw new Error('Erro na requisição');
                     }
