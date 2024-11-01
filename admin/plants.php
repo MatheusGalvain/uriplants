@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 include_once('includes/config.php');
 require_once('functions/audit.php');
 
@@ -28,7 +31,7 @@ function get_plant_name($con, $plant_id)
 function get_property_name($con, $property_id)
 {
 
-    $sql = "SELECT name, name_ref FROM properties WHERE id = ?";
+    $sql = "SELECT name, name_ref FROM Properties WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, 'i', $property_id);
@@ -53,7 +56,7 @@ function filter_input_data_custom($con, $data)
 
 function get_qrcode_url($con)
 {
-    $sql = "SELECT url FROM qrcode_url LIMIT 1";
+    $sql = "SELECT url FROM QrCodeUrl LIMIT 1";
     $url = null;
 
     if ($stmt = $con->prepare($sql)) {
@@ -163,7 +166,7 @@ if (isset($_POST['add_plant'])) {
 
                     $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
 
-                    $stmt_order = $con->prepare("SELECT MAX(sort_order) FROM images WHERE plants_property_id = ?");
+                    $stmt_order = $con->prepare("SELECT MAX(sort_order) FROM Images WHERE plants_property_id = ?");
                     if ($stmt_order) {
                         $stmt_order->bind_param("i", $plants_property_id);
                         $stmt_order->execute();
@@ -175,7 +178,7 @@ if (isset($_POST['add_plant'])) {
                         $next_sort_order = 1;
                     }
 
-                    $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
+                    $stmt = $con->prepare("INSERT INTO Images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
                     if (!$stmt) {
                         throw new Exception("Erro na preparação da consulta de imagem: " . $con->error);
                     }
@@ -198,7 +201,7 @@ if (isset($_POST['add_plant'])) {
             $link_name = filter_input_data_custom($con, $link['name']);
             $link_url = filter_input_data_custom($con, $link['link']);
 
-            $stmt = $con->prepare("INSERT INTO usefullinks (name, link, plant_id) VALUES (?, ?, ?)");
+            $stmt = $con->prepare("INSERT INTO UsefulLinks (name, link, plant_id) VALUES (?, ?, ?)");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da inserção de link: " . $con->error);
             }
@@ -210,7 +213,7 @@ if (isset($_POST['add_plant'])) {
             $stmt->close();
 
             $new_value = "$link_name, URL: $link_url";
-            log_audit_action($con, 'usefullinks', 1, $changed_by, null, $new_value, $plant_id);
+            log_audit_action($con, 'UsefulLinks', 1, $changed_by, null, $new_value, $plant_id);
         }
 
         mysqli_commit($con);
@@ -365,7 +368,7 @@ if (isset($_POST['edit_plant'])) {
                 }
 
                 // Atualizar imagens existentes
-                $stmt = $con->prepare("SELECT id, sort_order FROM images WHERE plants_property_id = ? ORDER BY sort_order ASC");
+                $stmt = $con->prepare("SELECT id, sort_order FROM Images WHERE plants_property_id = ? ORDER BY sort_order ASC");
                 if (!$stmt) {
                     throw new Exception("Erro na preparação da consulta de imagens: " . $con->error);
                 }
@@ -393,7 +396,7 @@ if (isset($_POST['edit_plant'])) {
                 if (!empty($images_to_delete)) {
 
                     $placeholders = implode(',', array_fill(0, count($images_to_delete), '?'));
-                    $delete_sql = "DELETE FROM images WHERE id IN ($placeholders)";
+                    $delete_sql = "DELETE FROM Images WHERE id IN ($placeholders)";
                     $stmt = $con->prepare($delete_sql);
                     if ($stmt) {
 
@@ -407,7 +410,7 @@ if (isset($_POST['edit_plant'])) {
 
                         // Auditoria para exclusão de imagens
                         foreach ($images_to_delete as $image_id) {
-                            $table = 'images';
+                            $table = 'Images';
                             $action_id = 3;
                             $changed_by = $_SESSION['id'];
                             $old_value = "Imagem ID: $image_id";
@@ -425,7 +428,7 @@ if (isset($_POST['edit_plant'])) {
 
                         $image_id = intval($imageData['id']);
                         $new_sort_order = intval($order) + 1;
-                        $stmt = $con->prepare("UPDATE images SET sort_order = ? WHERE id = ?");
+                        $stmt = $con->prepare("UPDATE Images SET sort_order = ? WHERE id = ?");
                         if ($stmt) {
                             $stmt->bind_param("ii", $new_sort_order, $image_id);
                             if (!$stmt->execute()) {
@@ -440,7 +443,7 @@ if (isset($_POST['edit_plant'])) {
 
                         $image_data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
 
-                        $stmt_order = $con->prepare("SELECT MAX(sort_order) FROM images WHERE plants_property_id = ?");
+                        $stmt_order = $con->prepare("SELECT MAX(sort_order) FROM Images WHERE plants_property_id = ?");
                         if ($stmt_order) {
                             $stmt_order->bind_param("i", $plants_property_id);
                             $stmt_order->execute();
@@ -452,7 +455,7 @@ if (isset($_POST['edit_plant'])) {
                             $next_sort_order = 1;
                         }
 
-                        $stmt = $con->prepare("INSERT INTO images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
+                        $stmt = $con->prepare("INSERT INTO Images (imagem, source, plants_property_id, sort_order) VALUES (?, ?, ?, ?)");
                         if (!$stmt) {
                             throw new Exception("Erro na preparação da consulta de imagem: " . $con->error);
                         }
@@ -464,7 +467,7 @@ if (isset($_POST['edit_plant'])) {
                         $stmt->close();
 
                         $new_value = "Imagem ID: $image_id, Fonte: $source";
-                        log_audit_action($con, 'images', 1, $changed_by, null, $new_value, $edit_id);
+                        log_audit_action($con, 'Images', 1, $changed_by, null, $new_value, $edit_id);
                     }
                 }
             }
@@ -472,9 +475,9 @@ if (isset($_POST['edit_plant'])) {
             // Processar Links Úteis
             $usefullinks_data = isset($_POST['usefullinks_data']) ? json_decode($_POST['usefullinks_data'], true) : [];
 
-            $stmt = $con->prepare("SELECT id, name, link FROM usefullinks WHERE plant_id = ? AND deleted_at IS NULL");
+            $stmt = $con->prepare("SELECT id, name, link FROM UsefulLinks WHERE plant_id = ? AND deleted_at IS NULL");
             if (!$stmt) {
-                throw new Exception("Erro na preparação da consulta usefullinks: " . $con->error);
+                throw new Exception("Erro na preparação da consulta UsefulLinks: " . $con->error);
             }
             $stmt->bind_param("i", $edit_id);
             $stmt->execute();
@@ -496,7 +499,7 @@ if (isset($_POST['edit_plant'])) {
 
                     if ($link_name != $existing_links[$link_id]['name'] || $link_url != $existing_links[$link_id]['link']) {
 
-                        $stmt = $con->prepare("UPDATE usefullinks SET name = ?, link = ? WHERE id = ?");
+                        $stmt = $con->prepare("UPDATE UsefulLinks SET name = ?, link = ? WHERE id = ?");
                         if (!$stmt) {
                             throw new Exception("Erro na preparação da atualização do link: " . $con->error);
                         }
@@ -508,7 +511,7 @@ if (isset($_POST['edit_plant'])) {
 
                         $old_value = "Link: " . $existing_links[$link_id]['name'] . ", URL: " . $existing_links[$link_id]['link'];
                         $new_value = "Link: $link_name, URL: $link_url";
-                        log_audit_action($con, 'usefullinks', 2, $changed_by, $old_value, $new_value, $edit_id);
+                        log_audit_action($con, 'UsefulLinks', 2, $changed_by, $old_value, $new_value, $edit_id);
                     }
 
                     $submitted_link_ids[] = $link_id;
@@ -517,7 +520,7 @@ if (isset($_POST['edit_plant'])) {
                     $link_name = filter_input_data_custom($con, $link['name']);
                     $link_url = filter_input_data_custom($con, $link['link']);
 
-                    $stmt = $con->prepare("INSERT INTO usefullinks (name, link, plant_id) VALUES (?, ?, ?)");
+                    $stmt = $con->prepare("INSERT INTO UsefulLinks (name, link, plant_id) VALUES (?, ?, ?)");
                     if (!$stmt) {
                         throw new Exception("Erro na preparação da inserção de link: " . $con->error);
                     }
@@ -529,14 +532,14 @@ if (isset($_POST['edit_plant'])) {
                     $stmt->close();
 
                     $new_value = "Link: $link_name, URL: $link_url";
-                    log_audit_action($con, 'usefullinks', 1, $changed_by, null, $new_value, $edit_id);
+                    log_audit_action($con, 'UsefulLinks', 1, $changed_by, null, $new_value, $edit_id);
                 }
             }
 
             // Determinar quais links foram removidos e marcar como excluídos
             $links_to_delete = array_diff(array_keys($existing_links), $submitted_link_ids);
             foreach ($links_to_delete as $link_id) {
-                $stmt = $con->prepare("UPDATE usefullinks SET deleted_at = NOW() WHERE id = ?");
+                $stmt = $con->prepare("UPDATE UsefulLinks SET deleted_at = NOW() WHERE id = ?");
                 if (!$stmt) {
                     throw new Exception("Erro na preparação da exclusão do link: " . $con->error);
                 }
@@ -548,7 +551,7 @@ if (isset($_POST['edit_plant'])) {
 
                 $old_value = "Link: " . $existing_links[$link_id]['name'] . ", URL: " . $existing_links[$link_id]['link'];
                 $new_value = null;
-                log_audit_action($con, 'usefullinks', 3, $changed_by, $old_value, $new_value, $edit_id);
+                log_audit_action($con, 'UsefulLinks', 3, $changed_by, $old_value, $new_value, $edit_id);
             }
 
             mysqli_commit($con);
@@ -660,7 +663,7 @@ if (isset($_GET['edit'])) {
                 $stmt_images = $con->prepare("
                     SELECT pp.property_id, i.id as image_id, i.imagem, i.source, i.sort_order 
                     FROM PlantsProperties pp
-                    JOIN images i ON pp.id = i.plants_property_id
+                    JOIN Images i ON pp.id = i.plants_property_id
                     WHERE pp.plant_id = ?
                     ORDER BY i.sort_order ASC
                 ");
@@ -682,7 +685,7 @@ if (isset($_GET['edit'])) {
                     }
                     $stmt_images->close();
                 }
-                $stmt = $con->prepare("SELECT id, name, link FROM usefullinks WHERE plant_id = ? AND deleted_at IS NULL");
+                $stmt = $con->prepare("SELECT id, name, link FROM UsefulLinks WHERE plant_id = ? AND deleted_at IS NULL");
                 if ($stmt) {
                     $stmt->bind_param("i", $edit_id);
                     $stmt->execute();
@@ -1354,7 +1357,7 @@ $qrcode_base_url = get_qrcode_url($con);
         });
     </script>
 
-    <!-- usefullinks -->
+    <!-- UsefulLinks -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

@@ -3,7 +3,7 @@
 function getConnection() {
     $servername = "localhost";
     $username = "root";
-    $password = "";
+    $password = "Arboreauri2k24#";
     $dbname = "uriplants";
 
     $conn = new mysqli($servername, $username, $password, $dbname);

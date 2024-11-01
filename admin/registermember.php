@@ -18,7 +18,7 @@ if (isset($_POST['submit'])) {
         $message = 'A senha deve ter mais de 6 dígitos.';
     } else {
 
-        $sql = mysqli_query($con, "SELECT id FROM users WHERE email='$email'");
+        $sql = mysqli_query($con, "SELECT id FROM Users WHERE email='$email'");
         $row = mysqli_num_rows($sql);
 
         if ($row > 0) {
@@ -27,7 +27,7 @@ if (isset($_POST['submit'])) {
 
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            $msg = mysqli_query($con, "INSERT INTO users (fname, email, password, is_administrator) VALUES ('$fname', '$email', '$hashed_password', '$is_administrator')");
+            $msg = mysqli_query($con, "INSERT INTO Users (fname, email, password, is_administrator) VALUES ('$fname', '$email', '$hashed_password', '$is_administrator')");
             if ($msg) {
                 $message = 'Registrado com sucesso';
             } else {

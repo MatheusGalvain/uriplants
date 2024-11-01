@@ -18,28 +18,28 @@ class PlantController
 
         $conn = getConnection();
 
-        $sql = "SELECT plants.id, plants.name, plants.common_names, plants.bark_description, plants.trunk_description, 
-                plants.leaf_description, plants.flower_description, plants.fruit_description, plants.seed_description, 
-                plants.biology, plants.species, plants.applications, plants.ecology, plants.created_at, 
-                plants.deleted_at, families.name AS family_name, orders.name AS order_name,
-                divisions.name AS division_name, classes.name AS class_name, genus.name AS genus_name,
-                regionmap.id AS region_map_id, regionmap.source AS region_map_source, 
-                regionmap.description AS region_map_description, regionmap.imagem AS region_map_image,
-                regionmap.name AS region_map_name,
-                properties.name AS property_name,
-                images.id AS image_id, images.imagem AS image_blob, images.source AS image_source
-                FROM plants
-                LEFT JOIN families ON plants.family_id = families.id
-                LEFT JOIN orders ON plants.order_id = orders.id
-                LEFT JOIN divisions ON plants.division_id = divisions.id
-                LEFT JOIN classes ON plants.class_id = classes.id
-                LEFT JOIN genus ON plants.genus_id = genus.id
-                LEFT JOIN regionmap ON plants.region_id = regionmap.id
-                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-                LEFT JOIN properties ON plantsproperties.property_id = properties.id
-                LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE plants.id = ?
-                ORDER BY images.sort_order ASC";
+        $sql = "SELECT Plants.id, Plants.name, Plants.common_names, Plants.bark_description, Plants.trunk_description, 
+                Plants.leaf_description, Plants.flower_description, Plants.fruit_description, Plants.seed_description, 
+                Plants.biology, Plants.species, Plants.applications, Plants.ecology, Plants.created_at, 
+                Plants.deleted_at, Families.name AS family_name, Orders.name AS order_name,
+                Divisions.name AS division_name, Classes.name AS class_name, Genus.name AS genus_name,
+                RegionMap.id AS region_map_id, RegionMap.source AS region_map_source, 
+                RegionMap.description AS region_map_description, RegionMap.imagem AS region_map_image,
+                RegionMap.name AS region_map_name,
+                Properties.name AS property_name,
+                Images.id AS image_id, Images.imagem AS image_blob, Images.source AS image_source
+                FROM Plants
+                LEFT JOIN Families ON Plants.family_id = Families.id
+                LEFT JOIN Orders ON Plants.order_id = Orders.id
+                LEFT JOIN Divisions ON Plants.division_id = Divisions.id
+                LEFT JOIN Classes ON Plants.class_id = Classes.id
+                LEFT JOIN Genus ON Plants.genus_id = Genus.id
+                LEFT JOIN RegionMap ON Plants.region_id = RegionMap.id
+                LEFT JOIN PlantsProperties ON Plants.id = PlantsProperties.plant_id
+                LEFT JOIN Properties ON PlantsProperties.property_id = Properties.id
+                LEFT JOIN Images ON PlantsProperties.id = Images.plants_property_id
+                WHERE Plants.id = ?
+                ORDER BY Images.sort_order ASC";
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -93,14 +93,14 @@ class PlantController
         $conn = getConnection();
 
         // Consulta com query
-        $countSql = "SELECT COUNT(DISTINCT plants.id) as total FROM plants
-                     LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-                     LEFT JOIN properties ON plantsproperties.property_id = properties.id
-                     LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                     WHERE plants.deleted_at IS NULL";
+        $countSql = "SELECT COUNT(DISTINCT Plants.id) as total FROM Plants
+                     LEFT JOIN PlantsProperties ON Plants.id = PlantsProperties.plant_id
+                     LEFT JOIN propertPropertiesies ON PlantsProperties.property_id = Properties.id
+                     LEFT JOIN Images ON PlantsProperties.id = Images.plants_property_id
+                     WHERE Plants.deleted_at IS NULL";
 
         if (!empty($query)) {
-            $countSql .= " AND plants.name LIKE ?";
+            $countSql .= " AND Plants.name LIKE ?";
             $query = "%" . $query . "%";
         }
 
@@ -129,23 +129,23 @@ class PlantController
 
         $countStmt->close();
         $sql = "SELECT 
-                    plants.id,
-                    plants.name,
-                    plants.common_names, 
-                    plants.ecology AS description, 
-                    images.imagem AS image_blob
-                FROM plants
-                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-                LEFT JOIN properties ON plantsproperties.property_id = properties.id
-                LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE plants.deleted_at IS NULL";
+                    Plants.id,
+                    Plants.name,
+                    Plants.common_names, 
+                    Plants.ecology AS description, 
+                    Images.imagem AS image_blob
+                FROM Plants
+                LEFT JOIN PlantsProperties ON Plants.id = PlantsProperties.plant_id
+                LEFT JOIN Properties ON PlantsProperties.property_id = Properties.id
+                LEFT JOIN Images ON PlantsProperties.id = Images.plants_property_id
+                WHERE Plants.deleted_at IS NULL";
 
         if (!empty($query)) {
-            $sql .= " AND plants.name LIKE ?";
+            $sql .= " AND Plants.name LIKE ?";
         }
 
-        $sql .= " GROUP BY plants.id
-                  ORDER BY images.sort_order ASC, plants.id ASC
+        $sql .= " GROUP BY Plants.id
+                  ORDER BY Images.sort_order ASC, Plants.id ASC
                   LIMIT ? OFFSET ?";
 
         $stmt = $conn->prepare($sql);
@@ -216,13 +216,13 @@ class PlantController
     {
         $conn = getConnection();
 
-        $sql = "SELECT plants.id, plants.name, images.imagem AS image_blob
-                FROM plants
-                LEFT JOIN plantsproperties ON plants.id = plantsproperties.plant_id
-                LEFT JOIN properties ON plantsproperties.property_id = properties.id
-                LEFT JOIN images ON plantsproperties.id = images.plants_property_id
-                WHERE plants.id != ? AND properties.id = 1
-                ORDER BY images.sort_order ASC, RAND() LIMIT ?";
+        $sql = "SELECT Plants.id, Plants.name, Images.imagem AS image_blob
+                FROM Plants
+                LEFT JOIN PlantsProperties ON Plants.id = PlantsProperties.plant_id
+                LEFT JOIN Properties ON PlantsProperties.property_id = Properties.id
+                LEFT JOIN Images ON PlantsProperties.id = Images.plants_property_id
+                WHERE Plants.id != ? AND Properties.id = 1
+                ORDER BY Images.sort_order ASC, RAND() LIMIT ?";
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -256,12 +256,12 @@ class PlantController
     {
         $conn = getConnection();
 
-        $sql = "SELECT images.imagem AS image_blob, images.source AS image_source, properties.name AS property_name
-                FROM images
-                JOIN plantsproperties ON images.plants_property_id = plantsproperties.id
-                JOIN properties ON plantsproperties.property_id = properties.id
-                WHERE plantsproperties.plant_id = ? AND plantsproperties.property_id = ?
-                ORDER BY images.sort_order ASC";
+        $sql = "SELECT Images.imagem AS image_blob, Images.source AS image_source, Properties.name AS property_name
+                FROM Images
+                JOIN PlantsProperties ON Images.plants_property_id = PlantsProperties.id
+                JOIN Properties ON PlantsProperties.property_id = Properties.id
+                WHERE PlantsProperties.plant_id = ? AND PlantsProperties.property_id = ?
+                ORDER BY Images.sort_order ASC";
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
@@ -296,7 +296,7 @@ class PlantController
         $conn = getConnection();
 
         $sql = "SELECT name, link
-                FROM usefullinks
+                FROM UsefulLinks
                 WHERE plant_id = ?
                 AND deleted_at IS NULL;";
 

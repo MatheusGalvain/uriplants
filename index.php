@@ -121,13 +121,13 @@
                         <p>URI Plantas oferece uma diversidade<br> gigante sobre as plantas</p>
                     </div>
                 </div>
-                <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('site//images/bg2.jpg'); ">
+                <div class="slide" style="background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('site/images/bg2.jpg'); ">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
                         <p>Leia o QR Code<br> e conheça mais sobre variadas espécies!</p>
                     </div>
                 </div>
-                <div class="slide" style="  background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('site//images/bg3.jpg');">
+                <div class="slide" style="  background-image: linear-gradient(to right, black, rgba(0, 0, 0, 0) 20%), linear-gradient(to left, black, rgba(0, 0, 0, 0) 20%),  url('site/images/bg3.jpg');">
                     <div class="slide-text">
                         <h2>URI Plantas</h2>
                         <p>Uma parceria dos cursos de Arquitetura,<br> Biologia e Ciência da Computação</p>
@@ -149,11 +149,11 @@
         </div>
         <div class="uriplantas-btn-start" style="width: 300px">
             <div class="button-title">URI Quiz</div>
-            <button onclick="window.location.href='/uriplants/quiz/quiz.php'" class="btn">Quiz Universitário</button>
+            <button onclick="window.location.href='quiz/quiz.php'" class="btn">Quiz Universitário</button>
         </div>
         <div class="uriplantas-btn-start" style="width: 300px">
             <div class="button-title">URI Admin</div>
-            <button onclick="window.location.href='/uriplants/admin'" class="btn">Painel Administrador</button>
+            <button onclick="window.location.href='admin/admin.php'" class="btn">Painel Administrador</button>
         </div>
     </div>
 

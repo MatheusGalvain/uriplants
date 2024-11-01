@@ -6,7 +6,7 @@ check_user_session();
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
 
-    $stmt = $con->prepare("SELECT user_id FROM password_resets WHERE token = ?");
+    $stmt = $con->prepare("SELECT user_id FROM PasswordResets WHERE token = ?");
     $stmt->bind_param("s", $token);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -23,11 +23,11 @@ if (isset($_GET['token'])) {
                 $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
                 $user_id = $reset['user_id'];
 
-                $stmt = $con->prepare("UPDATE users SET password = ? WHERE id = ?");
+                $stmt = $con->prepare("UPDATE Users SET password = ? WHERE id = ?");
                 $stmt->bind_param("si", $hashed_password, $user_id);
                 $stmt->execute();
 
-                $stmt = $con->prepare("DELETE FROM password_resets WHERE token = ?");
+                $stmt = $con->prepare("DELETE FROM PasswordResets WHERE token = ?");
                 $stmt->bind_param("s", $token);
                 $stmt->execute();
 
@@ -86,7 +86,7 @@ if (isset($_GET['token'])) {
                             <button class="submit-btn" name="reset_password" type="submit">Redefinir Senha</button>
                         </div>
                     </form>
-                    <a class="inittext" href="index.php">Voltar para o início</a>
+                    <a class="inittext" href="admin.php">Voltar para o início</a>
                 </div>
             </div>
         </section>

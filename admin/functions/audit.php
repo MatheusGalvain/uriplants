@@ -11,7 +11,7 @@ function log_audit($con, $table, $action_id, $changed_by, $old_value = null, $ne
     $new_value = isset($new_value) ? "'" . mysqli_real_escape_string($con, $new_value) . "'" : 'NULL';
 
 
-    $sql = "INSERT INTO auditlogs (table_name, action_id, changed_by, change_time, old_value, new_value, plant_id) 
+    $sql = "INSERT INTO AuditLogs (table_name, action_id, changed_by, change_time, old_value, new_value, plant_id) 
             VALUES ('$table', $action_id, $changed_by, NOW(), $old_value, $new_value, " . (is_numeric($plant_id) ? $plant_id : 'NULL') . ")";
 
     if (mysqli_query($con, $sql)) {

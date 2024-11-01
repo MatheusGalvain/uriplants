@@ -6,12 +6,12 @@ check_user_session();
 if (isset($_POST['add_class'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    $query = mysqli_query($con, "SELECT * FROM classes WHERE name='$name'");
+    $query = mysqli_query($con, "SELECT * FROM Classes WHERE name='$name'");
     if (mysqli_num_rows($query) > 0) {
         $error = "Uma classe com esse nome já existe.";
     } else {
 
-        $sql = "INSERT INTO classes (name) VALUES ('$name')";
+        $sql = "INSERT INTO Classes (name) VALUES ('$name')";
         if (mysqli_query($con, $sql)) {
             $success = "Classe adicionada com sucesso.";
 
@@ -35,16 +35,16 @@ if (isset($_POST['edit_class'])) {
     $id = intval($_POST['id']);
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    $query = mysqli_query($con, "SELECT * FROM classes WHERE name='$name' AND id != $id");
+    $query = mysqli_query($con, "SELECT * FROM Classes WHERE name='$name' AND id != $id");
     if (mysqli_num_rows($query) > 0) {
         $error = "Uma classe com esse nome já existe.";
     } else {
 
-        $old_query = mysqli_query($con, "SELECT name FROM classes WHERE id = $id");
+        $old_query = mysqli_query($con, "SELECT name FROM Classes WHERE id = $id");
         $old_row = mysqli_fetch_assoc($old_query);
         $old_name = $old_row['name'];
 
-        $sql = "UPDATE classes SET name = '$name' WHERE id = $id";
+        $sql = "UPDATE Classes SET name = '$name' WHERE id = $id";
         if (mysqli_query($con, $sql)) {
             $success = "Nome da classe atualizado com sucesso.";
 
@@ -65,11 +65,11 @@ if (isset($_POST['edit_class'])) {
 if (isset($_POST['delete_class'])) {
     $id = intval($_POST['id']);
 
-    $old_query = mysqli_query($con, "SELECT name FROM classes WHERE id = $id");
+    $old_query = mysqli_query($con, "SELECT name FROM Classes WHERE id = $id");
     $old_row = mysqli_fetch_assoc($old_query);
     $old_name = $old_row['name'];
 
-    $sql = "UPDATE classes SET deleted_at = NOW() WHERE id = $id";
+    $sql = "UPDATE Classes SET deleted_at = NOW() WHERE id = $id";
     if (mysqli_query($con, $sql)) {
         $success = "Classe excluída com sucesso.";
 
@@ -92,14 +92,14 @@ $limit = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$count_query = "SELECT COUNT(*) as total FROM classes WHERE deleted_at IS NULL";
+$count_query = "SELECT COUNT(*) as total FROM Classes WHERE deleted_at IS NULL";
 
 $count_result = mysqli_query($con, $count_query);
 $total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
 $total_pages = ceil($total_logs / $limit);
 
 $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
-$classesQuery = mysqli_query($con, "SELECT * FROM classes WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
+$classesQuery = mysqli_query($con, "SELECT * FROM Classes WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
 
 ?>
 

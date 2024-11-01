@@ -1,11 +1,14 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 include_once('includes/config.php');
 
 check_user_session();
 
 $userid = $_SESSION['id'];
 
-$stmt = $con->prepare("SELECT * FROM users WHERE id = ?");
+$stmt = $con->prepare("SELECT * FROM Users WHERE id = ?");
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -18,8 +21,8 @@ $stmt->close();
 <html lang="en">
 
 <head>
-    <?php include_once("includes/head.php"); ?>
     <title>Admin | Dashboard</title>
+    <?php include_once("includes/head.php"); ?>
 </head>
 
 <body class="sb-nav-fixed">

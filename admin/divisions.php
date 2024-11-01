@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 include_once('includes/config.php');
 
 check_user_session();
@@ -34,7 +37,7 @@ if (isset($_POST['add_division'])) {
 if (isset($_POST['delete_division'])) {
     $id = intval($_POST['id']);
 
-    $old_query = mysqli_query($con, "SELECT name FROM divisions WHERE id = $id");
+    $old_query = mysqli_query($con, "SELECT name FROM Divisions WHERE id = $id");
     $old_row = mysqli_fetch_assoc($old_query);
     $old_name = $old_row['name'];
 
@@ -63,7 +66,7 @@ if (isset($_POST['edit_division'])) {
     if (mysqli_num_rows($query) > 0) {
         $error = "Uma divisão com esse nome já existe.";
     } else {
-        $old_query = mysqli_query($con, "SELECT name FROM divisions WHERE id = $id");
+        $old_query = mysqli_query($con, "SELECT name FROM Divisions WHERE id = $id");
         $old_row = mysqli_fetch_assoc($old_query);
         $old_name = $old_row['name'];
 
@@ -91,7 +94,7 @@ $limit = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$count_query = "SELECT COUNT(*) AS total FROM divisions WHERE deleted_at IS NULL $searchQuery";
+$count_query = "SELECT COUNT(*) AS total FROM Divisions WHERE deleted_at IS NULL $searchQuery";
 
 $count_result = mysqli_query($con, $count_query);
 $total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;

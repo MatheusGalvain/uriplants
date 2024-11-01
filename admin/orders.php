@@ -7,12 +7,12 @@ check_user_session();
 if (isset($_POST['add_order'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    $query = mysqli_query($con, "SELECT * FROM orders WHERE name='$name'");
+    $query = mysqli_query($con, "SELECT * FROM Orders WHERE name='$name'");
     if (mysqli_num_rows($query) > 0) {
         $error = "Uma ordem com esse nome já existe.";
     } else {
 
-        $sql = "INSERT INTO orders (name) VALUES ('$name')";
+        $sql = "INSERT INTO Orders (name) VALUES ('$name')";
         if (mysqli_query($con, $sql)) {
             $success = "Ordem adicionada com sucesso.";
 
@@ -35,11 +35,11 @@ if (isset($_POST['add_order'])) {
 if (isset($_POST['delete_order'])) {
     $id = intval($_POST['id']);
 
-    $old_query = mysqli_query($con, "SELECT name FROM orders WHERE id = $id");
+    $old_query = mysqli_query($con, "SELECT name FROM Orders WHERE id = $id");
     $old_row = mysqli_fetch_assoc($old_query);
     $old_name = $old_row['name'];
 
-    $sql = "UPDATE orders SET deleted_at = NOW() WHERE id = $id";
+    $sql = "UPDATE Orders SET deleted_at = NOW() WHERE id = $id";
     if (mysqli_query($con, $sql)) {
         $success = "Ordem excluída com sucesso.";
 
@@ -60,12 +60,12 @@ if (isset($_POST['edit_order'])) {
     $id = intval($_POST['id']);
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    $old_query = mysqli_query($con, "SELECT name FROM orders WHERE id = $id");
+    $old_query = mysqli_query($con, "SELECT name FROM Orders WHERE id = $id");
     $old_row = mysqli_fetch_assoc($old_query);
     $old_name = $old_row['name'];
 
 
-    $sql = "UPDATE orders SET name = '$name' WHERE id = $id";
+    $sql = "UPDATE Orders SET name = '$name' WHERE id = $id";
     if (mysqli_query($con, $sql)) {
         $success = "Ordem atualizada com sucesso.";
 
@@ -88,14 +88,14 @@ $limit = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$count_query = "SELECT COUNT(*) as total FROM orders WHERE deleted_at IS NULL $searchQuery";
+$count_query = "SELECT COUNT(*) as total FROM Orders WHERE deleted_at IS NULL $searchQuery";
 
 $count_result = mysqli_query($con, $count_query);
 $total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
 $total_pages = ceil($total_logs / $limit);
 
 $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
-$ordersQuery = mysqli_query($con, "SELECT * FROM orders WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
+$ordersQuery = mysqli_query($con, "SELECT * FROM Orders WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
 
 ?>
 

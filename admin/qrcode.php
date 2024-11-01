@@ -13,14 +13,14 @@ if (isset($_POST['edit_url'])) {
     $id = intval($_POST['id']);
     $url = mysqli_real_escape_string($con, $_POST['url']);
 
-    $query = mysqli_query($con, "SELECT url FROM qrcode_url WHERE id = 1");
+    $query = mysqli_query($con, "SELECT url FROM QrCodeUrl WHERE id = 1");
 
     if (mysqli_num_rows($query) > 0) {
 
         $old_row = mysqli_fetch_assoc($query);
         $old_url = $old_row['url'];
 
-        $sql = "UPDATE qrcode_url SET url = '$url' WHERE id = 1";
+        $sql = "UPDATE QrCodeUrl SET url = '$url' WHERE id = 1";
         if (mysqli_query($con, $sql)) {
             $success = "URL atualizado com sucesso.";
 
@@ -37,7 +37,7 @@ if (isset($_POST['edit_url'])) {
         }
     } else {
 
-        $sql = "INSERT INTO qrcode_url (id, url) VALUES (1, '$url')";
+        $sql = "INSERT INTO QrCodeUrl (id, url) VALUES (1, '$url')";
         if (mysqli_query($con, $sql)) {
             $success = "URL inserida com sucesso.";
 
@@ -55,7 +55,7 @@ if (isset($_POST['edit_url'])) {
     }
 }
 
-$urlQuery = mysqli_query($con, "SELECT url FROM qrcode_url WHERE id = 1");
+$urlQuery = mysqli_query($con, "SELECT url FROM QrCodeUrl WHERE id = 1");
 ?>
 
 

@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = mysqli_real_escape_string($con, $_POST['email']);
         $userid = intval($_POST['userid']);
 
-        $updateQuery = "UPDATE users SET fname='$fname', email='$email' WHERE id='$userid'";
+        $updateQuery = "UPDATE Users SET fname='$fname', email='$email' WHERE id='$userid'";
         $msg = mysqli_query($con, $updateQuery);
 
         if ($msg) {
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $deleteUserId = intval($_POST['delete']);
 
         if ($deleteUserId != 1) {
-            $deleteQuery = "DELETE FROM users WHERE id='$deleteUserId'";
+            $deleteQuery = "DELETE FROM Users WHERE id='$deleteUserId'";
             $msg = mysqli_query($con, $deleteQuery);
 
             if ($msg) {
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $editUserId = isset($_GET['uid']) ? intval($_GET['uid']) : null;
 
 if ($editUserId) {
-    $query = mysqli_query($con, "SELECT * FROM users WHERE id='$editUserId'");
+    $query = mysqli_query($con, "SELECT * FROM Users WHERE id='$editUserId'");
     $editUser = mysqli_fetch_array($query);
     if (!$editUser) {
         $message = 'Usuário não encontrado.';
@@ -127,7 +127,7 @@ if ($editUserId) {
                                     </thead>
                                     <tbody>
                                         <?php
-                                        $ret = mysqli_query($con, "SELECT * FROM users");
+                                        $ret = mysqli_query($con, "SELECT * FROM Users");
                                         $cnt = 1;
                                         while ($row = mysqli_fetch_array($ret)) { ?>
                                             <tr>

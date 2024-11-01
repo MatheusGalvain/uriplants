@@ -10,7 +10,7 @@ if (isset($_POST['update'])) {
     $email = $_POST['email'];
     $userid = $_SESSION['id'];
 
-    if ($stmt = $con->prepare("UPDATE users SET fname = ?, email = ? WHERE id = ?")) {
+    if ($stmt = $con->prepare("UPDATE Users SET fname = ?, email = ? WHERE id = ?")) {
         $stmt->bind_param("ssi", $fname, $email, $userid);
         if ($stmt->execute()) {
             $message = 'Perfil atualizado com sucesso!';
@@ -44,7 +44,7 @@ if (isset($_POST['update'])) {
                     <?php
                     $userid = $_SESSION['id'];
 
-                    if ($stmt = $con->prepare("SELECT fname, email FROM users WHERE id = ?")) {
+                    if ($stmt = $con->prepare("SELECT fname, email FROM Users WHERE id = ?")) {
                         $stmt->bind_param("i", $userid);
                         $stmt->execute();
                         $stmt->bind_result($fname_db, $email_db);

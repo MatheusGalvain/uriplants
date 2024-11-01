@@ -8,7 +8,7 @@ use PHPMailer\PHPMailer\Exception;
 if (isset($_POST['recover'])) {
     $useremail = $_POST['uemail'];
 
-    $stmt = $con->prepare("SELECT id, fname FROM users WHERE email = ?");
+    $stmt = $con->prepare("SELECT id, fname FROM Users WHERE email = ?");
     $stmt->bind_param("s", $useremail);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -18,7 +18,7 @@ if (isset($_POST['recover'])) {
         $token = bin2hex(random_bytes(50));
 
         $user_id = $num['id'];
-        $stmt = $con->prepare("INSERT INTO password_resets (user_id, token) VALUES (?, ?)");
+        $stmt = $con->prepare("INSERT INTO PasswordResets (user_id, token) VALUES (?, ?)");
         $stmt->bind_param("is", $user_id, $token);
         $stmt->execute();
 
@@ -57,7 +57,7 @@ if (isset($_POST['recover'])) {
 
             $mail->send();
             $_SESSION['message'] = 'Um e-mail de recuperação de senha foi enviado para o endereço fornecido.';
-            header('Location: index.php');
+            header('Location: admin.php');
         } catch (Exception $e) {
             echo "<script>alert('Falha ao enviar o e-mail. Erro: {$mail->ErrorInfo}');</script>";
         }
@@ -104,7 +104,7 @@ if (isset($_POST['recover'])) {
             <div class="container">
                 <article class="title-admin">
                     <!-- TODO: Ajustar href -->
-                    <a class="returnbtn" href="index.php" alt="Link do Site">
+                    <a class="returnbtn" href="admin.php" alt="Link do Site">
                         <i class="fas fa-angle-left"></i>
                         Voltar para o login
                     </a>

@@ -7,11 +7,11 @@ check_user_session();
 if (isset($_POST['add_genus'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    $query = mysqli_query($con, "SELECT * FROM genus WHERE name='$name'");
+    $query = mysqli_query($con, "SELECT * FROM Genus WHERE name='$name'");
     if (mysqli_num_rows($query) > 0) {
         $error = "Um gênero com esse nome já existe.";
     } else {
-        $sql = "INSERT INTO genus (name) VALUES ('$name')";
+        $sql = "INSERT INTO Genus (name) VALUES ('$name')";
         if (mysqli_query($con, $sql)) {
             $success = "Gênero adicionado com sucesso.";
 
@@ -34,11 +34,11 @@ if (isset($_POST['add_genus'])) {
 if (isset($_POST['delete_genus'])) {
     $id = intval($_POST['id']);
 
-    $old_query = mysqli_query($con, "SELECT name FROM genus WHERE id = $id");
+    $old_query = mysqli_query($con, "SELECT name FROM Genus WHERE id = $id");
     $old_row = mysqli_fetch_assoc($old_query);
     $old_name = $old_row['name'];
 
-    $sql = "UPDATE genus SET deleted_at = NOW() WHERE id = $id";
+    $sql = "UPDATE Genus SET deleted_at = NOW() WHERE id = $id";
     if (mysqli_query($con, $sql)) {
         $success = "Gênero excluído com sucesso.";
 
@@ -59,11 +59,11 @@ if (isset($_POST['edit_genus'])) {
     $id = intval($_POST['id']);
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    $old_query = mysqli_query($con, "SELECT name FROM genus WHERE id = $id");
+    $old_query = mysqli_query($con, "SELECT name FROM Genus WHERE id = $id");
     $old_row = mysqli_fetch_assoc($old_query);
     $old_name = $old_row['name'];
 
-    $sql = "UPDATE genus SET name = '$name' WHERE id = $id";
+    $sql = "UPDATE Genus SET name = '$name' WHERE id = $id";
     if (mysqli_query($con, $sql)) {
         $success = "Gênero atualizado com sucesso.";
 
@@ -86,14 +86,14 @@ $limit = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$count_query = "SELECT COUNT(*) as total FROM genus WHERE deleted_at IS NULL $searchQuery";
+$count_query = "SELECT COUNT(*) as total FROM Genus WHERE deleted_at IS NULL $searchQuery";
 
 $count_result = mysqli_query($con, $count_query);
 $total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
 $total_pages = ceil($total_logs / $limit);
 
 $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
-$genusQuery = mysqli_query($con, "SELECT * FROM genus WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
+$genusQuery = mysqli_query($con, "SELECT * FROM Genus WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
 ?>
 
 <!DOCTYPE html>

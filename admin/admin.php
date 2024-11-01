@@ -1,11 +1,15 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 include_once('includes/config.php');
 
 if (isset($_POST['login'])) {
     $password = $_POST['password'];
     $useremail = $_POST['uemail'];
 
-    $ret = mysqli_query($con, "SELECT id, fname, password FROM users WHERE email='$useremail'");
+    $ret = mysqli_query($con, "SELECT id, fname, password FROM Users WHERE email='$useremail'");
     $num = mysqli_fetch_array($ret);
 
     if ($num > 0) {

@@ -7,12 +7,12 @@ check_user_session();
 if (isset($_POST['add_family'])) {
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    $query = mysqli_query($con, "SELECT * FROM families WHERE name='$name'");
+    $query = mysqli_query($con, "SELECT * FROM Families WHERE name='$name'");
     if (mysqli_num_rows($query) > 0) {
         $error = "Uma família com esse nome já existe.";
     } else {
 
-        $sql = "INSERT INTO families (name) VALUES ('$name')";
+        $sql = "INSERT INTO Families (name) VALUES ('$name')";
         if (mysqli_query($con, $sql)) {
             $success = "Família adicionada com sucesso.";
 
@@ -36,16 +36,16 @@ if (isset($_POST['edit_family'])) {
     $id = intval($_POST['id']);
     $name = mysqli_real_escape_string($con, $_POST['name']);
 
-    $query = mysqli_query($con, "SELECT * FROM families WHERE name='$name' AND id != $id");
+    $query = mysqli_query($con, "SELECT * FROM Families WHERE name='$name' AND id != $id");
     if (mysqli_num_rows($query) > 0) {
         $error = "Uma família com esse nome já existe.";
     } else {
 
-        $old_query = mysqli_query($con, "SELECT name FROM families WHERE id = $id");
+        $old_query = mysqli_query($con, "SELECT name FROM Families WHERE id = $id");
         $old_row = mysqli_fetch_assoc($old_query);
         $old_name = $old_row['name'];
 
-        $sql = "UPDATE families SET name = '$name' WHERE id = $id";
+        $sql = "UPDATE Families SET name = '$name' WHERE id = $id";
         if (mysqli_query($con, $sql)) {
             $success = "Nome da família atualizado com sucesso.";
 
@@ -67,11 +67,11 @@ if (isset($_POST['edit_family'])) {
 if (isset($_POST['delete_family'])) {
     $id = intval($_POST['id']);
 
-    $old_query = mysqli_query($con, "SELECT name FROM families WHERE id = $id");
+    $old_query = mysqli_query($con, "SELECT name FROM Families WHERE id = $id");
     $old_row = mysqli_fetch_assoc($old_query);
     $old_name = $old_row['name'];
 
-    $sql = "UPDATE families SET deleted_at = NOW() WHERE id = $id";
+    $sql = "UPDATE Families SET deleted_at = NOW() WHERE id = $id";
     if (mysqli_query($con, $sql)) {
         $success = "Família excluída com sucesso.";
 
@@ -94,14 +94,14 @@ $limit = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$count_query = "SELECT COUNT(*) as total FROM families WHERE deleted_at IS NULL $searchQuery";
+$count_query = "SELECT COUNT(*) as total FROM Families WHERE deleted_at IS NULL $searchQuery";
 
 $count_result = mysqli_query($con, $count_query);
 $total_logs = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
 $total_pages = ceil($total_logs / $limit);
 
 $searchQuery = $search ? "AND name LIKE '%$search%'" : "";
-$familiesQuery = mysqli_query($con, "SELECT * FROM families WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
+$familiesQuery = mysqli_query($con, "SELECT * FROM Families WHERE deleted_at IS NULL $searchQuery LIMIT $limit OFFSET $offset");
 
 ?>
 

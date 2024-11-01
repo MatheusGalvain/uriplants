@@ -24,8 +24,8 @@ if ($search !== '') {
 
 $count_query = "
     SELECT COUNT(*) AS total
-    FROM auditlogs AS al
-    LEFT JOIN plants AS p ON al.plant_id = p.id
+    FROM AuditLogs AS al
+    LEFT JOIN Plants AS p ON al.plant_id = p.id
     WHERE $where
 ";
 $count_result = mysqli_query($con, $count_query);
@@ -47,10 +47,10 @@ $query = "
         u.fname AS userName, 
         u.email AS email, 
         p.name AS plantName
-    FROM auditlogs AS al
-    INNER JOIN actions AS a ON al.action_id = a.id
-    INNER JOIN users AS u ON al.changed_by = u.id
-    LEFT JOIN plants AS p ON al.plant_id = p.id
+    FROM AuditLogs AS al
+    INNER JOIN Actions AS a ON al.action_id = a.id
+    INNER JOIN Users AS u ON al.changed_by = u.id
+    LEFT JOIN Plants AS p ON al.plant_id = p.id
     WHERE $where
     ORDER BY al.change_time DESC
     LIMIT $limit OFFSET $offset

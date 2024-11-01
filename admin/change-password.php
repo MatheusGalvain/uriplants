@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $userid = $_SESSION['id'];
 
-            if ($stmt = $con->prepare("SELECT password FROM users WHERE id = ?")) {
+            if ($stmt = $con->prepare("SELECT password FROM Users WHERE id = ?")) {
                 $stmt->bind_param("i", $userid);
                 $stmt->execute();
                 $stmt->store_result();
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-                        if ($updateStmt = $con->prepare("UPDATE users SET password = ? WHERE id = ?")) {
+                        if ($updateStmt = $con->prepare("UPDATE Users SET password = ? WHERE id = ?")) {
                             $updateStmt->bind_param("si", $newHashedPassword, $userid);
                             if ($updateStmt->execute()) {
                                 $message = 'Senha alterada com sucesso!';
