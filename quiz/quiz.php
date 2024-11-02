@@ -34,6 +34,13 @@
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../site/css/quiz.css">
+    <style>
+        .carousel-item { margin-right: 0!important;  }
+        .carousel-item-next, .carousel-item-prev, .carousel-item.active { display: flex!important; }
+        a:hover {
+            color: white!important;
+        }
+    </style>
 </head>
 
 <body>
@@ -92,8 +99,6 @@
     <div id="resultR"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const QUIZ_URL = '/uriplants/public/quiz';
-
         const carouselInner = document.getElementById('carousel-inner');
         const questionEl = document.getElementById('question');
         const optionsEl = document.getElementById('options');
@@ -153,74 +158,80 @@
         };
 
         async function fetchQuiz() {
-            try {
-                optionsEl.innerHTML = '';
-                nextButton.style.display = 'none';
-                questionEl.textContent = 'Carregando pergunta...';
+    try {
+        optionsEl.innerHTML = '';
+        nextButton.style.display = 'none';
+        questionEl.textContent = 'Carregando pergunta...';
 
-                const response = await fetch(QUIZ_URL);
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar o quiz');
-                }
-                const data = await response.json();
+        const data = await $.ajax({
+            url: 'getQuiz.php',
+            type: 'GET',
+            dataType: 'json'
+        });
 
-                questionEl.textContent = data.question;
-
-                carouselInner.innerHTML = '';
-
-                if (data.images && data.images.length > 0) {
-                    data.images.forEach((imageUri, index) => {
-                        const carouselItem = document.createElement('div');
-                        carouselItem.classList.add('carousel-item');
-                        if (index === 0) {
-                            carouselItem.classList.add('active');
-                        }
-
-                        const img = document.createElement('img');
-                        img.src = imageUri;
-                        img.alt = `Imagem ${index + 1}`;
-                        img.style.width = '400px';
-                        img.style.height = '300px';
-
-                        carouselItem.appendChild(img);
-                        carouselInner.appendChild(carouselItem);
-                    });
-                } else {
-                    const carouselItem = document.createElement('div');
-                    carouselItem.classList.add('carousel-item', 'active');
-
-                    const img = document.createElement('img');
-                    img.src = 'https://via.placeholder.com/100x100?text=Sem+Imagem';
-                    img.alt = 'Sem Imagem Disponível';
-                    img.style.width = '50px';
-                    img.style.height = 'auto';
-
-                    carouselItem.appendChild(img);
-                    carouselInner.appendChild(carouselItem);
-                }
-
-                updateCarouselControls();
-
-                correctOption = data.correct_answer;
-
-                data.options.forEach(option => {
-                    const button = document.createElement('button');
-                    button.classList.add('option-button', 'btn', 'btn-outline-secondary');
-                    button.textContent = option;
-                    button.onclick = () => handleAnswer(option, button);
-                    optionsEl.appendChild(button);
-                });
-                nextButton.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest'
-                });
-
-            } catch (error) {
-                console.error(error);
-                questionEl.textContent = 'Erro ao carregar o quiz. Tente novamente mais tarde.';
-            }
-            updateCarouselControls();
+        if (data.message) {
+            questionEl.textContent = data.message;
+            return;
         }
+
+        questionEl.textContent = data.question;
+
+        carouselInner.innerHTML = '';
+
+        if (data.images && data.images.length > 0) {
+            data.images.forEach((imageUri, index) => {
+                const carouselItem = document.createElement('div');
+                carouselItem.classList.add('carousel-item');
+                if (index === 0) {
+                    carouselItem.classList.add('active');
+                }
+
+                const img = document.createElement('img');
+                img.src = imageUri;
+                img.alt = `Imagem ${index + 1}`;
+                img.style.width = '400px';
+                img.style.height = '300px';
+
+                carouselItem.appendChild(img);
+                carouselInner.appendChild(carouselItem);
+            });
+        } else {
+            const carouselItem = document.createElement('div');
+            carouselItem.classList.add('carousel-item', 'active');
+
+            const img = document.createElement('img');
+            img.src = 'https://via.placeholder.com/100x100?text=Sem+Imagem';
+            img.alt = 'Sem Imagem Disponível';
+            img.style.width = '50px';
+            img.style.height = 'auto';
+
+            carouselItem.appendChild(img);
+            carouselInner.appendChild(carouselItem);
+        }
+
+        updateCarouselControls();
+
+        correctOption = data.correct_answer;
+
+        data.options.forEach(option => {
+            const button = document.createElement('button');
+            button.classList.add('option-button', 'btn', 'btn-outline-secondary');
+            button.textContent = option;
+            button.onclick = () => handleAnswer(option, button);
+            optionsEl.appendChild(button);
+        });
+        nextButton.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+
+    } catch (error) {
+        console.error(error);
+        questionEl.textContent = 'Erro ao carregar o quiz. Tente novamente mais tarde.';
+    }
+    updateCarouselControls();
+}
+
 
         function handleAnswer(selectedOption, button) {
             const allButtons = document.querySelectorAll('.option-button');

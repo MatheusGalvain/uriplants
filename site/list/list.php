@@ -101,11 +101,12 @@
 
             async function fetchPlants(page, limit, query) {
                 try {
-                    const response = await fetch(`http://arborea.uricer.edu.br/public/plants?limit=${limit}&page=${page}&query=${encodeURIComponent(query)}`);
-                    if (!response.ok) {
-                        throw new Error('Erro na requisição');
-                    }
-                    const data = await response.json();
+                    const data = await $.ajax({
+                        url: 'getPlants.php',
+                        type: 'GET',
+                        data: { limit: limit, page: page, query: query },
+                        dataType: 'json'
+                    });
                     return data;
                 } catch (error) {
                     console.error(error);
