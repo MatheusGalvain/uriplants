@@ -185,7 +185,7 @@ if (isset($_GET['id'])) {
                             <p class="source"><?php echo htmlspecialchars($plant['image_source']); ?></p>
                         </div>
                     </div>
-                    <div class="otherphotos-wrapp">
+                    <div class="otherphotos-wrapp scroll-container">
                         <?php
                         $propertyId = 1;
                         $plantImages = $plantController->getPlantImages($id, $propertyId);
@@ -385,7 +385,7 @@ if (isset($_GET['id'])) {
             </div>
         </section>
 
-        <section id="main-section" class="otherplants-wrapp">
+        <section id="main-section" class="otherplants-wrapp scroll-container">
             <div class="box">
                 <h1>Outras Plantas</h1>
                 <div class="otherplants">
@@ -489,7 +489,7 @@ if (isset($_GET['id'])) {
         });
 
         $('.item-menu').click(function() {
-            // Desativar todos os menus ativos quando clicar em um novo menu
+            // Desativar gis os menus ativos quando clicar em um novo menu
             $('.menu-link').removeClass('activeheader');
             // Ativar o menu sublinhado quando for clicado
             $(this).children().addClass('activeheader');

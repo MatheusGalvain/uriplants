@@ -9,7 +9,6 @@ main{
     align-items: center;
     align-content: center;
     flex-direction: column;
-    flex-wrap: wrap;
     z-index: 999;
     width: 100%;
     margin-top: 120px;
@@ -22,7 +21,6 @@ main{
     align-items: center;
     align-content: center;
     flex-direction: column;
-    flex-wrap: wrap;
     width: 100%;
     padding-top: 50px;
 }
@@ -86,12 +84,12 @@ main{
 }
 .plantinfo{
     flex-direction: column;
-    flex-wrap: wrap;
+    
 }
 #main-section .boximage{
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
+    
 
 }
 .articletitle{
@@ -100,7 +98,7 @@ main{
     align-items: flex-end;
     align-content: flex-end;
     flex-direction: column;
-    flex-wrap: wrap;
+    
 }
 .articletitle h1{
     font-size: 60px;
@@ -168,7 +166,7 @@ main{
     align-items: flex-start;
     align-content: flex-start;
     flex-direction: column;
-    flex-wrap: wrap;
+    
     max-width: 100%;
     gap: 10px;
     flex-wrap: nowrap;
@@ -191,7 +189,7 @@ main{
 }
 .navigator{
     flex-direction: column;
-    flex-wrap: wrap;
+    
     padding-top: 10px;
 }
 .navigatordiv{
@@ -280,13 +278,13 @@ button {width: 100%;}
 }
 .ecology, .taxonomy, .description, .occourrence{
     flex-direction: column;
-    flex-wrap: wrap;
+    
     padding-top: 50px;
 }
 .ecology, .taxonomy, .description, .occourrence, .box{
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
+    
     gap: 20px;
 }
 .occourrence .informationsart{
@@ -319,7 +317,7 @@ button {width: 100%;}
     align-items: flex-start;
     align-content: flex-start;
     flex-direction: column;
-    flex-wrap: wrap;
+    
     width: 100%;
     overflow: hidden;
 }
@@ -377,10 +375,6 @@ button {width: 100%;}
     overflow: auto;
     /* padding-left: 28px */
 }
-/* .slick-slide img {
-    display: block;
-    height: 120px; 
-} */
 
 .slick-slide {
     height: 120px!important;
@@ -442,7 +436,7 @@ button {width: 100%;}
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    flex-wrap: wrap;
+    
     cursor: pointer;
     text-align: center;
     border: 1px solid #18392B;
@@ -466,7 +460,7 @@ button {width: 100%;}
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    flex-wrap: wrap;
+    
     gap: 20px;
 }
 .otherplantimg {
@@ -488,7 +482,7 @@ button {width: 100%;}
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    flex-wrap: wrap;
+    
 }
 .titleothersplants h1{
     font-size: 20px;
@@ -536,16 +530,13 @@ button {width: 100%;}
 }
 
 ::-webkit-scrollbar {
+    border-radius: 6px;
     width: 12px;
+    scrollbar-color: #1d4535;
 }
-/* .source {
-    font-style: italic; 
-    overflow:hidden; 
-    margin: 0;
-    max-width: 70vw;
-} */
 
 ::-webkit-scrollbar-track {
+    border-radius: 6px;
     background: #fff;
 }
 
@@ -556,12 +547,13 @@ button {width: 100%;}
 }
 
 ::-webkit-scrollbar-thumb:hover {
+    border-radius: 6px;
     background-color: #555;
 }
 
-
 .scroll-container {
-    scrollbar-color: #1d4535 #fff;
+    border-radius: 6px;
+    scrollbar-color: #1d4535 #fff!important;
 }
 
 @media screen and (min-width: 1850px){
@@ -569,9 +561,7 @@ button {width: 100%;}
 }
 
 @media screen and (min-width: 1651px) and (max-width: 1850px) {
-    .boxheader{
-        width: 1600px;
-    }
+    .boxheader{ width: 1600px; }
     .otherphotos-wrapp{gap:15px;}
 }
 @media screen and (min-width: 1451px) and (max-width: 1650px) {
@@ -582,47 +572,29 @@ button {width: 100%;}
 }
 
 @media screen and (min-width: 1251px) and (max-width: 1450px) {
-    .boxheader{
-        width: 1200px;
-    }
-    .box{
-        width: 1200px;
-    }
-    .boximage{
-        width: 1200px;
-    }
-    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
+    .boxheader{ width: 1200px; }
+    .box{ width: 1200px; }
+    .boximage{ width: 1200px; }
+    .photosplant{flex-direction: column;  justify-content: center; align-items: center; align-content: center;}
     .photocentral{width: 850px;}
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap; max-height: 710px;}
     .otherplant{width: 280px;}
 
 }
 @media screen and (min-width: 1151px) and (max-width: 1250px) {
-    .boxheader{
-        width: 1100px;
-    }
-    .box{
-        width: 1100px;
-    }
-    .boximage{
-        width: 1100px;
-    }
-    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
+    .boxheader{ width: 1100px; }
+    .box{ width: 1100px; }
+    .boximage{ width: 1100px; }
+    .photosplant{flex-direction: column;  justify-content: center; align-items: center; align-content: center;}
     .photocentral{width: 850px;}
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap; max-height: 710px;}
     .otherplant{width: 260px;}
 }
 @media screen and (min-width: 1024px) and (max-width: 1150px) {
-    .boxheader{
-        width: 1000px;
-    }
-    .box{
-        width: 1000px;
-    }
-    .boximage{
-        width: 1000px;
-    }
-    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center;}
+    .boxheader{ width: 1000px; }
+    .box{ width: 1000px; }
+    .boximage{width: 1000px; }
+    .photosplant{flex-direction: column;  justify-content: center; align-items: center; align-content: center;}
     .photocentral{width: 850px;}
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap; max-height: 710px;}
     .otherplant{width: 240px;}
@@ -633,40 +605,32 @@ button {width: 100%;}
     #header .topheader,.bottomheader{display: none;}
     #main-menu-mobile{ display: flex; }
     .navigatorcontainer{display: none;}
-    .box{
-        width: 750px;
-    }
-    .boximage{
-        width: 100%;
-    }
+    .box { width: 750px;}
+    .boximage{width: 100%;}
     .articletitle{display: none;}
-    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 50px;}
+    .photosplant{flex-direction: column;  justify-content: center; align-items: center; align-content: center; gap: 50px;}
     .plantinfo{width: 100%;}
     .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
-    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; }
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
-    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+    .otherplants{flex-direction: row;  gap: 20px; justify-content: center;}
 }
 @media screen and (min-width: 599px) and (max-width: 799px) {
     body::after{background-image: none;}
     #header .topheader,.bottomheader{display: none;}
     #main-menu-mobile{ display: flex; }
     .navigatorcontainer{display: none;}
-    .box{
-        width: 550px;
-    }
-    .boximage{
-        width: 100%;
-    }
+    .box{ width: 550px;}
+    .boximage{ width: 100%;}
     .articletitle{display: none;}
-    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
+    .photosplant{flex-direction: column;  justify-content: center; align-items: center; align-content: center; gap: 20px;}
     .plantinfo{width: 100%;}
     .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
-    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; }
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
-    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+    .otherplants{flex-direction: row;  gap: 20px; justify-content: center;}
     footer {flex-direction: column;}
     footer .footer-left {align-items: center;flex-direction: column;gap: 30px;}
 }
@@ -675,26 +639,18 @@ button {width: 100%;}
     #header .topheader,.bottomheader{display: none;}
     #main-menu-mobile{ display: flex; }
     .navigatorcontainer{display: none;}
-    .box{
-        width: 400px;
-    }
-    .boximage{
-        width: 100%;
-    }
+    .box{ width: 400px;}
+    .boximage{ width: 100%; }
     .articletitle{display: none;}
-    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
+    .photosplant{flex-direction: column;  justify-content: center; align-items: center; align-content: center; gap: 20px;}
     .plantinfo{width: 100%;}
     .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
-    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; }
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
-    .navigatorList{flex-direction: column;
-        flex-wrap: wrap;
-        width: 70%;
-        padding: 20px;
-        gap: 20px;}
-    .navigatordiv {flex-wrap: wrap; height: auto; flex-wrap: wrap;}
-    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+    .navigatorList{flex-direction: column; width: 70%; padding: 20px; gap: 20px;}
+    .navigatordiv { height: auto; }
+    .otherplants{flex-direction: row;  gap: 20px; justify-content: center;}
     footer {flex-direction: column;}
     footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
 }
@@ -710,22 +666,22 @@ button {width: 100%;}
         width: 100%;
     }
     .articletitle{display: none;}
-    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
+    .photosplant{flex-direction: column;  justify-content: center; align-items: center; align-content: center; gap: 20px;}
     .plantinfo{width: 100%;}
     .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
-    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; }
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
     .navigatorref{font-size: 15px;}
     .informationsart h2{font-size: 18px;}
-    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center;}
+    .otherplants{flex-direction: row;  gap: 20px; justify-content: center;}
     .otherplants-wrapp h1{font-size: 40px;}
     .navigatorList{flex-direction: column;
-        flex-wrap: wrap;
+        
         width: 70%;
         padding: 20px;
         gap: 20px;}
-    .navigatordiv {flex-wrap: wrap; height: auto; flex-wrap: wrap;}
+    .navigatordiv { height: auto; }
     footer {flex-direction: column;}
     .search-form-mobile input[type="text"]{padding-right: 5px;}
     footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
@@ -744,26 +700,26 @@ button {width: 100%;}
         width: 100%;
     }
     .articletitle{display: none;}
-    .photosplant{flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; align-content: center; gap: 20px;}
+    .photosplant{flex-direction: column;  justify-content: center; align-items: center; align-content: center; gap: 20px;}
     .plantinfo{width: 100%;}
     .photocentral{width: 100%; border-radius: 0;}
     .photoImg{border-radius: 0;}
-    .photocentral-wrapp{width: 100%; flex-direction: column; flex-wrap: wrap;}
+    .photocentral-wrapp{width: 100%; flex-direction: column; }
     .otherphotos-wrapp{flex-direction: row; flex-wrap: nowrap;}
     .navigatorref{font-size: 15px;}
     .informationsart h2{font-size: 18px;}
-    .otherplants{flex-direction: row; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 246px;}
+    .otherplants{flex-direction: row;  gap: 20px; justify-content: center; max-width: 246px;}
     .otherplants-wrapp h1{font-size: 40px;}
     .navigatorList{flex-direction: column;
-        flex-wrap: wrap;
+        
         width: 70%;
         padding: 20px;
         gap: 20px;}
         @media screen and (min-width: 0px) and (max-width: 359px) {
             .navigatordiv {
-                flex-wrap: wrap;
+                
                 height: auto;
-                flex-wrap: wrap;
+                
             }
     footer {flex-direction: column;}
     footer .footer-left {align-items: center;flex-direction: column;gap: 30px; width: 100%;}
@@ -835,10 +791,7 @@ button {width: 100%;}
         max-width: 89vw;
         margin: 0 1vw;
     }
-    .navbar {
-        pointer-events: none;
-        background-color: transparent!important;
-    }
+
     .source {
         margin-left:55px;
     }
@@ -856,7 +809,7 @@ button {width: 100%;}
     .photocentral-wrapp {
         width: 100%;
         flex-direction: column;
-        flex-wrap: wrap;
+        
     }
     .otherphotos-wrapp {
         overflow: auto;
@@ -868,4 +821,12 @@ button {width: 100%;}
     .source {
         margin-left:55px;
     }
+}
+
+
+@media screen and (max-width: 1024px) { 
+    main {margin-top: 0;}
+    #navBarPrinc {display: none!important;}
+    .navbar { pointer-events: none; background-color: transparent!important;}
+    .photosplant {margin-top: 0; border-radius: 0;}
 }
