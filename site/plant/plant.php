@@ -418,7 +418,7 @@ if (isset($_GET['id'])) {
 
         <div class="btnHolder">
             <div class="go-to-listing-button">
-                <button style="margin-bottom: 10px;" onclick="window.location.href='../list/list.php'">Lista geral</button>
+                <button style="margin-bottom: 10px;" onclick="window.location.href='../list/list.php'">Lista Geral</button>
             </div>
             <div class="go-to-listing-button" style="display:block;">
                 <button style="margin-bottom: 40px;" onclick="window.location.href='../../quiz/quiz.php'">URI Quiz</button>

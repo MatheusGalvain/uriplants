@@ -221,7 +221,7 @@ class PlantController
                 LEFT JOIN PlantsProperties ON Plants.id = PlantsProperties.plant_id
                 LEFT JOIN Properties ON PlantsProperties.property_id = Properties.id
                 LEFT JOIN Images ON PlantsProperties.id = Images.plants_property_id
-                WHERE Plants.id != ? AND Properties.id = 1
+                WHERE Plants.id != ? AND Properties.id = 1 AND Plants.deleted_at IS NULL
                 ORDER BY Images.sort_order ASC, RAND() LIMIT ?";
 
         $stmt = $conn->prepare($sql);
