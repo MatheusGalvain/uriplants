@@ -27,7 +27,6 @@ function get_plant_name($con, $plant_id)
     return "Desconhecida";
 }
 
-// Para listar as propriedades que a planta pode ter
 function get_property_name($con, $property_id)
 {
 
@@ -84,6 +83,9 @@ function get_qrcode_url($con)
         return false;
     }
 }
+
+$form_data = [];
+$show_form = false;
 
 if (isset($_POST['add_plant'])) {
     // Dados da Planta
@@ -221,6 +223,8 @@ if (isset($_POST['add_plant'])) {
     } catch (Exception $e) {
         mysqli_rollback($con);
         $error = $e->getMessage();
+        $form_data = $_POST;
+        $show_form = true;
     }
 }
 
@@ -782,12 +786,12 @@ $qrcode_base_url = get_qrcode_url($con);
                         <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                     <?php } ?>
 
-                    <?php if (!$edit_mode) { ?>
+                    <?php if (!$edit_mode && !$show_form) { ?>
                         <button id="toggleForm" class="btn btn-primary mb-4">Nova Planta</button>
                     <?php } ?>
 
                     <!-- Formulário de Adição/Editação de Planta -->
-                    <div id="plant-form" class="card mb-4" style="<?php echo ($edit_mode || false) ? 'display: block;' : 'display: none;'; ?>">
+                    <div id="plant-form" class="card mb-4" style="<?php echo ($edit_mode || $show_form) ? 'display: block;' : 'display: none;'; ?>">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo $edit_mode ? 'Editar Planta' : 'Nova Planta'; ?></h5>
                             <form method="POST" action="" id="addPlantForm">
@@ -804,12 +808,12 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                 <div class="mb-3">
                                     <label for="name" class="form-label">*Nome Científico</label>
-                                    <input type="text" class="form-control" id="name" name="name" required value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['name']) : ''; ?>">
+                                    <input type="text" class="form-control" id="name" name="name" required value="<?php echo isset($form_data['name']) ? htmlspecialchars($form_data['name']) : ($edit_mode ? htmlspecialchars($edit_plant['name']) : ''); ?>">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="common_names" class="form-label">Nomes Comuns</label>
-                                    <textarea class="form-control" id="common_names" name="common_names"><?php echo $edit_mode ? htmlspecialchars($edit_plant['common_names']) : ''; ?></textarea>
+                                    <textarea class="form-control" id="common_names" name="common_names"><?php echo isset($form_data['common_names']) ? htmlspecialchars($form_data['common_names']) : ($edit_mode ? htmlspecialchars($edit_plant['common_names']) : ''); ?></textarea>
                                 </div>
 
                                 <div class="mb-3">
@@ -817,7 +821,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <select class="form-select" id="division_id" name="division_id" required>
                                         <option value="0">Selecione a divisão</option>
                                         <?php foreach ($divisions as $division) { ?>
-                                            <option value="<?php echo htmlspecialchars($division['id']); ?>" <?php echo ($edit_mode && $edit_plant['division_id'] == $division['id']) ? 'selected' : ''; ?>>
+                                            <option value="<?php echo htmlspecialchars($division['id']); ?>" <?php echo ((isset($form_data['division_id']) && $form_data['division_id'] == $division['id']) || ($edit_mode && $edit_plant['division_id'] == $division['id'])) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($division['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -829,7 +833,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <select class="form-select" id="class_id" name="class_id" required>
                                         <option value="0">Selecione a classe</option>
                                         <?php foreach ($classes as $class) { ?>
-                                            <option value="<?php echo htmlspecialchars($class['id']); ?>" <?php echo ($edit_mode && $edit_plant['class_id'] == $class['id']) ? 'selected' : ''; ?>>
+                                            <option value="<?php echo htmlspecialchars($class['id']); ?>" <?php echo ((isset($form_data['class_id']) && $form_data['class_id'] == $class['id']) || ($edit_mode && $edit_plant['class_id'] == $class['id'])) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($class['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -841,7 +845,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <select class="form-select" id="order_id" name="order_id" required>
                                         <option value="0">Selecione a ordem</option>
                                         <?php foreach ($orders as $order) { ?>
-                                            <option value="<?php echo htmlspecialchars($order['id']); ?>" <?php echo ($edit_mode && $edit_plant['order_id'] == $order['id']) ? 'selected' : ''; ?>>
+                                            <option value="<?php echo htmlspecialchars($order['id']); ?>" <?php echo ((isset($form_data['order_id']) && $form_data['order_id'] == $order['id']) || ($edit_mode && $edit_plant['order_id'] == $order['id'])) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($order['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -853,7 +857,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <select class="form-select" id="family_id" name="family_id" required>
                                         <option value="0">Selecione a família</option>
                                         <?php foreach ($families as $family) { ?>
-                                            <option value="<?php echo htmlspecialchars($family['id']); ?>" <?php echo ($edit_mode && $edit_plant['family_id'] == $family['id']) ? 'selected' : ''; ?>>
+                                            <option value="<?php echo htmlspecialchars($family['id']); ?>" <?php echo ((isset($form_data['family_id']) && $form_data['family_id'] == $family['id']) || ($edit_mode && $edit_plant['family_id'] == $family['id'])) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($family['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -865,7 +869,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <select class="form-select" id="genus_id" name="genus_id">
                                         <option value="0">Selecione o gênero</option>
                                         <?php foreach ($genus as $genusItem) { ?>
-                                            <option value="<?php echo htmlspecialchars($genusItem['id']); ?>" <?php echo ($edit_mode && $edit_plant['genus_id'] == $genusItem['id']) ? 'selected' : ''; ?>>
+                                            <option value="<?php echo htmlspecialchars($genusItem['id']); ?>" <?php echo ((isset($form_data['genus_id']) && $form_data['genus_id'] == $genusItem['id']) || ($edit_mode && $edit_plant['genus_id'] == $genusItem['id'])) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($genusItem['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -877,7 +881,7 @@ $qrcode_base_url = get_qrcode_url($con);
                                     <select class="form-select" id="region_id" name="region_id">
                                         <option value="0">Selecione a região</option>
                                         <?php foreach ($regionMap as $region) { ?>
-                                            <option value="<?php echo htmlspecialchars($region['id']); ?>" <?php echo ($edit_mode && $edit_plant['region_id'] == $region['id']) ? 'selected' : ''; ?>>
+                                            <option value="<?php echo htmlspecialchars($region['id']); ?>" <?php echo ((isset($form_data['region_id']) && $form_data['region_id'] == $region['id']) || ($edit_mode && $edit_plant['region_id'] == $region['id'])) ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($region['name']); ?>
                                             </option>
                                         <?php } ?>
@@ -886,19 +890,19 @@ $qrcode_base_url = get_qrcode_url($con);
 
                                 <div class="mb-3">
                                     <label for="species" class="form-label">Espécie</label>
-                                    <input type="text" class="form-control" id="species" name="species" value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['species']) : ''; ?>">
+                                    <input type="text" class="form-control" id="species" name="species" value="<?php echo isset($form_data['species']) ? htmlspecialchars($form_data['species']) : ($edit_mode ? htmlspecialchars($edit_plant['species']) : ''); ?>">
                                 </div>
                                 <div class="mb-3">
                                     <label for="applications" class="form-label">Aplicações</label>
-                                    <textarea class="form-control" id="applications" name="applications"><?php echo $edit_mode ? htmlspecialchars($edit_plant['applications']) : ''; ?></textarea>
+                                    <textarea class="form-control" id="applications" name="applications"><?php echo isset($form_data['applications']) ? htmlspecialchars($form_data['applications']) : ($edit_mode ? htmlspecialchars($edit_plant['applications']) : ''); ?></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="ecology" class="form-label">Ecologia</label>
-                                    <textarea class="form-control" id="ecology" name="ecology"><?php echo $edit_mode ? htmlspecialchars($edit_plant['ecology']) : ''; ?></textarea>
+                                    <textarea class="form-control" id="ecology" name="ecology"><?php echo isset($form_data['ecology']) ? htmlspecialchars($form_data['ecology']) : ($edit_mode ? htmlspecialchars($edit_plant['ecology']) : ''); ?></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="biology" class="form-label">Biologia</label>
-                                    <textarea class="form-control" id="biology" name="biology"><?php echo $edit_mode ? htmlspecialchars($edit_plant['biology']) : ''; ?></textarea>
+                                    <textarea class="form-control" id="biology" name="biology"><?php echo isset($form_data['biology']) ? htmlspecialchars($form_data['biology']) : ($edit_mode ? htmlspecialchars($edit_plant['biology']) : ''); ?></textarea>
                                 </div>
 
                                 <?php foreach ($properties_list as $property_item): ?>
@@ -917,12 +921,10 @@ $qrcode_base_url = get_qrcode_url($con);
                                             } ?>
                                         </div>
                                         <div class="mb-3 mt-2">
-                                            <!-- <label for="description_<?php echo $property_item['id']; ?>" class="form-label">Descrição</label> -->
                                             <?php
-                                            // Determina o nome do campo de descrição com base na propriedade
                                             $description_field = strtolower($property_item['name_ref']) . '_description';
                                             ?>
-                                            <textarea class="form-control" id="<?php echo $description_field; ?>" name="<?php echo $description_field; ?>"><?php echo $edit_mode ? htmlspecialchars($edit_plant[$description_field]) : ''; ?></textarea>
+                                            <textarea class="form-control" id="<?php echo $description_field; ?>" name="<?php echo $description_field; ?>"><?php echo isset($form_data[$description_field]) ? htmlspecialchars($form_data[$description_field]) : ($edit_mode ? htmlspecialchars($edit_plant[$description_field]) : ''); ?></textarea>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -948,7 +950,7 @@ $qrcode_base_url = get_qrcode_url($con);
                     </div>
 
                     <!-- Lista de Plantas Cadastradas -->
-                    <div id="plant-list" class="card mb-4" style="<?php echo ($edit_mode) ? 'display: none;' : 'display: block;'; ?>">
+                    <div id="plant-list" class="card mb-4" style="<?php echo ($edit_mode || $show_form) ? 'display: none;' : 'display: block;'; ?>">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="card-title mb-0">Plantas Cadastradas</h5>
@@ -1182,6 +1184,8 @@ $qrcode_base_url = get_qrcode_url($con);
 
             <?php if ($edit_mode && isset($edit_plant['properties'])) { ?>
                 propertiesData = <?php echo json_encode($edit_plant['properties']); ?>;
+            <?php } elseif ($show_form) { ?>
+                propertiesData = <?php echo json_encode($form_data['properties_data'] ?? []); ?>;
             <?php } ?>
 
             // Exibir e ocultar mensagens de erro
@@ -1337,11 +1341,19 @@ $qrcode_base_url = get_qrcode_url($con);
                 });
             }
 
-            // Inicializar listas de imagens existentes
-            <?php if ($edit_mode && isset($edit_plant['properties'])) { ?>
-                <?php foreach ($edit_plant['properties'] as $property_id => $images) { ?>
-                    updateImagesList(<?php echo $property_id; ?>);
-                <?php } ?>
+            // Inicializar listas de imagens existentes ou do formulário
+            <?php if (($edit_mode && isset($edit_plant['properties'])) || $show_form) { ?>
+                <?php 
+                if ($show_form && isset($form_data['properties_data'])) {
+                    foreach ($form_data['properties_data'] as $property_id => $images) { ?>
+                        propertiesData[<?php echo $property_id; ?>] = <?php echo json_encode($images); ?>;
+                        updateImagesList(<?php echo $property_id; ?>);
+                <?php }
+                } else {
+                    foreach ($edit_plant['properties'] as $property_id => $images) { ?>
+                        updateImagesList(<?php echo $property_id; ?>);
+                <?php }
+                } ?>
             <?php } ?>
 
             // Submit
@@ -1364,6 +1376,8 @@ $qrcode_base_url = get_qrcode_url($con);
             var usefullinksData = [];
             <?php if ($edit_mode && isset($edit_plant['usefullinks'])) { ?>
                 usefullinksData = <?php echo json_encode($edit_plant['usefullinks']); ?>;
+            <?php } elseif ($show_form && isset($form_data['usefullinks_data'])) { ?>
+                usefullinksData = <?php echo json_encode($form_data['usefullinks_data']); ?>;
             <?php } ?>
 
             var addLinkButton = document.getElementById('addLinkButton');
