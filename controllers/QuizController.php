@@ -21,7 +21,7 @@ class quizController
                 FROM Plants p
                 INNER JOIN PlantsProperties pp ON p.id = pp.plant_id
                 INNER JOIN Images i ON pp.id = i.plants_property_id
-                WHERE pp.property_id = 1
+                WHERE pp.property_id = 1 AND p.deleted_at IS NULL
                 GROUP BY p.id
                 HAVING COUNT(i.imagem) > 0
                 ORDER BY RAND()
@@ -68,7 +68,7 @@ class quizController
                 FROM Plants p
                 INNER JOIN PlantsProperties pp ON p.id = pp.plant_id
                 INNER JOIN Images i ON pp.id = i.plants_property_id
-                WHERE p.id != ? AND pp.property_id = 1
+                WHERE p.id != ? AND pp.property_id = 1 AND p.deleted_at IS NULL
                 GROUP BY p.id
                 HAVING COUNT(i.imagem) > 0
                 ORDER BY RAND()
