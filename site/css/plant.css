@@ -829,4 +829,5 @@ button {width: 100%;}
     #navBarPrinc {display: none!important;}
     .navbar { pointer-events: none; background-color: transparent!important;}
     .photosplant {margin-top: 0; border-radius: 0;}
+    .otherplants {flex-direction: column;}
 }
