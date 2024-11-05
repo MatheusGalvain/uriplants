@@ -1,6 +1,8 @@
 <?php
 include_once('includes/config.php');
 require 'vendor/autoload.php';
+loadEnv(__DIR__ . '/.env');
+
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -22,25 +24,23 @@ if (isset($_POST['recover'])) {
         $stmt->bind_param("is", $user_id, $token);
         $stmt->execute();
 
-        // TODO: ALTERAR PARA URL CORRETA
-        $resetLink = "http://localhost/uriplants/admin/password-reset.php?token=" . $token;
+        $resetLink =  $_ENV['PASSWORDRESETLINK'] . $token;
 
         $mail = new PHPMailer(true);
 
         try {
-            // TODO: CONFIGURAÇÕES DO SERVIDOR DE E-MAIL
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
+            $mail->Host = $_ENV['MAILHOST'];
             $mail->SMTPAuth = true;
-            $mail->Username = 'uriplantaspi3@gmail.com';   // TODO: Endereço de e-mail 
-            $mail->Password = 'xcpp nbia xrnl liyi';        // TODO: Senha de app - FAVOR NÃO DEIXAR AQUI QUEM FOR BOTAR ISSO EM PROD
+            $mail->Username = $_ENV['MAILUSER'];  
+            $mail->Password = $_ENV['MAILPW'];        
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
 
-            $mail->setFrom('uriplantaspi3@gmail.com', 'URI Plantas'); // TODO: Altera o remetente
+            $mail->setFrom($_ENV['MAILADRESS'], $_ENV['MAILNAME']); 
             $mail->addAddress($useremail, $num['fname']);
 
             // TODO: Conteúdo do e-mail - personalizar conforme necessário
