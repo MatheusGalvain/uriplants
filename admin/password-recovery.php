@@ -1,8 +1,8 @@
 <?php
 include_once('includes/config.php');
 require 'vendor/autoload.php';
-loadEnv(__DIR__ . '/.env');
-
+$envPath = realpath(__DIR__ . '/../env');
+loadEnv($envPath);
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -24,23 +24,23 @@ if (isset($_POST['recover'])) {
         $stmt->bind_param("is", $user_id, $token);
         $stmt->execute();
 
-        $resetLink =  $_ENV['PASSWORDRESETLINK'] . $token;
+        $resetLink =  getenv(['PASSWORDRESETLINK']) . $token;
 
         $mail = new PHPMailer(true);
 
         try {
             $mail->isSMTP();
-            $mail->Host = $_ENV['MAILHOST'];
+            $mail->Host = getenv(['MAILHOST']);
             $mail->SMTPAuth = true;
-            $mail->Username = $_ENV['MAILUSER'];  
-            $mail->Password = $_ENV['MAILPW'];        
+            $mail->Username = getenv(['MAILUSER']);  
+            $mail->Password = getenv(['MAILPW']);        
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
 
-            $mail->setFrom($_ENV['MAILADRESS'], $_ENV['MAILNAME']); 
+            $mail->setFrom(getenv(['MAILADRESS']), getenv(['MAILNAME'])); 
             $mail->addAddress($useremail, $num['fname']);
 
             // TODO: Conteúdo do e-mail - personalizar conforme necessário

@@ -104,6 +104,7 @@ if (isset($_GET['id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Renan Poersch, Mateus Galvain, Allan Knecht">
     <title><?php echo !empty($plantName) ? $plantName : "Detalhes da Planta"; ?> - URI Plantas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
