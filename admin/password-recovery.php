@@ -1,7 +1,7 @@
 <?php
 include_once('includes/config.php');
 require 'vendor/autoload.php';
-$envPath = realpath(__DIR__ . '/../env');
+$envPath = realpath(__DIR__ . '/../.env');
 loadEnv($envPath);
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -115,10 +115,10 @@ if (isset($_POST['recover'])) {
                 </article>
                 <form class="custom-form" method="post">
                     <div class="form-group">
-                        <input class="form-input" placeholder="Informe seu E-mail" type="email" name="uemail" id="inputEmail" required />
+                        <input class="form-input" placeholder="Informe seu e-mail" type="email" name="uemail" id="inputEmail" required />
                     </div>
                     <div class="form-actions">
-                        <button class="submit-btn" name="recover" type="submit">Enviar E-mail</button>
+                        <button class="submit-btn" name="recover" type="submit">Enviar e-mail</button>
                         <button class="sending-btn" type="button" disabled>Enviando...</button>
                     </div>
                 </form>
