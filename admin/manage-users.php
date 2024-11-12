@@ -208,24 +208,26 @@ if ($editUserId) {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', event => {
-            const datatablesSimple = document.getElementById('datatablesSimple');
-            if (datatablesSimple) {
-                new simpleDatatables.DataTable(datatablesSimple, {
-                    labels: {
-                        placeholder: "Buscar...",
-                        perPage: "por página",
-                        noRows: "Nenhum registro encontrado",
-                        info: "Mostrando {start} a {end} de {rows} entradas",
-                        noResults: "Nenhum resultado correspondente",
-                        perPageSelect: "entradas"
-                    }
-                });
-            }
-        });
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+
+        const datatablesSimple = document.getElementById('datatablesSimple');
+        if (datatablesSimple) {
+            new simpleDatatables.DataTable(datatablesSimple, {
+                labels: {
+                    placeholder: "Buscar...",
+                    perPage: "por página",
+                    noRows: "Nenhum registro encontrado",
+                    info: "Mostrando {start} a {end} de {rows} entradas",
+                    noResults: "Nenhum resultado correspondente",
+                    perPageSelect: "entradas"
+                }
+            });
+        }
 
         function showMessageModal(message) {
             const modalBody = document.getElementById('messageModalBody');
@@ -235,33 +237,30 @@ if ($editUserId) {
             modal.show();
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteButtons = document.querySelectorAll('.delete-user-btn');
-            const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-            const deleteUserIdInput = document.getElementById('deleteUserId');
-            const deleteForm = document.getElementById('deleteForm');
+        const deleteButtons = document.querySelectorAll('.delete-user-btn');
+        const confirmDeleteModalElement = document.getElementById('confirmDeleteModal');
+        const confirmDeleteModal = new bootstrap.Modal(confirmDeleteModalElement);
+        const deleteUserIdInput = document.getElementById('deleteUserId');
 
-            deleteButtons.forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
+        deleteButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
 
-                    const userId = this.getAttribute('data-user-id');
-                    deleteUserIdInput.value = userId;
+                const userId = this.getAttribute('data-user-id');
+                deleteUserIdInput.value = userId;
 
-                    confirmDeleteModal.show();
-                });
+                confirmDeleteModal.show();
             });
         });
-    </script>
 
-    <?php if (!empty($message)): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                showMessageModal('<?php echo addslashes($message); ?>');
-            });
-        </script>
-    <?php endif; ?>
+        <?php if (!empty($message)): ?>
+            showMessageModal('<?php echo addslashes($message); ?>');
+        <?php endif; ?>
+    });
+</script>
 
+
+   
 </body>
 
 </html>
