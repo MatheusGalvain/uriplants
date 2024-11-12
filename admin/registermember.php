@@ -105,7 +105,12 @@ if (isset($_POST['submit'])) {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Pode cadastrar mais usuários</th>
+                                    <th>
+                                        <div class="d-flex flex-column">
+                                            <div>Administrador:</div>
+                                            <small class="fw-normal">*Pode cadastrar novos usuários, tem acesso a todas seções</small>
+                                        </div>
+                                    </th>
                                     <td>
                                         <select class="form-control" id="is_administrator" name="is_administrator">
                                             <option value="0">Não</option>
