@@ -1,8 +1,6 @@
 <?php
 include_once('includes/config.php');
 
-check_user_session();
-
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
 
@@ -57,38 +55,49 @@ if (isset($_GET['token'])) {
     <link href="css/reset.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <link href="css/index.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
     <main>
         <section id="main-admin">
-            <div class="main-admin-right">
-                <div class="right-content">
-                    <h1>Redefinir Senha</h1>
-                    <p>Por favor, insira sua nova senha abaixo.</p>
-                </div>
-                <div id="content-btns">
-                    <?php
-                    if (isset($error_message)) {
-                        echo '<div class="alert alert-danger">' . htmlspecialchars($error_message) . '</div>';
-                    }
-                    ?>
-                    <form class="custom-form" method="post">
-                        <div class="form-group">
-                            <label class="form-label" for="password">Nova Senha:</label>
-                            <input class="form-input" type="password" name="password" id="password" required />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="confirm_password">Confirmar Nova Senha:</label>
-                            <input class="form-input" type="password" name="confirm_password" id="confirm_password" required />
-                        </div>
-                        <div class="form-actions">
-                            <button class="submit-btn" name="reset_password" type="submit">Redefinir Senha</button>
-                        </div>
-                    </form>
-                    <a class="inittext" href="admin.php">Voltar para o início</a>
+            <div class="container">
+                <article class="title-admin">
+                    <a class="returnbtn" href="admin.php" alt="Link do Site">
+                        <i class="fas fa-angle-left"></i>
+                        Voltar para o login
+                    </a>
+                    <div class="container-return">
+                        <h2>Redefinir Senha</h1>
+                        <h1>Por favor, insira sua nova senha abaixo.</p>
+                    </div>
+                    <div id="content-btns">
+                        <?php
+                        if (isset($error_message)) {
+                            echo '<div class="alert alert-danger">' . htmlspecialchars($error_message) . '</div>';
+                        }
+                        ?>
+                    </div>
+                </article>
+                <form class="custom-form" method="post">
+                    <div class="form-group">
+                        <input class="form-input" placeholder="Nova senha" type="password" name="password" id="password" required />
+                    </div>
+                    <div class="form-group">
+                        <input class="form-input" placeholder="Confirme a nova senha" type="password" name="confirm_password" id="confirm_password" required />
+                    </div>
+                    <div class="form-actions">
+                        <button class="submit-btn" name="reset_password" type="submit">Redefinir Senha</button>
+                    </div>
+                </form>
+                <div class="logo-wrapp">
+                    <div class="logocontainer">
+                        <img class="logoadmin" src="images/logouri.png" alt="Logo da URI">
+                    </div>
                 </div>
             </div>
+             
         </section>
     </main>
 </body>

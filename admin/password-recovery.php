@@ -24,8 +24,9 @@ if (isset($_POST['recover'])) {
         $stmt->bind_param("is", $user_id, $token);
         $stmt->execute();
 
-        $resetLink = 'https://arborea.uricer.edu.br/admin/password-reset.php?token=' . $token;
-
+        $resetLink = getenv('PASSWORDRESETLINK') . $token;
+        // $resetLink = 'https://arborea.uricer.edu.br/admin/password-reset.php?token=' . $token;
+        
         $mail = new PHPMailer(true);
 
         try {
