@@ -18,15 +18,24 @@ $plantImage = "../images/plant-placeholder.png";
 $plantImageAlt = "";
 $errorMessage = "";
 $familyName = "";
+$familyId = "";
 $commonName = "";
 $orderName = "";
+$orderId = "";
 $biologyName = "";
 $divisionName = "";
+$divisionId = "";
 $className = "";
+$classId = "";
 $genusName = "";
+$genusId = "";
 $speciesName = "";
 $ecologyName = "";
 $applicationsName = "";
+$regionMapImage = "";
+$regionMapSrc = "";
+$regionMapName = "";
+$regionMapDescp = "";
 
 // Inicializar array para as descrições das propriedades
 $propertyDescriptions = [
@@ -76,6 +85,12 @@ if (isset($_GET['id'])) {
             $regionMapSrc = sanitize_input($plant['region_map_source']);
             $regionMapName = sanitize_input($plant['region_map_name']);
             $regionMapDescp = sanitize_input($plant['region_map_description']);
+            $familyId = sanitize_input($plant['family_id']);
+            $oderId = sanitize_input($plant['order_id']);
+            $divisionId = sanitize_input($plant['division_id']);
+            $classId = sanitize_input($plant['class_id']);
+            $genusId = sanitize_input($plant['genus_id']);
+
             $otherPlants = $plantController->getOtherPlants($id);
 
             // Preencher as descrições das propriedades
@@ -305,42 +320,42 @@ if (isset($_GET['id'])) {
         <!-- Sessão de informações da planta que está em Taxonomia -->
         <section id="taxonomy-section" class="taxonomy" style="display: none;">
             <div class="box">
-                <?php if (!empty($plantName)): ?>
+                <?php if (!empty($plantName) && $plant['']): ?>
                     <article class="informationsart">
                         <h1>Nome</h1>
                         <h2><?php echo $plantName; ?></h2>
                     </article>
                 <?php endif; ?>
 
-                <?php if (!empty($divisionName)): ?>
+                <?php if (!empty($divisionName) && !empty($divisionId)): ?>
                     <article class="informationsart">
                         <h1>Divisão</h1>
                         <h2><?php echo $divisionName; ?></h2>
                     </article>
                 <?php endif; ?>
 
-                <?php if (!empty($className)): ?>
+                <?php if (!empty($className) && !empty($classId)): ?>
                     <article class="informationsart">
                         <h1>Classe</h1>
                         <h2><?php echo $className; ?></h2>
                     </article>
                 <?php endif; ?>
 
-                <?php if (!empty($orderName)): ?>
+                <?php if (!empty($orderName) && !empty($orderId)): ?>
                     <article class="informationsart">
                         <h1>Ordem</h1>
                         <h2><?php echo $orderName; ?></h2>
                     </article>
                 <?php endif; ?>
 
-                <?php if (!empty($familyName)): ?>
+                <?php if (!empty($familyName) && !empty($familyId)): ?>
                     <article class="informationsart">
                         <h1>Família</h1>
                         <h2><?php echo $familyName; ?></h2>
                     </article>
                 <?php endif; ?>
 
-                <?php if (!empty($genusName)): ?>
+                <?php if (!empty($genusName) && !empty($genusId)): ?>
                     <article class="informationsart">
                         <h1>Gênero</h1>
                         <h2><?php echo $genusName; ?></h2>
@@ -365,7 +380,7 @@ if (isset($_GET['id'])) {
                         <h2><?php echo $applicationsName; ?></h2>
                     </article>
                 <?php endif; ?>
-                <?php if (!empty($applicationsName)): ?>
+                <?php if (!empty($regionMapName)): ?>
                     <article class="informationsart">
                         <h1>Regiões de ocorrência</h1>
                         <h2><?php echo $regionMapName; ?></h2>
