@@ -3,6 +3,13 @@ include_once('includes/config.php');
 require 'vendor/autoload.php';
 $envPath = realpath(__DIR__ . '/../.env');
 loadEnv($envPath);
+echo '<pre style="color:white">';
+var_dump(getenv('MAILHOST'));
+var_dump(getenv('MAILUSER'));
+var_dump(getenv('MAILPW'));
+echo '</pre>';
+
+
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -24,23 +31,24 @@ if (isset($_POST['recover'])) {
         $stmt->bind_param("is", $user_id, $token);
         $stmt->execute();
 
-        $resetLink =  getenv(['PASSWORDRESETLINK']) . $token;
+        $resetLink = 'https://arborea.uricer.edu.br/admin/password-reset.php?token=' . $token;
 
         $mail = new PHPMailer(true);
 
         try {
+         
             $mail->isSMTP();
-            $mail->Host = getenv(['MAILHOST']);
+            $mail->Host = getenv('MAILHOST');
             $mail->SMTPAuth = true;
-            $mail->Username = getenv(['MAILUSER']);  
-            $mail->Password = getenv(['MAILPW']);        
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
+            $mail->Username = getenv('MAILUSER');
+            $mail->Password = getenv('MAILPW');
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+            $mail->Port = 587;      
 
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
 
-            $mail->setFrom(getenv(['MAILADRESS']), getenv(['MAILNAME'])); 
+            $mail->setFrom(getenv('MAILADRESS'), getenv('MAILNAME')); 
             $mail->addAddress($useremail, $num['fname']);
 
             // TODO: Conteúdo do e-mail - personalizar conforme necessário
