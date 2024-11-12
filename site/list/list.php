@@ -131,6 +131,7 @@
 
                     const plantName = document.createElement('h3');
                     plantName.textContent = `${plant.name}`;
+                    plantName.style.fontStyle = 'italic';
 
                     const plantDescription = document.createElement('p');
                     plantDescription.textContent = `${plant.common_names}` + ` ${plant.description}`;

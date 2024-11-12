@@ -72,6 +72,10 @@ if (isset($_GET['id'])) {
             $ecologyName = sanitize_input($plant['ecology']);
             $applicationsName = sanitize_input($plant['applications']);
             $biologyName = sanitize_input($plant['biology']);
+            $regionMapImage = sanitize_input($plant['region_map_image']);
+            $regionMapSrc = sanitize_input($plant['region_map_source']);
+            $regionMapName = sanitize_input($plant['region_map_name']);
+            $regionMapDescp = sanitize_input($plant['region_map_description']);
             $otherPlants = $plantController->getOtherPlants($id);
 
             // Preencher as descrições das propriedades
@@ -167,7 +171,7 @@ if (isset($_GET['id'])) {
         <section id="main-section" class="plantinfo">
             <div class="boximage">
                 <article class="articletitle">
-                    <h1 style="font-size: 60px!important; font-family: 'poppins'; color: black;"><?php echo $plantName; ?></h1>
+                    <h1 style="font-size: 60px!important; font-family: 'poppins'; color: black; font-style: italic!important;"><?php echo $plantName; ?></h1>
                     <h2 style="font-family: 'poppins'; color: black;">Conheça mais sobre a planta!</h2>
                 </article>
                 <section class="photosplant">
@@ -227,7 +231,7 @@ if (isset($_GET['id'])) {
                 <?php if (!empty($plantName)): ?>
                     <article class="informationsart">
                         <h1>Nome</h1>
-                        <h2><?php echo $plantName; ?></h2>
+                        <h2 style="font-style: italic;"><?php echo $plantName; ?></h2>
                     </article>
                 <?php endif; ?>
 
@@ -360,18 +364,22 @@ if (isset($_GET['id'])) {
                         <h1>Produtos e Usos</h1>
                         <h2><?php echo $applicationsName; ?></h2>
                     </article>
+                <?php endif; ?>
+                <?php if (!empty($applicationsName)): ?>
                     <article class="informationsart">
                         <h1>Regiões de ocorrência</h1>
-                        <h2><?php echo $plant["region_map_name"]; ?></h2>
+                        <h2><?php echo $regionMapName; ?></h2>
                         <div class="map-photo">
                             <article class="informationsart">
-                                <img src="data:image/jpeg;base64,<?php echo $plant['region_map_image']; ?>" alt="<?php echo $plant["region_map_name"]; ?>">
-                                <span style="font-style: italic;" class="imgfont"><?php echo $plant['region_map_source']; ?></span>
+                                <img src="data:image/jpeg;base64,<?php echo $regionMapImage ?>" alt="<?php echo $regionMapName; ?>">
+                                <span style="font-style: italic;" class="imgfont"><?php echo $regionMapSrc; ?></span>
                             </article>
                         </div>
-                        <h2><?php echo $plant["region_map_description"]; ?></h2>
+                        <h2><?php echo $regionMapDescp; ?></h2>
                     </article>
-                    <?php $u_links = $plantController->getUsefullLinks($id); ?>
+                <?php endif; ?>
+                <?php $u_links = $plantController->getUsefullLinks($id); ?>
+                <?php if (!empty($u_links)): ?>
                     <article class="informationsart">
                         <h1>Links úteis</h1>
                         <div class="content-ulinks">
@@ -404,7 +412,7 @@ if (isset($_GET['id'])) {
                                         <?php endif; ?>
                                     </div>
                                     <div class="titleothersplants">
-                                        <h1 style="white-space: break-spaces; min-height: 48px;"><?php echo sanitize_input($otherPlant['name']); ?></h1>
+                                        <h1 style="white-space: break-spaces; min-height: 48px; font-style: italic;"><?php echo sanitize_input($otherPlant['name']); ?></h1>
                                     </div>
                                 </div>
                                 <a class="btnotherplant" href="#">ACESSE</a>
