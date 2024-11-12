@@ -3,13 +3,6 @@ include_once('includes/config.php');
 require 'vendor/autoload.php';
 $envPath = realpath(__DIR__ . '/../.env');
 loadEnv($envPath);
-echo '<pre style="color:white">';
-var_dump(getenv('MAILHOST'));
-var_dump(getenv('MAILUSER'));
-var_dump(getenv('MAILPW'));
-echo '</pre>';
-
-
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
