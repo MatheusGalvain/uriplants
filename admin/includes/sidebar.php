@@ -51,11 +51,6 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="dropdown-item text-white ps-5" href="regions.php">
-                                    Regiões
-                                </a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="dropdown-item text-white ps-5" href="qrcode.php">
                                     QR Code URL
                                 </a>

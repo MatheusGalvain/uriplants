@@ -7,13 +7,11 @@ require_once('functions/audit.php');
 
 check_user_session();
 
-function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id = null)
-{
+function log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id = null) {
     log_audit($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 }
 
-function get_plant_name($con, $plant_id)
-{
+function get_plant_name($con, $plant_id) {
     $sql = "SELECT name FROM Plants WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
     if ($stmt) {
@@ -27,8 +25,7 @@ function get_plant_name($con, $plant_id)
     return "Desconhecida";
 }
 
-function get_property_name($con, $property_id)
-{
+function get_property_name($con, $property_id) {
 
     $sql = "SELECT name, name_ref FROM Properties WHERE id = ?";
     $stmt = mysqli_prepare($con, $sql);
@@ -48,13 +45,11 @@ function get_property_name($con, $property_id)
     return "Desconhecida";
 }
 
-function filter_input_data_custom($con, $data)
-{
+function filter_input_data_custom($con, $data) {
     return mysqli_real_escape_string($con, trim($data));
 }
 
-function get_qrcode_url($con)
-{
+function get_qrcode_url($con) {
     $sql = "SELECT url FROM QrCodeUrl LIMIT 1";
     $url = null;
 
@@ -96,11 +91,10 @@ if (isset($_POST['add_plant'])) {
     $order_id = intval($_POST['order_id']);
     $family_id = intval($_POST['family_id']);
     $genus_id = intval($_POST['genus_id']);
-    $region_id = intval($_POST['region_id']);
     $species = filter_input_data_custom($con, $_POST['species']);
-    $applications = filter_input_data_custom($con, $_POST['applications']);
-    $ecology = filter_input_data_custom($con, $_POST['ecology']);
-    $biology = filter_input_data_custom($con, $_POST['biology']);
+    $curious_description = filter_input_data_custom($con, $_POST['curious_description']);
+    $uses_description = filter_input_data_custom($con, $_POST['uses_description']);
+    $biology_description = filter_input_data_custom($con, $_POST['biology_description']);
     $bark_description = filter_input_data_custom($con, $_POST['bark_description'] ?? '');
     $trunk_description = filter_input_data_custom($con, $_POST['trunk_description'] ?? '');
     $leaf_description = filter_input_data_custom($con, $_POST['leaf_description'] ?? '');
@@ -108,29 +102,32 @@ if (isset($_POST['add_plant'])) {
     $fruit_description = filter_input_data_custom($con, $_POST['fruit_description'] ?? '');
     $seed_description = filter_input_data_custom($con, $_POST['seed_description'] ?? '');
 
+    $region_name = mysqli_real_escape_string($con, $_POST['region_name']);
+    $region_source = mysqli_real_escape_string($con, $_POST['region_source']);
+    $region_description = mysqli_real_escape_string($con, $_POST['region_description']);
+    
+    $region_image = null;
+    if (isset($_FILES['region_image'])) {
+        echo 'Error code: ' . $_FILES['region_image']['error']; 
+    }
+    if (isset($_FILES['region_image']) && $_FILES['region_image']['error'] == 0) {
+        $file_tmp = $_FILES['region_image']['tmp_name'];
+        if (is_uploaded_file($file_tmp)) {
+            $region_image = file_get_contents($file_tmp);
+        } 
+    } 
+
     $properties_data = isset($_POST['properties_data']) ? json_decode($_POST['properties_data'], true) : [];
 
     mysqli_begin_transaction($con);
     try {
+        print_r($_FILES);
 
-        $stmt = $con->prepare("SELECT id FROM Plants WHERE name = ? AND deleted_at IS NULL");
-        if (!$stmt) {
-            throw new Exception("Erro na preparação da consulta: " . $con->error);
-        }
-        $stmt->bind_param("s", $name);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            throw new Exception("Uma planta com esse nome já existe.");
-        }
-        $stmt->close();
-
-
-        $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, region_id, species, applications, ecology, biology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $con->prepare("INSERT INTO Plants (name, common_names, division_id, class_id, `order_id`, family_id, genus_id, species, curious_description, uses_description, biology_description, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description, region_name, region_source, region_description, region_image ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             throw new Exception("Erro na preparação da inserção: " . $con->error);
         }
-        $stmt->bind_param("ssiiiiiissssssssss", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description);
+        $stmt->bind_param("ssiiiiissssssssssssss", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $species, $curious_description, $uses_description, $biology_description, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description, $region_name, $region_source, $region_description, $region_image);
         if (!$stmt->execute()) {
             throw new Exception("Erro ao adicionar planta: " . $stmt->error);
         }
@@ -142,10 +139,10 @@ if (isset($_POST['add_plant'])) {
         $action_id = 1;
         $changed_by = $_SESSION['id'];
         $old_value = null;
-        $new_value = "Planta: $name, Espécie: $species";
+        $new_value = "Planta: $name, $common_names, $species, $curious_description, $uses_description, $biology_description, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description, $region_name, $region_source, $region_description";
         log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $plant_id);
 
-
+        // Inserir propriedades da planta
         foreach ($properties_data as $property_id => $images) {
             $property_id = intval($property_id);
 
@@ -197,8 +194,8 @@ if (isset($_POST['add_plant'])) {
             }
         }
 
+        // Inserir links úteis
         $usefullinks_data = isset($_POST['usefullinks_data']) ? json_decode($_POST['usefullinks_data'], true) : [];
-
         foreach ($usefullinks_data as $link) {
             $link_name = filter_input_data_custom($con, $link['name']);
             $link_url = filter_input_data_custom($con, $link['link']);
@@ -257,7 +254,7 @@ if (isset($_POST['delete_plant'])) {
             $stmt->close();
 
             $table = 'Plantas';
-            $action_id = 3;
+            $action_id = 2;
             $changed_by = $_SESSION['id'];
             $old_value = "Planta: $plant_name";
             $new_value = null;
@@ -284,17 +281,34 @@ if (isset($_POST['edit_plant'])) {
     $order_id = intval($_POST['order_id']);
     $family_id = intval($_POST['family_id']);
     $genus_id = intval($_POST['genus_id']);
-    $region_id = intval($_POST['region_id']);
     $species = filter_input_data_custom($con, $_POST['species']);
-    $applications = filter_input_data_custom($con, $_POST['applications']);
-    $ecology = filter_input_data_custom($con, $_POST['ecology']);
-    $biology = filter_input_data_custom($con, $_POST['biology']);
+    $curious_description = filter_input_data_custom($con, $_POST['curious_description']);
+    $uses_description = filter_input_data_custom($con, $_POST['uses_description']);
+    $biology_description = filter_input_data_custom($con, $_POST['biology_description']);
     $bark_description = filter_input_data_custom($con, $_POST['bark_description'] ?? '');
     $trunk_description = filter_input_data_custom($con, $_POST['trunk_description'] ?? '');
     $leaf_description = filter_input_data_custom($con, $_POST['leaf_description'] ?? '');
     $flower_description = filter_input_data_custom($con, $_POST['flower_description'] ?? '');
     $fruit_description = filter_input_data_custom($con, $_POST['fruit_description'] ?? '');
     $seed_description = filter_input_data_custom($con, $_POST['seed_description'] ?? '');
+
+    $region_name = mysqli_real_escape_string($con, $_POST['region_name']);
+    $region_source = mysqli_real_escape_string($con, $_POST['region_source']);
+    $region_description = mysqli_real_escape_string($con, $_POST['region_description']);
+
+    $region_image = null;
+    if (isset($_FILES['region_image']) && $_FILES['region_image']['error'] == 0) {
+        $file_tmp = $_FILES['region_image']['tmp_name'];
+        if (is_uploaded_file($file_tmp)) {
+            $region_image = file_get_contents($file_tmp);
+        } else {
+            throw new Exception("Erro no upload da imagem.");
+        }
+    } else {
+
+        $region_image = false; 
+    }
+
 
     $properties_data = isset($_POST['properties_data']) ? json_decode($_POST['properties_data'], true) : [];
 
@@ -303,7 +317,7 @@ if (isset($_POST['edit_plant'])) {
         try {
 
             $stmt = $con->prepare("
-            SELECT name, common_names, species, applications, ecology, biology, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description 
+            SELECT name, common_names, species, uses_description, curious_description, biology_description, bark_description, trunk_description, leaf_description, flower_description, fruit_description, seed_description, region_name, region_source, region_description, region_image 
             FROM Plants 
             WHERE id = ? AND deleted_at IS NULL
         ");
@@ -313,30 +327,74 @@ if (isset($_POST['edit_plant'])) {
             $stmt->bind_param("i", $edit_id);
             $stmt->execute();
 
-            $stmt->bind_result($plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description);
+            $stmt->bind_result($plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description, $plant_region_name, $plant_region_source, $plant_region_description, $plant_region_image);
 
             if (!mysqli_stmt_fetch($stmt)) {
                 throw new Exception("Planta não encontrada ou já foi excluída.");
             }
             $stmt->close();
 
-            $stmt = $con->prepare("UPDATE Plants SET name = ?, common_names = ?, division_id = ?, class_id = ?, `order_id` = ?, family_id = ?, genus_id = ?, region_id = ?, species = ?, applications = ?, ecology = ?, biology = ?, bark_description = ?, trunk_description = ?, leaf_description = ?, flower_description = ?, fruit_description = ?, seed_description = ? WHERE id = ?");
+            $stmt = $con->prepare("
+            UPDATE Plants SET 
+                name = ?, 
+                common_names = ?, 
+                division_id = ?, 
+                class_id = ?, 
+                `order_id` = ?, 
+                family_id = ?, 
+                genus_id = ?, 
+                species = ?, 
+                uses_description = ?, 
+                curious_description = ?, 
+                biology_description = ?, 
+                bark_description = ?, 
+                trunk_description = ?, 
+                leaf_description = ?, 
+                flower_description = ?, 
+                fruit_description = ?, 
+                seed_description = ?, 
+                region_name = ?, 
+                region_source = ?, 
+                region_description = ?, 
+                region_image = ? 
+            WHERE id = ?");
             if (!$stmt) {
                 throw new Exception("Erro na preparação da atualização: " . $con->error);
             }
-            $stmt->bind_param("ssiiiiiissssssssssi", $name, $common_names, $division_id, $class_id, $order_id, $family_id, $genus_id, $region_id, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description, $edit_id);
+
+            $stmt->bind_param("ssiiiiisssssssssssssss", 
+                $name, 
+                $common_names, 
+                $division_id, 
+                $class_id, 
+                $order_id, 
+                $family_id, 
+                $genus_id,  
+                $species, 
+                $uses_description, 
+                $curious_description, 
+                $biology_description, 
+                $bark_description, 
+                $trunk_description, 
+                $leaf_description, 
+                $flower_description, 
+                $fruit_description, 
+                $seed_description, 
+                $region_name, 
+                $region_source, 
+                $region_description, 
+                $region_image, 
+                $edit_id);
+
             if (!$stmt->execute()) {
                 throw new Exception("Erro ao atualizar planta: " . $stmt->error);
             }
             $stmt->close();
 
-            $table = 'Plantas';
-            $action_id = 3;
-            $changed_by = $_SESSION['id'];
-            $old_value = "Planta: $plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description";
-            $new_value = "Planta: $name, $common_names, $species, $applications, $ecology, $biology, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description";
-
-            log_audit_action($con, $table, $action_id, $changed_by, $old_value, $new_value, $edit_id);
+            // Auditoria
+            $old_value = "Planta: $plant_name, $plant_common_names, $plant_species, $plant_applications, $plant_ecology, $plant_biology, $plant_bark_description, $plant_trunk_description, $plant_leaf_description, $plant_flower_description, $plant_fruit_description, $plant_seed_description, Região: $plant_region_name, Fonte: $plant_region_source, Descrição: $plant_region_description";
+            $new_value = "Planta: $name, $common_names, $species, $uses_description, $curious_description, $biology_description, $bark_description, $trunk_description, $leaf_description, $flower_description, $fruit_description, $seed_description, Região: $region_name, Fonte: $region_source, Descrição: $region_description";
+            log_audit_action($con, 'Plantas', 3, $_SESSION['id'], $old_value, $new_value, $edit_id);
 
             $stmt = $con->prepare("SELECT property_id, id FROM PlantsProperties WHERE plant_id = ?");
             if (!$stmt) {
@@ -471,7 +529,7 @@ if (isset($_POST['edit_plant'])) {
                         $stmt->close();
 
                         $new_value = "Imagem ID: $image_id, Fonte: $source";
-                        log_audit_action($con, 'Images', 1, $changed_by, null, $new_value, $edit_id);
+                        log_audit_action($con, 'Images', 1, $_SESSION['id'], null, $new_value, $edit_id);
                     }
                 }
             }
@@ -585,7 +643,6 @@ $count_sql = "
     LEFT JOIN Orders o ON p.order_id = o.id
     LEFT JOIN Families fa ON p.family_id = fa.id
     LEFT JOIN Genus ge ON p.genus_id = ge.id
-    LEFT JOIN RegionMap re ON p.region_id = re.id
     WHERE p.deleted_at IS NULL $searchQuery
 ";
 $count_result = mysqli_query($con, $count_sql);
@@ -605,14 +662,13 @@ $offset = ($page - 1) * $items_per_page;
 
 // Busca e exibição de plantas com paginação
 $plantsQuery = mysqli_query($con, "
-    SELECT p.*, d.name as division_name, cl.name as class_name, o.name as order_name, fa.name as family_name, ge.name as genus_name, re.name as region_name
+    SELECT p.*, d.name as division_name, cl.name as class_name, o.name as order_name, fa.name as family_name, ge.name as genus_name
     FROM Plants p
     LEFT JOIN Divisions d ON p.division_id = d.id
     LEFT JOIN Classes cl ON p.class_id = cl.id
     LEFT JOIN Orders o ON p.order_id = o.id
     LEFT JOIN Families fa ON p.family_id = fa.id
     LEFT JOIN Genus ge ON p.genus_id = ge.id
-    LEFT JOIN RegionMap re ON p.region_id = re.id
     WHERE p.deleted_at IS NULL $searchQuery
     ORDER BY p.created_at DESC
     LIMIT $items_per_page OFFSET $offset
@@ -627,7 +683,6 @@ $classes = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Classes WHE
 $orders = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Orders WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
 $families = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Families WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
 $genus = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM Genus WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
-$regionMap = mysqli_fetch_all(mysqli_query($con, "SELECT id, name FROM RegionMap WHERE deleted_at IS NULL ORDER BY name ASC"), MYSQLI_ASSOC);
 
 // Lista de propriedades
 $properties_list = [
@@ -635,8 +690,11 @@ $properties_list = [
     ['id' => 3, 'name' => 'Casca', 'name_ref' => 'bark'],
     ['id' => 4, 'name' => 'Folha', 'name_ref' => 'leaf'],
     ['id' => 5, 'name' => 'Flor', 'name_ref' => 'flower'],
-    ['id' => 6, 'name' => 'Fruta', 'name_ref' => 'fruit'],
-    ['id' => 7, 'name' => 'Semente', 'name_ref' => 'seed']
+    ['id' => 6, 'name' => 'Fruto', 'name_ref' => 'fruit'],
+    ['id' => 7, 'name' => 'Semente', 'name_ref' => 'seed'],
+    ['id' => 8, 'name' => 'Biologia', 'name_ref' => 'biology'],
+    ['id' => 9, 'name' => 'Curiosidades', 'name_ref' => 'curious'],
+    ['id' => 10, 'name' => 'Produtos e Usos', 'name_ref' => 'uses']
 ];
 
 // Verificar se está no modo de edição
@@ -647,14 +705,13 @@ if (isset($_GET['edit'])) {
     if ($edit_id > 0) {
         $stmt = $con->prepare("
             SELECT p.*, d.name as division_name, cl.name as class_name, o.name as order_name, 
-                   fa.name as family_name, ge.name as genus_name, re.name as region_name
+                   fa.name as family_name, ge.name as genus_name
             FROM Plants p
             LEFT JOIN Divisions d ON p.division_id = d.id
             LEFT JOIN Classes cl ON p.class_id = cl.id
             LEFT JOIN Orders o ON p.order_id = o.id
             LEFT JOIN Families fa ON p.family_id = fa.id
             LEFT JOIN Genus ge ON p.genus_id = ge.id
-            LEFT JOIN RegionMap re ON p.region_id = re.id
             WHERE p.id = ? AND p.deleted_at IS NULL
         ");
         if ($stmt) {
@@ -794,7 +851,7 @@ $qrcode_base_url = get_qrcode_url($con);
                     <div id="plant-form" class="card mb-4" style="<?php echo ($edit_mode || $show_form) ? 'display: block;' : 'display: none;'; ?>">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo $edit_mode ? 'Editar Planta' : 'Nova Planta'; ?></h5>
-                            <form method="POST" action="" id="addPlantForm">
+                            <form method="POST" action="" id="addPlantForm" enctype="multipart/form-data">
                                 <?php if ($edit_mode) { ?>
                                     <input type="hidden" name="plant_id" value="<?php echo htmlspecialchars($edit_plant['id']); ?>">
                                 <?php } ?>
@@ -877,32 +934,8 @@ $qrcode_base_url = get_qrcode_url($con);
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="region_id" class="form-label">Região</label>
-                                    <select class="form-select" id="region_id" name="region_id">
-                                        <option value="0">Selecione a região</option>
-                                        <?php foreach ($regionMap as $region) { ?>
-                                            <option value="<?php echo htmlspecialchars($region['id']); ?>" <?php echo ((isset($form_data['region_id']) && $form_data['region_id'] == $region['id']) || ($edit_mode && $edit_plant['region_id'] == $region['id'])) ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($region['name']); ?>
-                                            </option>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-
-                                <div class="mb-3">
                                     <label for="species" class="form-label">Espécie</label>
                                     <input type="text" class="form-control" id="species" name="species" value="<?php echo isset($form_data['species']) ? htmlspecialchars($form_data['species']) : ($edit_mode ? htmlspecialchars($edit_plant['species']) : ''); ?>">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="applications" class="form-label">Aplicações</label>
-                                    <textarea class="form-control" id="applications" name="applications"><?php echo isset($form_data['applications']) ? htmlspecialchars($form_data['applications']) : ($edit_mode ? htmlspecialchars($edit_plant['applications']) : ''); ?></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="ecology" class="form-label">Ecologia</label>
-                                    <textarea class="form-control" id="ecology" name="ecology"><?php echo isset($form_data['ecology']) ? htmlspecialchars($form_data['ecology']) : ($edit_mode ? htmlspecialchars($edit_plant['ecology']) : ''); ?></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="biology" class="form-label">Biologia</label>
-                                    <textarea class="form-control" id="biology" name="biology"><?php echo isset($form_data['biology']) ? htmlspecialchars($form_data['biology']) : ($edit_mode ? htmlspecialchars($edit_plant['biology']) : ''); ?></textarea>
                                 </div>
 
                                 <?php foreach ($properties_list as $property_item): ?>
@@ -929,6 +962,50 @@ $qrcode_base_url = get_qrcode_url($con);
                                     </div>
                                 <?php endforeach; ?>
 
+                                <div class="mb-4">
+                                <h4>Região</h4>
+
+                                <div class="mb-3">
+                                    <label for="region_name" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="region_name" name="region_name" 
+                                        value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['region_name']) : ''; ?>" >
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="region_source" class="form-label">Fonte</label>
+                                    <input type="text" class="form-control" id="region_source" name="region_source" 
+                                        value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['region_source']) : ''; ?>" >
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="region_description" class="form-label">Descrição</label>
+                                    <input type="text" class="form-control" id="region_description" name="region_description" 
+                                        value="<?php echo $edit_mode ? htmlspecialchars($edit_plant['region_description']) : ''; ?>" >
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="region_image" class="form-label">Imagem</label>
+
+                                    <!-- Se a imagem existir no banco, exibe ela -->
+                                    <?php if ($edit_mode && !empty($edit_plant['region_image'])): ?>
+                                        <div>
+                                            <h5>Atual</h5>
+                                            <img id="region_image_current" src="data:image/jpeg;base64,<?php echo base64_encode($edit_plant['region_image']); ?>" alt="Imagem da Região" style="max-width: 200px;">
+                                            <div class="mt-2">
+                                                
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <!-- Campo de upload de nova imagem -->
+                                    <div class="mt-3">
+                                        <input type="file" class="form-control" id="region_image" name="region_image" accept="image/*">
+                                        <div id="region_image_preview" class="mt-2">
+                                            <!-- Previsão da nova imagem -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                                 <div class="mb-4">
                                     <h4>Links Úteis</h4>
                                     <button type="button" class="btn btn-primary btn-sm" id="addLinkButton">Adicionar Link</button>
@@ -1097,7 +1174,6 @@ $qrcode_base_url = get_qrcode_url($con);
         </div>
     </div>
 
-
     <!-- Modal de Confirmação de Exclusão -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel">
         <div class="modal-dialog">
@@ -1162,6 +1238,28 @@ $qrcode_base_url = get_qrcode_url($con);
             });
         });
     </script>
+
+<script>
+    document.getElementById('region_image').addEventListener('change', function (event) {
+        const preview = document.getElementById('region_image_preview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.innerHTML = '<img src="' + e.target.result + '" alt="Pré-visualização" style="max-width: 200px;">';
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '';
+        }
+    });
+</script>
+
+
+
 
     <!-- Imagens -->
     <script>

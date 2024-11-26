@@ -44,7 +44,10 @@ $propertyDescriptions = [
     'leaf' => '',
     'flower' => '',
     'fruit' => '',
-    'seed' => ''
+    'seed' => '',
+    'biology' => '',
+    'curious' => '',
+    'uses' => ''
 ];
 
 // Lista de propriedades
@@ -53,8 +56,11 @@ $properties_list = [
     ['id' => 3, 'name' => 'Casca', 'name_ref' => 'bark'],
     ['id' => 4, 'name' => 'Folha', 'name_ref' => 'leaf'],
     ['id' => 5, 'name' => 'Flor', 'name_ref' => 'flower'],
-    ['id' => 6, 'name' => 'Fruta', 'name_ref' => 'fruit'],
-    ['id' => 7, 'name' => 'Semente', 'name_ref' => 'seed']
+    ['id' => 6, 'name' => 'Fruto', 'name_ref' => 'fruit'],
+    ['id' => 7, 'name' => 'Semente', 'name_ref' => 'seed'],
+    ['id' => 8, 'name' => 'Biologia', 'name_ref' => 'biology'],
+    ['id' => 9, 'name' => 'Curiosidades', 'name_ref' => 'curious'],
+    ['id' => 10, 'name' => 'Produtos e Usos', 'name_ref' => 'uses']
 ];
 
 // Verificar se o parâmetro 'id' foi passado na URL
@@ -64,7 +70,7 @@ if (isset($_GET['id'])) {
         $plant = $plantController->getSinglePlant($id);
         if (isset($plant['id'])) {
             $plantName = sanitize_input($plant['name']);
-            $plantDescription = sanitize_input($plant['ecology']);
+            $plantDescription = sanitize_input($plant['curious_description']);
             if (!empty($plant['image_blob'])) {
                 $plantImage = 'data:image/jpeg;base64,' . $plant['image_blob'];
             }
@@ -78,9 +84,9 @@ if (isset($_GET['id'])) {
             $genusName = sanitize_input($plant['genus_name']);
             $speciesName = sanitize_input($plant['species']);
             $commonName = sanitize_input($plant['common_names']);
-            $ecologyName = sanitize_input($plant['ecology']);
-            $applicationsName = sanitize_input($plant['applications']);
-            $biologyName = sanitize_input($plant['biology']);
+            $ecologyName = sanitize_input($plant['curious_description']);
+            $applicationsName = sanitize_input($plant['uses_description']);
+            $biologyName = sanitize_input($plant['biology_description']);
             $regionMapImage = sanitize_input($plant['region_map_image']);
             $regionMapSrc = sanitize_input($plant['region_map_source']);
             $regionMapName = sanitize_input($plant['region_map_name']);
@@ -100,7 +106,10 @@ if (isset($_GET['id'])) {
                 'leaf' => sanitize_input($plant['leaf_description']),
                 'flower' => sanitize_input($plant['flower_description']),
                 'fruit' => sanitize_input($plant['fruit_description']),
-                'seed' => sanitize_input($plant['seed_description'])
+                'seed' => sanitize_input($plant['seed_description']),
+                'biology' => sanitize_input($plant['biology_description']),
+                'curious' => sanitize_input($plant['curious_description']),
+                'uses' => sanitize_input($plant['uses_description'])
             ];
         } else {
             $errorMessage = isset($plant['message']) ? $plant['message'] : "Erro desconhecido.";
@@ -234,7 +243,7 @@ if (isset($_GET['id'])) {
                     <ul class="navigatorList">
                         <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('description')">Descrição</a></li>
                         <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('taxonomy')">Taxonomia</a></li>
-                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('ecology')">Ecologia</a></li>
+                        <li><a class="navigatorref" href="javascript:void(0);" onclick="showSection('ecology')">Curiosidades</a></li>
                     </ul>
                 </div>
             </div>
@@ -257,19 +266,6 @@ if (isset($_GET['id'])) {
                     </article>
                 <?php endif; ?>
 
-                <?php if (!empty($plantDescription)): ?>
-                    <article class="informationsart">
-                        <h1>Descrição</h1>
-                        <h2><?php echo $plantDescription; ?></h2>
-                    </article>
-                <?php endif; ?>
-
-                <?php if (!empty($biologyName)): ?>
-                    <article class="informationsart">
-                        <h1>Forma Biológica</h1>
-                        <h2><?php echo $biologyName; ?></h2>
-                    </article>
-                <?php endif; ?>
 
                 <?php
                 // Loop pelas propriedades para exibir as descrições e imagens
@@ -280,7 +276,7 @@ if (isset($_GET['id'])) {
 
                     $description = $propertyDescriptions[$propertyRef];
 
-                    if (!empty($description)) {
+                    if (!empty($description) && $propertyId !== 9 &&  $propertyId !== 10 ) {
                 ?>
                         <article class="informationsart">
                             <h1><?php echo $propertyName; ?></h1>
@@ -320,67 +316,120 @@ if (isset($_GET['id'])) {
         <!-- Sessão de informações da planta que está em Taxonomia -->
         <section id="taxonomy-section" class="taxonomy" style="display: none;">
             <div class="box">
-                <?php if (!empty($plantName) && $plant['']): ?>
-                    <article class="informationsart">
-                        <h1>Nome</h1>
-                        <h2><?php echo $plantName; ?></h2>
+                <?php if (!empty($plantName)): ?>
+                        <article class="informationsart">
+                            <h1>Nome</h1>
+                        <h2 style="font-style: italic;"><?php echo $plantName; ?></h2>
                     </article>
                 <?php endif; ?>
 
                 <?php if (!empty($divisionName) && !empty($divisionId)): ?>
                     <article class="informationsart">
                         <h1>Divisão</h1>
-                        <h2><?php echo $divisionName; ?></h2>
+                        <h2 style="font-style: italic;"><?php echo $divisionName; ?></h2>
                     </article>
                 <?php endif; ?>
 
                 <?php if (!empty($className) && !empty($classId)): ?>
                     <article class="informationsart">
                         <h1>Classe</h1>
-                        <h2><?php echo $className; ?></h2>
+                        <h2 style="font-style: italic;"><?php echo $className; ?></h2>
                     </article>
                 <?php endif; ?>
 
                 <?php if (!empty($orderName) && !empty($orderId)): ?>
                     <article class="informationsart">
                         <h1>Ordem</h1>
-                        <h2><?php echo $orderName; ?></h2>
+                        <h2 style="font-style: italic;"><?php echo $orderName; ?></h2>
                     </article>
                 <?php endif; ?>
 
                 <?php if (!empty($familyName) && !empty($familyId)): ?>
                     <article class="informationsart">
                         <h1>Família</h1>
-                        <h2><?php echo $familyName; ?></h2>
+                        <h2 style="font-style: italic;"><?php echo $familyName; ?></h2>
                     </article>
                 <?php endif; ?>
 
                 <?php if (!empty($genusName) && !empty($genusId)): ?>
                     <article class="informationsart">
                         <h1>Gênero</h1>
-                        <h2><?php echo $genusName; ?></h2>
+                        <h2 style="font-style: italic;"><?php echo $genusName; ?></h2>
                     </article>
                 <?php endif; ?>
 
                 <?php if (!empty($speciesName)): ?>
                     <article class="informationsart">
                         <h1>Espécie</h1>
-                        <h2><?php echo $speciesName; ?></h2>
+                        <h2 style="font-style: italic;"><?php echo $speciesName; ?></h2>
                     </article>
                 <?php endif; ?>
             </div>
         </section>
 
-        <!-- Sessão de informações da planta que está em Ecologia -->
+        <!-- Sessão de informações da planta que está em Curiosidades -->
         <section id="ecology-section" class="ecology" style="display: none;">
             <div class="box">
+
+                <!-- <?php if (!empty($plantDescription)): ?>
+                    <article class="informationsart">
+                        <h1>Curiosidades</h1>
+                        <h2><?php echo $plantDescription; ?></h2>
+                    </article>
+                <?php endif; ?>
+
                 <?php if (!empty($applicationsName)): ?>
                     <article class="informationsart">
                         <h1>Produtos e Usos</h1>
                         <h2><?php echo $applicationsName; ?></h2>
                     </article>
-                <?php endif; ?>
-                <?php if (!empty($regionMapName)): ?>
+                <?php endif; ?> -->
+
+                <?php
+                // Loop pelas propriedades para exibir as descrições e imagens
+                foreach ($properties_list as $property) {
+                    $propertyId = $property['id'];
+                    $propertyName = $property['name'];
+                    $propertyRef = $property['name_ref'];
+
+                    $description = $propertyDescriptions[$propertyRef];
+
+                    if (!empty($description) && $propertyId === 9 || $propertyId === 10 ) {
+                ?>
+                        <article class="informationsart">
+                            <h1><?php echo $propertyName; ?></h1>
+                            <h2><?php echo $description; ?></h2>
+                            <div class="photos-wrapp scroll-container">
+                                <?php
+                                // Obter imagens para esta propriedade
+                                $plantImages = $plantController->getPlantImages($id, $propertyId);
+
+                                if (!empty($plantImages)):
+                                    foreach ($plantImages as $image):
+                                        if ($image['image_blob'] !== base64_encode($plantImage)):
+                                ?>
+                                            <a
+                                                data-title="<div class='lightbox-title'><?php echo sanitize_input($image['property_name']); ?></div><div class='lightbox-source'>
+                                                <a style='color:white; font-style: italic;' target='_BLANK'><?php echo htmlspecialchars($image['image_source']); ?></div>"
+                                                class="photoproperty-wrapp"
+                                                href="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
+                                                data-lightbox="<?php echo sanitize_input($plantName); ?>">
+                                                <img class="photopropertyImg" src="data:image/jpeg;base64,<?php echo $image['image_blob']; ?>"
+                                                    alt="<?php echo sanitize_input($plantName); ?>">
+                                            </a>
+                                <?php
+                                        endif;
+                                    endforeach;
+                                endif;
+                                ?>
+                            </div>
+                        </article>
+                <?php
+                    }
+                }
+                ?>
+
+                <?php if (!empty($regionMapName) || !empty($regionMapDescp) || !empty($regionMapImage)): ?>
                     <article class="informationsart">
                         <h1>Regiões de ocorrência</h1>
                         <h2><?php echo $regionMapName; ?></h2>

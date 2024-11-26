@@ -205,8 +205,8 @@ CREATE TABLE `Plants` (
   `Genus_id` int(11) DEFAULT NULL,
   `species` varchar(255) DEFAULT NULL,
   `region_id` int(11) DEFAULT NULL,
-  `applications` text DEFAULT NULL,
-  `ecology` text DEFAULT NULL,
+  `uses_description` text DEFAULT NULL,
+  `curious_description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `deleted_at` timestamp NULL DEFAULT NULL,
   `bark_description` text DEFAULT NULL,
@@ -215,7 +215,7 @@ CREATE TABLE `Plants` (
   `flower_description` text DEFAULT NULL,
   `fruit_description` text DEFAULT NULL,
   `seed_description` text DEFAULT NULL,
-  `biology` text DEFAULT NULL
+  `biology_description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -255,7 +255,7 @@ INSERT INTO `Properties` (`id`, `name`, `ordenation`, `name_ref`) VALUES
 (3, 'Casca', 2, 'bark'),
 (4, 'Folha', 3, 'leaf'),
 (5, 'Flor', 4, 'flower'),
-(6, 'Fruta', 5, 'fruit'),
+(6, 'Fruto', 5, 'fruit'),
 (7, 'Semente', 6, 'seed');
 
 -- --------------------------------------------------------

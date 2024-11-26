@@ -20,16 +20,16 @@ class PlantController
 
         $sql = "SELECT Plants.id, Plants.name, Plants.common_names, Plants.bark_description, Plants.trunk_description, 
                 Plants.leaf_description, Plants.flower_description, Plants.fruit_description, Plants.seed_description, 
-                Plants.biology, Plants.species, Plants.applications, Plants.ecology, Plants.created_at, 
+                Plants.biology_description, Plants.species, Plants.uses_description, Plants.curious_description, Plants.created_at, 
                 Plants.deleted_at, 
                 Families.name AS family_name, Families.id AS family_id, 
                 Orders.name AS order_name, Orders.id AS order_id, 
                 Divisions.name AS division_name, Divisions.id AS division_id, 
                 Classes.name AS class_name, Classes.id AS class_id, 
                 Genus.name AS genus_name, Genus.id AS genus_id, 
-                RegionMap.id AS region_map_id, RegionMap.source AS region_map_source, 
-                RegionMap.description AS region_map_description, RegionMap.imagem AS region_map_image,
-                RegionMap.name AS region_map_name,
+                Plants.region_source AS region_map_source, 
+                Plants.region_description AS region_map_description, Plants.region_image AS region_map_image,
+                Plants.region_name AS region_map_name,
                 Properties.name AS property_name,
                 Images.id AS image_id, Images.imagem AS image_blob, Images.source AS image_source
                 FROM Plants
@@ -38,7 +38,6 @@ class PlantController
                 LEFT JOIN Divisions ON Plants.division_id = Divisions.id
                 LEFT JOIN Classes ON Plants.class_id = Classes.id
                 LEFT JOIN Genus ON Plants.genus_id = Genus.id
-                LEFT JOIN RegionMap ON Plants.region_id = RegionMap.id
                 LEFT JOIN PlantsProperties ON Plants.id = PlantsProperties.plant_id
                 LEFT JOIN Properties ON PlantsProperties.property_id = Properties.id
                 LEFT JOIN Images ON PlantsProperties.id = Images.plants_property_id
@@ -136,7 +135,7 @@ class PlantController
                     Plants.id,
                     Plants.name,
                     Plants.common_names, 
-                    Plants.ecology AS description, 
+                    Plants.curious_description AS description, 
                     Images.imagem AS image_blob
                 FROM Plants
                 LEFT JOIN PlantsProperties ON Plants.id = PlantsProperties.plant_id
