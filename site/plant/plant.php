@@ -429,15 +429,17 @@ if (isset($_GET['id'])) {
                 }
                 ?>
 
-                <?php if (!empty($regionMapName) || !empty($regionMapDescp) || !empty($regionMapImage)): ?>
+                <?php if (!empty($regionMapName) || !empty($regionMapDescp)): ?>
                     <article class="informationsart">
                         <h1>Regiões de ocorrência</h1>
                         <h2><?php echo $regionMapName; ?></h2>
                         <div class="map-photo">
-                            <article class="informationsart">
-                                <img src="data:image/jpeg;base64,<?php echo $regionMapImage ?>" alt="<?php echo $regionMapName; ?>">
-                                <span style="font-style: italic;" class="imgfont"><?php echo $regionMapSrc; ?></span>
-                            </article>
+                        <?php if (!empty($regionMapImage)): ?>
+                                <article class="informationsart">
+                                    <img src="data:image/jpeg;base64,<?php echo $regionMapImage ?>" alt="<?php echo $regionMapName; ?>">
+                                    <span style="font-style: italic;" class="imgfont"><?php echo $regionMapSrc; ?></span>
+                                </article>
+                            <?php endif; ?>
                         </div>
                         <h2><?php echo $regionMapDescp; ?></h2>
                     </article>

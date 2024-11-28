@@ -1,10 +1,5 @@
 <?php
 function loadEnv($filePath) {
-    if (!file_exists($filePath)) {
-        echo "Arquivo .env não encontrado em: $filePath";
-        return;
-    }
-
     $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         if (strpos(trim($line), '#') === 0) {
